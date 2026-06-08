@@ -25,3 +25,4 @@ dist-ssr
 
 # Claude Code session snapshot (local-only)
 claude-session.txt
+CLAUDE.md

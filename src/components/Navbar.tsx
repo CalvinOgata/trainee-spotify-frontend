@@ -1,6 +1,11 @@
 import { Spotify, Home, Search, X, Bell, Download } from './icons'
 
-function Navbar() {
+type NavbarProps = {
+  query: string
+  onQueryChange: (q: string) => void
+}
+
+function Navbar({ query, onQueryChange }: NavbarProps) {
   return (
     <header className="flex items-center justify-between bg-black p-3 border-b border-neutral-800">
       <div className="flex items-center">
@@ -11,11 +16,27 @@ function Navbar() {
           <Home strokeWidth={1} />
         </button>
         <div className="flex h-9 w-[355px] items-center justify-between rounded-2xl border border-white bg-[#1F1F1F] px-3.5 text-white">
-          <div className="flex items-center gap-2">
-            <Search className="h-4 w-[15px] text-[#B3B3B3]" strokeWidth={1.5} />
-            <span className="text-xs font-normal text-white">touch</span>
+          <div className="flex flex-1 items-center gap-2 overflow-hidden">
+            <Search className="h-4 w-[15px] shrink-0 text-[#B3B3B3]" strokeWidth={1.5} />
+            <input
+              type="text"
+              value={query}
+              onChange={(e) => onQueryChange(e.target.value)}
+              placeholder="O que você quer ouvir?"
+              aria-label="Pesquisar"
+              className="flex-1 bg-transparent text-xs font-normal text-white placeholder:text-[#B3B3B3] outline-none"
+            />
           </div>
-          <X className="h-[12.59px] w-[12.29px] text-[#B3B3B3]" strokeWidth={1} />
+          {query && (
+            <button
+              type="button"
+              onClick={() => onQueryChange('')}
+              aria-label="Limpar busca"
+              className="shrink-0 text-[#B3B3B3] hover:text-white"
+            >
+              <X className="h-[12.59px] w-[12.29px]" strokeWidth={1} />
+            </button>
+          )}
         </div>
       </div>
       <div className="flex h-9 items-center gap-8">

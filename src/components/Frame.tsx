@@ -54,7 +54,16 @@ function Pill({ children, active }: { children: React.ReactNode; active?: boolea
   )
 }
 
-function Frame() {
+type FrameProps = { query: string }
+
+function Frame({ query }: FrameProps) {
+  const q = query.trim().toLowerCase()
+  const filteredResults = q
+    ? results.filter(
+        (r) => r.title.toLowerCase().includes(q) || r.sub.toLowerCase().includes(q),
+      )
+    : results
+
   return (
     <div className="flex justify-center gap-2 overflow-hidden py-[14.5px]">
       {/* Library ────────────────────────────────────────────────── */}
@@ -94,7 +103,7 @@ function Frame() {
       {/* Main section (search results) ──────────────────────────── */}
       <main className="flex h-[927px] w-[1268px] flex-col gap-8 overflow-hidden rounded-lg bg-gradient-to-b from-[#202020] to-[#121212] pt-6 pr-5 pb-6 pl-5">
         <ul className="flex flex-col gap-2">
-          {results.map((r, i) => (
+          {filteredResults.map((r, i) => (
             <li key={i} className="grid grid-cols-[64px_1fr_auto_auto_auto] items-center gap-4 rounded-md px-2 py-1 hover:bg-neutral-900">
               <div className="h-16 w-16 rounded bg-neutral-700" />
               <div className="min-w-0">

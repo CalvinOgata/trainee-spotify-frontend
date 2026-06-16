@@ -4,29 +4,38 @@ export const Spotify = () => (
   </svg>
 )
 
-export const Home = () => (
-  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="h-5 w-5">
+type IconProps = { className?: string; strokeWidth?: number }
+
+export const Home = ({ className = 'h-5 w-5', strokeWidth = 2 }: IconProps) => (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={strokeWidth} className={className}>
     <path d="M3 11 12 3l9 8v10h-6v-7H9v7H3z" />
   </svg>
 )
 
-export const Search = () => (
-  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="h-4 w-4">
+export const Search = ({ className = 'h-4 w-4', strokeWidth = 2 }: IconProps) => (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={strokeWidth} className={className}>
     <circle cx="11" cy="11" r="7" />
     <path d="m20 20-3.5-3.5" />
   </svg>
 )
 
-export const X = () => (
-  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="h-4 w-4">
+export const X = ({ className = 'h-4 w-4', strokeWidth = 2 }: IconProps) => (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={strokeWidth} className={className}>
     <path d="M6 6l12 12M18 6 6 18" />
   </svg>
 )
 
-export const Bell = () => (
-  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="h-5 w-5">
+export const Bell = ({ className = 'h-5 w-5', strokeWidth = 2 }: IconProps) => (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={strokeWidth} className={className}>
     <path d="M6 8a6 6 0 1 1 12 0c0 5 2 6 2 6H4s2-1 2-6Z" />
     <path d="M10 20a2 2 0 0 0 4 0" />
+  </svg>
+)
+
+export const Download = ({ className = 'h-3 w-3', strokeWidth = 2 }: IconProps) => (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={strokeWidth} className={className}>
+    <path d="M12 4v11m0 0-5-5m5 5 5-5" />
+    <path d="M4 20h16" />
   </svg>
 )
 

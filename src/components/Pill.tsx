@@ -1,10 +1,15 @@
-type PillProps = { children: React.ReactNode; active?: boolean }
+type PillProps = {
+  children: React.ReactNode
+  active?: boolean
+  onClick?: () => void
+}
 
-function Pill({ children, active }: PillProps) {
+function Pill({ children, active, onClick }: PillProps) {
   return (
     <button
-      className={`rounded-full px-3 py-1 text-xs font-semibold ${
-        active ? 'bg-white text-black' : 'bg-neutral-800 text-neutral-200 hover:bg-neutral-700'
+      onClick={onClick}
+      className={`flex h-8 w-14 items-center justify-center overflow-hidden whitespace-nowrap rounded-2xl p-2.5 text-[10px] font-medium leading-none ${
+        active ? 'bg-white text-black' : 'bg-[#343333] text-white'
       }`}
     >
       {children}

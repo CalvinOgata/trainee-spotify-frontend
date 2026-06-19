@@ -1,5 +1,10 @@
+import { useState } from 'react'
 import { Search } from './icons'
 import Pill from './Pill'
+
+type LibraryFilter = 'Tudo' | 'Playlists' | 'Álbuns' | 'Artistas'
+
+const filters: LibraryFilter[] = ['Tudo', 'Playlists', 'Álbuns', 'Artistas']
 
 const libraryItems = [
   { title: 'Músicas curtidas', sub: 'Playlist • Vitoria Tenorio' },
@@ -19,7 +24,19 @@ const libraryItems = [
   { title: 'LEMONADE - The 2nd Album', sub: 'Álbum • aespa' },
 ]
 
+function matchesFilter(sub: string, filter: LibraryFilter): boolean {
+  if (filter === 'Tudo') return true
+  if (filter === 'Playlists') return sub.startsWith('Playlist')
+  if (filter === 'Álbuns') return sub.startsWith('Álbum')
+  if (filter === 'Artistas') return sub.startsWith('Artista')
+  return true
+}
+
 function Library() {
+  const [activeFilter, setActiveFilter] = useState<LibraryFilter>('Tudo')
+
+  const visibleItems = libraryItems.filter((item) => matchesFilter(item.sub, activeFilter))
+
   return (
     <aside className="flex h-[927px] w-[312px] flex-col gap-3 overflow-hidden rounded-lg bg-[#121212] pb-3">
       <div className="flex items-center justify-between px-3 pt-3">
@@ -29,17 +46,18 @@ function Library() {
         </button>
       </div>
       <div className="flex gap-2 px-3">
-        <Pill active>Tudo</Pill>
-        <Pill>Playlists</Pill>
-        <Pill>Álbuns</Pill>
-        <Pill>Artistas</Pill>
+        {filters.map((f) => (
+          <Pill key={f} active={f === activeFilter} onClick={() => setActiveFilter(f)}>
+            {f}
+          </Pill>
+        ))}
       </div>
       <div className="mx-3 flex h-9 items-center gap-2 rounded-md bg-neutral-900 px-3 text-neutral-400">
         <Search />
         <span className="text-xs">Buscar em Sua Biblioteca</span>
       </div>
       <ul className="flex min-h-0 flex-col overflow-hidden px-2">
-        {libraryItems.map((item, i) => (
+        {visibleItems.map((item, i) => (
           <li key={i} className="flex items-center gap-3 rounded-md px-2 py-1.5 hover:bg-neutral-900">
             <div className="h-10 w-10 shrink-0 rounded bg-neutral-700" />
             <div className="min-w-0 flex-1">

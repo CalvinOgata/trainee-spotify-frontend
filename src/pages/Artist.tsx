@@ -7,7 +7,7 @@ const popularTracks = Array.from({ length: 5 }, () => ({
   explicit: true,
 }))
 
-const discography = Array.from({ length: 9 }, () => ({
+const discography = Array.from({ length: 8 }, () => ({
   title: 'Hurry Up Tomorrow',
   year: '2025 • Álbum',
 }))
@@ -27,53 +27,49 @@ const GreenCheck = () => (
 
 function Artist() {
   return (
-    <div className="flex h-full flex-col gap-4">
-      <div className="-mx-5 -mt-6 relative flex h-[250px] items-end bg-neutral-700">
-        <div className="p-6">
-          <h1 className="text-6xl font-bold leading-none text-white">The Weeknd</h1>
-          <p className="mt-3 flex items-center gap-1.5 text-xs font-normal text-white">
-            <Verified />
-            Verified by Spotify
-          </p>
-          <p className="mt-1 text-xs font-normal text-white">115.716.453 ouvintes mensais</p>
-        </div>
+    <div className="flex h-full flex-col gap-3">
+      <div className="-mx-5 -mt-6 flex h-[280px] flex-col justify-end bg-gradient-to-b from-[#938D8E] to-[#3E3939] px-5 pt-10 pb-4">
+        <h1 className="text-7xl font-bold leading-none text-white">The Weeknd</h1>
+        <p className="mt-3 flex items-center gap-1.5 text-xs font-normal text-white">
+          <Verified />
+          Verified by Spotify
+        </p>
+        <p className="mt-1 text-xs font-normal text-white">115.716.453 ouvintes mensais</p>
       </div>
 
-      <div className="flex items-center gap-4">
+      <div className="flex items-center gap-3">
         <button
-          className="grid h-12 w-12 place-items-center rounded-full bg-[#1FDF64] text-black transition hover:scale-105"
+          className="grid h-10 w-10 place-items-center rounded-full bg-[#1FDF64] text-black transition hover:scale-105"
           aria-label="Reproduzir"
         >
           <PlayArrow />
         </button>
-        <button className="rounded-full border border-neutral-400 px-5 py-1 text-sm font-semibold text-white hover:border-white">
+        <button className="rounded-full border border-neutral-400 px-4 py-1 text-xs font-semibold text-white hover:border-white">
           Seguir
         </button>
       </div>
 
-      <section className="flex flex-col gap-2">
-        <h2 className="text-base font-bold text-white">Populares</h2>
-        <ul className="flex flex-col">
+      <section className="flex w-[457px] flex-col gap-2.5">
+        <h2 className="text-base font-bold leading-tight text-white">Populares</h2>
+        <ul className="flex flex-col gap-2.5">
           {popularTracks.map((t, i) => (
             <li
               key={i}
-              className="grid grid-cols-[24px_40px_1fr_160px_40px] items-center gap-4 rounded px-2 py-1 hover:bg-white/5"
+              className="grid h-9 w-[455px] grid-cols-[12px_36px_1fr_auto_auto_auto] items-center gap-2.5"
             >
               <span className="text-xs font-normal text-neutral-400">{i + 1}</span>
-              <div className="h-10 w-10 rounded bg-neutral-700" />
+              <div className="h-9 w-9 rounded bg-neutral-700" />
               <div className="flex min-w-0 flex-col gap-0.5">
-                <p className="truncate text-xs font-semibold leading-tight text-white">{t.title}</p>
+                <p className="truncate text-xs font-semibold leading-none text-white">{t.title}</p>
                 {t.explicit && (
                   <span className="inline-grid h-3 w-3 place-items-center rounded-sm bg-neutral-500 text-[8px] font-bold leading-none text-black">
                     E
                   </span>
                 )}
               </div>
-              <div className="flex items-center justify-end gap-2 text-xs font-normal text-neutral-400">
-                <span>{t.plays}</span>
-                <GreenCheck />
-              </div>
-              <span className="text-right text-xs font-normal text-neutral-400">{t.duration}</span>
+              <span className="text-xs font-normal text-neutral-400">{t.plays}</span>
+              <GreenCheck />
+              <span className="text-xs font-normal text-neutral-400">{t.duration}</span>
             </li>
           ))}
         </ul>
@@ -82,15 +78,15 @@ function Artist() {
         </button>
       </section>
 
-      <section className="flex flex-col gap-2">
+      <section className="flex w-[1140px] flex-col gap-2.5">
         <div className="flex items-center justify-between">
-          <h2 className="text-base font-bold text-white">Discografia</h2>
+          <h2 className="text-base font-bold leading-tight text-white">Discografia</h2>
           <button className="text-xs font-semibold text-neutral-400 hover:text-white">Mostrar tudo</button>
         </div>
         <div className="flex gap-3">
           {discography.map((d, i) => (
-            <div key={i} className="flex w-[125px] shrink-0 flex-col gap-2">
-              <div className="h-[125px] w-[125px] rounded bg-neutral-700" />
+            <div key={i} className="flex h-[172px] w-[132px] flex-col gap-2">
+              <div className="h-[132px] w-[132px] rounded bg-neutral-700" />
               <div className="min-w-0">
                 <p className="truncate text-xs font-semibold leading-tight text-white">{d.title}</p>
                 <p className="truncate text-[11px] font-normal leading-tight text-neutral-400">{d.year}</p>

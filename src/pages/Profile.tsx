@@ -1,15 +1,27 @@
-const profileArtists = Array.from({ length: 3 }, () => ({ name: 'aespa', role: 'Artista' }))
-const profileTracks = [
-  { title: 'Starboy', plays: '4.536.796.459', duration: '3:50', explicit: true },
-  { title: 'Right Back!', plays: '4.536.796.459', duration: '3:50', explicit: true },
-  { title: 'Right Back!', plays: '4.536.796.459', duration: '3:50', explicit: true },
-  { title: 'Right Back!', plays: '4.536.796.459', duration: '3:50', explicit: true },
-]
-const profilePlaylists = Array.from({ length: 7 }, () => ({ title: 'you know' }))
+import { useApi } from '../lib/useApi'
+import {
+  getFollowers,
+  getMostPlayedArtists,
+  getMostPlayedMusics,
+  getUserPlaylists,
+} from '../lib/endpoints'
+import { formatDuration, formatPlays } from '../lib/format'
+import type { Artist } from '../lib/types'
 
-type ProfileProps = { onArtistClick: () => void }
+type ProfileProps = { onArtistClick: (artist: Artist) => void }
 
 function Profile({ onArtistClick }: ProfileProps) {
+  const { data: playlists } = useApi(getUserPlaylists)
+  const { data: followers } = useApi(getFollowers)
+  const { data: topArtists } = useApi(getMostPlayedArtists)
+  const { data: topMusics } = useApi(getMostPlayedMusics)
+
+  const playlistCount = playlists?.length ?? 0
+  const followerCount = followers?.length ?? 0
+  const artistTiles = (topArtists ?? []).slice(0, 3)
+  const musicRows = (topMusics ?? []).slice(0, 4)
+  const playlistTiles = (playlists ?? []).slice(0, 7)
+
   return (
     <div className="flex h-full flex-col gap-3">
       <div className="-mx-5 -mt-6 flex items-end gap-2.5 bg-gradient-to-b from-[#938D8E] to-[#3E3939] pt-10 pr-5 pb-4 pl-5">
@@ -17,7 +29,9 @@ function Profile({ onArtistClick }: ProfileProps) {
         <div className="flex min-w-0 flex-col pb-2">
           <p className="text-xs font-semibold leading-none text-white">Perfil</p>
           <h1 className="mt-2 truncate text-7xl font-bold leading-none text-white">Vitoria Tenorio</h1>
-          <p className="mt-3 text-xs font-normal leading-none text-white">8 playlists públicas • 2 seguidores • 2 seguindo</p>
+          <p className="mt-3 text-xs font-normal leading-none text-white">
+            {playlistCount} playlists públicas • {followerCount} seguidores • 2 seguindo
+          </p>
         </div>
       </div>
 
@@ -27,16 +41,16 @@ function Profile({ onArtistClick }: ProfileProps) {
           <p className="text-xs font-normal leading-tight text-neutral-400">Visíveis apenas para você</p>
         </div>
         <div className="flex gap-3">
-          {profileArtists.map((a, i) => (
+          {artistTiles.map((a) => (
             <button
-              key={i}
-              onClick={onArtistClick}
+              key={a.id}
+              onClick={() => onArtistClick(a)}
               className="flex h-[172px] w-[132px] flex-col gap-2 text-left"
             >
               <div className="h-[132px] w-[132px] rounded-full bg-neutral-700" />
               <div className="min-w-0">
                 <p className="truncate text-xs font-semibold leading-tight text-white">{a.name}</p>
-                <p className="truncate text-[11px] font-normal leading-tight text-neutral-400">{a.role}</p>
+                <p className="truncate text-[11px] font-normal leading-tight text-neutral-400">Artista</p>
               </div>
             </button>
           ))}
@@ -49,9 +63,9 @@ function Profile({ onArtistClick }: ProfileProps) {
           <p className="text-xs font-normal leading-tight text-neutral-400">Visíveis apenas para você</p>
         </div>
         <ul className="flex flex-col gap-2.5">
-          {profileTracks.map((t, i) => (
+          {musicRows.map((t, i) => (
             <li
-              key={i}
+              key={t.id}
               className="grid h-9 w-[455px] grid-cols-[12px_36px_1fr_auto_auto] items-center gap-2.5"
             >
               <span className="text-xs font-normal text-neutral-400">{i + 1}</span>
@@ -64,8 +78,8 @@ function Profile({ onArtistClick }: ProfileProps) {
                   </span>
                 )}
               </div>
-              <span className="text-xs font-normal text-neutral-400">{t.plays}</span>
-              <span className="text-xs font-normal text-neutral-400">{t.duration}</span>
+              <span className="text-xs font-normal text-neutral-400">{formatPlays(t.timesListen)}</span>
+              <span className="text-xs font-normal text-neutral-400">{formatDuration(t.duration)}</span>
             </li>
           ))}
         </ul>
@@ -74,10 +88,10 @@ function Profile({ onArtistClick }: ProfileProps) {
       <section className="flex w-[996px] flex-col gap-2.5">
         <h2 className="text-base font-bold leading-tight text-white">Playlists públicas</h2>
         <div className="flex gap-3">
-          {profilePlaylists.map((p, i) => (
-            <div key={i} className="flex h-[172px] w-[132px] flex-col gap-2">
+          {playlistTiles.map((p) => (
+            <div key={p.id} className="flex h-[172px] w-[132px] flex-col gap-2">
               <div className="h-[132px] w-[132px] rounded bg-neutral-700" />
-              <p className="truncate text-xs font-semibold text-white">{p.title}</p>
+              <p className="truncate text-xs font-semibold text-white">{p.name}</p>
             </div>
           ))}
         </div>

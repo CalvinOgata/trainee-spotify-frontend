@@ -1,17 +1,29 @@
 import { useState } from 'react'
+import { useApi } from '../lib/useApi'
+import {
+  getRecentAlbums,
+  getRecentArtists,
+  getRecentMusics,
+  getUserPlaylists,
+} from '../lib/endpoints'
+import type { Artist } from '../lib/types'
 
 const filters = ['Tudo', 'Música', 'Playlists'] as const
 type Filter = (typeof filters)[number]
 
-const recentItems = Array.from({ length: 8 }, () => ({ title: 'follow the beat (or die trying)' }))
-const playlists = Array.from({ length: 7 }, () => ({ title: 'you know', sub: 'Playlist • Vitoria Tenorio' }))
-const artists = Array.from({ length: 9 }, () => ({ name: 'aespa', role: 'Artista' }))
-const albums = Array.from({ length: 7 }, () => ({ title: 'Hurry Up Tomorrow', sub: '2025 • Album' }))
-
-type HomeProps = { onArtistClick: () => void }
+type HomeProps = { onArtistClick: (artist: Artist) => void }
 
 function Home({ onArtistClick }: HomeProps) {
   const [activeFilter, setActiveFilter] = useState<Filter>('Tudo')
+  const { data: recentMusics } = useApi(getRecentMusics)
+  const { data: playlists } = useApi(getUserPlaylists)
+  const { data: recentArtists } = useApi(getRecentArtists)
+  const { data: recentAlbums } = useApi(getRecentAlbums)
+
+  const recentItems = (recentMusics ?? []).slice(0, 8)
+  const playlistTiles = (playlists ?? []).slice(0, 7)
+  const artistTiles = (recentArtists ?? []).slice(0, 9)
+  const albumTiles = (recentAlbums ?? []).slice(0, 7)
 
   return (
     <div className="flex h-full flex-col gap-5">
@@ -33,13 +45,13 @@ function Home({ onArtistClick }: HomeProps) {
           })}
         </div>
         <div className="grid grid-cols-[repeat(4,295px)] justify-between gap-y-2">
-          {recentItems.map((item, i) => (
+          {recentItems.map((m) => (
             <button
-              key={i}
+              key={m.id}
               className="flex h-[60px] w-[295px] items-center gap-2.5 overflow-hidden rounded-[4px] bg-[#2D2D2D] pr-3 text-left hover:brightness-110"
             >
               <div className="h-[60px] w-[60px] shrink-0 bg-neutral-700" />
-              <span className="truncate text-sm font-semibold text-white">{item.title}</span>
+              <span className="truncate text-sm font-semibold text-white">{m.title}</span>
             </button>
           ))}
         </div>
@@ -48,12 +60,14 @@ function Home({ onArtistClick }: HomeProps) {
       <section className="flex flex-col gap-2">
         <h3 className="text-base font-bold text-white">Suas Playlists</h3>
         <div className="flex gap-3">
-          {playlists.map((p, i) => (
-            <div key={i} className="flex h-[172px] w-[132px] flex-col gap-2">
+          {playlistTiles.map((p) => (
+            <div key={p.id} className="flex h-[172px] w-[132px] flex-col gap-2">
               <div className="h-[132px] w-[132px] rounded-[2px] bg-neutral-700" />
               <div className="min-w-0">
-                <p className="truncate text-xs font-semibold leading-tight text-white">{p.title}</p>
-                <p className="truncate text-[11px] font-normal leading-tight text-neutral-400">{p.sub}</p>
+                <p className="truncate text-xs font-semibold leading-tight text-white">{p.name}</p>
+                <p className="truncate text-[11px] font-normal leading-tight text-neutral-400">
+                  {p.description ? `Playlist • ${p.description}` : 'Playlist'}
+                </p>
               </div>
             </div>
           ))}
@@ -66,16 +80,16 @@ function Home({ onArtistClick }: HomeProps) {
           <button className="text-xs font-semibold text-neutral-400 hover:text-white">Mostrar tudo</button>
         </div>
         <div className="flex gap-3">
-          {artists.map((a, i) => (
+          {artistTiles.map((a) => (
             <button
-              key={i}
-              onClick={onArtistClick}
+              key={a.id}
+              onClick={() => onArtistClick(a)}
               className="flex h-[172px] w-[132px] flex-col gap-2 text-left"
             >
               <div className="h-[132px] w-[132px] rounded-full bg-neutral-700" />
               <div className="min-w-0">
                 <p className="truncate text-xs font-semibold leading-tight text-white">{a.name}</p>
-                <p className="truncate text-[11px] font-normal leading-tight text-neutral-400">{a.role}</p>
+                <p className="truncate text-[11px] font-normal leading-tight text-neutral-400">Artista</p>
               </div>
             </button>
           ))}
@@ -85,12 +99,14 @@ function Home({ onArtistClick }: HomeProps) {
       <section className="flex flex-col gap-2">
         <h3 className="text-base font-bold text-white">Álbuns recentes</h3>
         <div className="flex gap-3">
-          {albums.map((a, i) => (
-            <div key={i} className="flex w-[140px] flex-col gap-1.5 rounded-[4px] p-1">
+          {albumTiles.map((a) => (
+            <div key={a.id} className="flex w-[140px] flex-col gap-1.5 rounded-[4px] p-1">
               <div className="h-[132px] w-[132px] rounded-[2px] bg-neutral-700" />
               <div className="min-w-0">
                 <p className="truncate text-xs font-semibold leading-tight text-white">{a.title}</p>
-                <p className="truncate text-[11px] font-normal leading-tight text-neutral-400">{a.sub}</p>
+                <p className="truncate text-[11px] font-normal leading-tight text-neutral-400">
+                  {a.year ? `${a.year} • Álbum` : 'Álbum'}
+                </p>
               </div>
             </div>
           ))}

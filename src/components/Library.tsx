@@ -1,41 +1,54 @@
 import { useState } from 'react'
 import { Search } from './icons'
 import Pill from './Pill'
+import { useApi } from '../lib/useApi'
+import { getRecentAlbums, getRecentArtists, getUserPlaylists } from '../lib/endpoints'
+import type { Artist } from '../lib/types'
 
 type LibraryFilter = 'Tudo' | 'Playlists' | 'Álbuns' | 'Artistas'
-
 const filters: LibraryFilter[] = ['Tudo', 'Playlists', 'Álbuns', 'Artistas']
 
-const libraryItems = [
-  { title: 'Músicas curtidas', sub: 'Playlist • Vitoria Tenorio' },
-  { title: 'aespa', sub: 'Artista' },
-  { title: 'LEMONADE - The 2nd Album', sub: 'Álbum • aespa', playing: true },
-  { title: 'follow the beat (or die trying)', sub: 'Playlist • Vitoria Tenorio' },
-  { title: 'foreign', sub: 'Playlist • Vitoria Tenorio' },
-  { title: 'you know', sub: 'Playlist • Vitoria Tenorio' },
-  { title: 'Kendrick Lamar', sub: 'Artista' },
-  { title: 'flow state', sub: 'Playlist • Vitoria Tenorio' },
-  { title: 'LEMONADE - The 2nd Album', sub: 'Álbum • aespa' },
-  { title: 'follow the beat (or die trying)', sub: 'Playlist • Vitoria Tenorio' },
-  { title: 'foreign', sub: 'Playlist • Vitoria Tenorio' },
-  { title: 'you know', sub: 'Playlist • Vitoria Tenorio' },
-  { title: 'Kendrick Lamar', sub: 'Artista' },
-  { title: 'flow state', sub: 'Playlist • Vitoria Tenorio' },
-  { title: 'LEMONADE - The 2nd Album', sub: 'Álbum • aespa' },
-]
+type Row =
+  | { key: string; kind: 'playlist'; title: string; sub: string }
+  | { key: string; kind: 'album'; title: string; sub: string }
+  | { key: string; kind: 'artist'; title: string; sub: string; artist: Artist }
 
-function matchesFilter(sub: string, filter: LibraryFilter): boolean {
-  if (filter === 'Tudo') return true
-  if (filter === 'Playlists') return sub.startsWith('Playlist')
-  if (filter === 'Álbuns') return sub.startsWith('Álbum')
-  if (filter === 'Artistas') return sub.startsWith('Artista')
-  return true
+type LibraryProps = {
+  onArtistClick: (artist: Artist) => void
 }
 
-function Library() {
+function Library({ onArtistClick }: LibraryProps) {
   const [activeFilter, setActiveFilter] = useState<LibraryFilter>('Tudo')
+  const { data: playlists } = useApi(getUserPlaylists)
+  const { data: artists } = useApi(getRecentArtists)
+  const { data: albums } = useApi(getRecentAlbums)
 
-  const visibleItems = libraryItems.filter((item) => matchesFilter(item.sub, activeFilter))
+  const rows: Row[] = []
+  if (activeFilter === 'Tudo' || activeFilter === 'Playlists') {
+    for (const p of playlists ?? []) {
+      rows.push({
+        key: `pl-${p.id}`,
+        kind: 'playlist',
+        title: p.name,
+        sub: `Playlist${p.description ? ` • ${p.description}` : ''}`,
+      })
+    }
+  }
+  if (activeFilter === 'Tudo' || activeFilter === 'Artistas') {
+    for (const a of artists ?? []) {
+      rows.push({ key: `ar-${a.id}`, kind: 'artist', title: a.name, sub: 'Artista', artist: a })
+    }
+  }
+  if (activeFilter === 'Tudo' || activeFilter === 'Álbuns') {
+    for (const a of albums ?? []) {
+      rows.push({
+        key: `al-${a.id}`,
+        kind: 'album',
+        title: a.title,
+        sub: `Álbum • ${a.artistName}`,
+      })
+    }
+  }
 
   return (
     <aside className="flex h-[927px] w-[312px] flex-col gap-3 overflow-hidden rounded-lg bg-[#121212] pb-3">
@@ -57,18 +70,36 @@ function Library() {
         <span className="text-xs">Buscar em Sua Biblioteca</span>
       </div>
       <ul className="flex min-h-0 flex-col overflow-hidden px-2">
-        {visibleItems.map((item, i) => (
-          <li key={i} className="flex items-center gap-3 rounded-md px-2 py-1.5 hover:bg-neutral-900">
-            <div className="h-10 w-10 shrink-0 rounded bg-neutral-700" />
-            <div className="min-w-0 flex-1">
-              <p className={`truncate text-sm ${item.playing ? 'font-semibold text-emerald-400' : 'font-normal text-neutral-100'}`}>
-                {item.title}
-              </p>
-              <p className="truncate text-xs text-neutral-400">{item.sub}</p>
-            </div>
-            {item.playing && <span className="text-emerald-400 text-xs">♪</span>}
-          </li>
-        ))}
+        {rows.map((row) => {
+          const isArtist = row.kind === 'artist'
+          const thumbClass = `h-10 w-10 shrink-0 bg-neutral-700 ${isArtist ? 'rounded-full' : 'rounded'}`
+          const content = (
+            <>
+              <div className={thumbClass} />
+              <div className="min-w-0 flex-1">
+                <p className="truncate text-sm font-normal text-neutral-100">{row.title}</p>
+                <p className="truncate text-xs text-neutral-400">{row.sub}</p>
+              </div>
+            </>
+          )
+          if (row.kind === 'artist') {
+            return (
+              <li key={row.key}>
+                <button
+                  onClick={() => onArtistClick(row.artist)}
+                  className="flex w-full items-center gap-3 rounded-md px-2 py-1.5 text-left hover:bg-neutral-900"
+                >
+                  {content}
+                </button>
+              </li>
+            )
+          }
+          return (
+            <li key={row.key} className="flex items-center gap-3 rounded-md px-2 py-1.5 hover:bg-neutral-900">
+              {content}
+            </li>
+          )
+        })}
       </ul>
     </aside>
   )

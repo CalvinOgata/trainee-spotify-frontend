@@ -1,16 +1,8 @@
 import { Verified } from '../components/icons'
-
-const popularTracks = Array.from({ length: 5 }, () => ({
-  title: 'Starboy',
-  plays: '4.536.796.459',
-  duration: '3:50',
-  explicit: true,
-}))
-
-const discography = Array.from({ length: 8 }, () => ({
-  title: 'Hurry Up Tomorrow',
-  year: '2025 • Álbum',
-}))
+import { useApi } from '../lib/useApi'
+import { getArtistAlbums, getArtistPopularMusics } from '../lib/endpoints'
+import { formatDuration, formatPlays } from '../lib/format'
+import type { Artist as ArtistDTO } from '../lib/types'
 
 const PlayArrow = () => (
   <svg viewBox="0 0 24 24" fill="currentColor" className="h-5 w-5">
@@ -25,16 +17,26 @@ const GreenCheck = () => (
   </svg>
 )
 
-function Artist() {
+type ArtistProps = { artist: ArtistDTO }
+
+function Artist({ artist }: ArtistProps) {
+  const { data: popular } = useApi(() => getArtistPopularMusics(artist.id), [artist.id])
+  const { data: albums } = useApi(() => getArtistAlbums(artist.id), [artist.id])
+
+  const popularTracks = popular ?? []
+  const discography = albums ?? []
+
   return (
     <div className="flex h-full flex-col gap-3">
       <div className="-mx-5 -mt-6 flex h-[280px] flex-col justify-end bg-gradient-to-b from-[#938D8E] to-[#3E3939] px-5 pt-10 pb-4">
-        <h1 className="text-7xl font-bold leading-none text-white">The Weeknd</h1>
+        <h1 className="text-7xl font-bold leading-none text-white">{artist.name}</h1>
         <p className="mt-3 flex items-center gap-1.5 text-xs font-normal text-white">
           <Verified />
           Verified by Spotify
         </p>
-        <p className="mt-1 text-xs font-normal text-white">115.716.453 ouvintes mensais</p>
+        <p className="mt-1 text-xs font-normal text-white">
+          {formatPlays(artist.listeners)} ouvintes mensais
+        </p>
       </div>
 
       <div className="flex items-center gap-3">
@@ -54,7 +56,7 @@ function Artist() {
         <ul className="flex flex-col gap-2.5">
           {popularTracks.map((t, i) => (
             <li
-              key={i}
+              key={t.id}
               className="grid h-9 w-[455px] grid-cols-[12px_36px_1fr_auto_auto_auto] items-center gap-2.5"
             >
               <span className="text-xs font-normal text-neutral-400">{i + 1}</span>
@@ -67,9 +69,9 @@ function Artist() {
                   </span>
                 )}
               </div>
-              <span className="text-xs font-normal text-neutral-400">{t.plays}</span>
+              <span className="text-xs font-normal text-neutral-400">{formatPlays(t.timesListen)}</span>
               <GreenCheck />
-              <span className="text-xs font-normal text-neutral-400">{t.duration}</span>
+              <span className="text-xs font-normal text-neutral-400">{formatDuration(t.duration)}</span>
             </li>
           ))}
         </ul>
@@ -84,12 +86,14 @@ function Artist() {
           <button className="text-xs font-semibold text-neutral-400 hover:text-white">Mostrar tudo</button>
         </div>
         <div className="flex gap-3">
-          {discography.map((d, i) => (
-            <div key={i} className="flex h-[172px] w-[132px] flex-col gap-2">
+          {discography.map((d) => (
+            <div key={d.id} className="flex h-[172px] w-[132px] flex-col gap-2">
               <div className="h-[132px] w-[132px] rounded bg-neutral-700" />
               <div className="min-w-0">
                 <p className="truncate text-xs font-semibold leading-tight text-white">{d.title}</p>
-                <p className="truncate text-[11px] font-normal leading-tight text-neutral-400">{d.year}</p>
+                <p className="truncate text-[11px] font-normal leading-tight text-neutral-400">
+                  {d.year ? `${d.year} • Álbum` : 'Álbum'}
+                </p>
               </div>
             </div>
           ))}

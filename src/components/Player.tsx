@@ -1,10 +1,11 @@
+import songCover from '../assets/images/song_default.png'
 import { Play, Prev, Next, Mixer, MinimizedPlayer } from './icons'
 
 function Player() {
   return (
     <footer className="flex items-center justify-between bg-black p-2.5">
       <div className="flex h-[35px] w-[111px] items-center gap-3">
-        <div className="h-[35px] w-9 shrink-0 rounded-[2px] bg-neutral-700" />
+        <img src={songCover} alt="" className="h-[35px] w-9 shrink-0 rounded-[2px] object-cover" />
         <div className="min-w-0">
           <p className="truncate text-[10px] font-semibold text-white">Never Let Go</p>
           <p className="truncate text-[10px] font-normal text-neutral-400">LNGSHOT</p>

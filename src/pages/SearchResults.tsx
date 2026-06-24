@@ -1,3 +1,8 @@
+import albumCover from '../assets/images/album_default.png'
+import artistCover from '../assets/images/artist_default.png'
+import favoritesCover from '../assets/images/favorites_default.png'
+import playlistCover from '../assets/images/playlist_default.png'
+import songCover from '../assets/images/song_default.png'
 import { Dots, Plus } from '../components/icons'
 import { useApi } from '../lib/useApi'
 import {
@@ -66,7 +71,15 @@ function SearchResults({ query, onArtistClick }: SearchResultsProps) {
           key={r.key}
           className="grid grid-cols-[64px_1fr_auto_auto_auto] items-center gap-4 rounded-md px-2 py-1 hover:bg-neutral-900"
         >
-          <div className={`h-16 w-16 ${r.pill === 'Artista' ? 'rounded-full' : 'rounded'} bg-neutral-700`} />
+          {(() => {
+            const src =
+              r.pill === 'Playlist' ? (r.title === 'Músicas Curtidas' ? favoritesCover : playlistCover) :
+              r.pill === 'Álbum' ? albumCover :
+              r.pill === 'Artista' ? artistCover :
+              songCover
+            const shape = r.pill === 'Artista' ? 'rounded-full' : 'rounded'
+            return <img src={src} alt="" className={`h-16 w-16 ${shape} object-cover`} />
+          })()}
           <div className="min-w-0">
             {r.pill === 'Artista' ? (
               <button

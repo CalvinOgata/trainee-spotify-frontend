@@ -1,3 +1,8 @@
+import artistCover from '../assets/images/artist_default.png'
+import favoritesCover from '../assets/images/favorites_default.png'
+import playlistCover from '../assets/images/playlist_default.png'
+import profilePhoto from '../assets/images/profile_default.png'
+import songCover from '../assets/images/song_default.png'
 import { useApi } from '../lib/useApi'
 import {
   getFollowers,
@@ -25,7 +30,7 @@ function Profile({ onArtistClick }: ProfileProps) {
   return (
     <div className="flex h-full flex-col gap-3">
       <div className="-mx-5 -mt-6 flex items-end gap-2.5 bg-gradient-to-b from-[#938D8E] to-[#3E3939] pt-10 pr-5 pb-4 pl-5">
-        <div className="h-[175px] w-[175px] shrink-0 rounded-full bg-neutral-700" />
+        <img src={profilePhoto} alt="" className="h-[175px] w-[175px] shrink-0 rounded-full object-cover" />
         <div className="flex min-w-0 flex-col pb-2">
           <p className="text-xs font-semibold leading-none text-white">Perfil</p>
           <h1 className="mt-2 truncate text-7xl font-bold leading-none text-white">Vitoria Tenorio</h1>
@@ -47,7 +52,7 @@ function Profile({ onArtistClick }: ProfileProps) {
               onClick={() => onArtistClick(a)}
               className="flex h-[172px] w-[132px] flex-col gap-2 text-left"
             >
-              <div className="h-[132px] w-[132px] rounded-full bg-neutral-700" />
+              <img src={artistCover} alt="" className="h-[132px] w-[132px] rounded-full object-cover" />
               <div className="min-w-0">
                 <p className="truncate text-xs font-semibold leading-tight text-white">{a.name}</p>
                 <p className="truncate text-[11px] font-normal leading-tight text-neutral-400">Artista</p>
@@ -69,7 +74,7 @@ function Profile({ onArtistClick }: ProfileProps) {
               className="grid h-9 w-[455px] grid-cols-[12px_36px_1fr_auto_auto] items-center gap-2.5"
             >
               <span className="text-xs font-normal text-neutral-400">{i + 1}</span>
-              <div className="h-9 w-9 rounded bg-neutral-700" />
+              <img src={songCover} alt="" className="h-9 w-9 rounded object-cover" />
               <div className="flex min-w-0 flex-col gap-0.5">
                 <p className="truncate text-xs font-semibold leading-none text-white">{t.title}</p>
                 {t.explicit && (
@@ -90,7 +95,7 @@ function Profile({ onArtistClick }: ProfileProps) {
         <div className="flex gap-3">
           {playlistTiles.map((p) => (
             <div key={p.id} className="flex h-[172px] w-[132px] flex-col gap-2">
-              <div className="h-[132px] w-[132px] rounded bg-neutral-700" />
+              <img src={p.name === 'Músicas Curtidas' ? favoritesCover : playlistCover} alt="" className="h-[132px] w-[132px] rounded object-cover" />
               <p className="truncate text-xs font-semibold text-white">{p.name}</p>
             </div>
           ))}

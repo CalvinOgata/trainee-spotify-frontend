@@ -1,4 +1,9 @@
 import { useState } from 'react'
+import albumCover from '../assets/images/album_default.png'
+import artistCover from '../assets/images/artist_default.png'
+import favoritesCover from '../assets/images/favorites_default.png'
+import playlistCover from '../assets/images/playlist_default.png'
+import songCover from '../assets/images/song_default.png'
 import { useApi } from '../lib/useApi'
 import {
   getRecentAlbums,
@@ -50,7 +55,7 @@ function Home({ onArtistClick }: HomeProps) {
               key={m.id}
               className="flex h-[60px] w-[295px] items-center gap-2.5 overflow-hidden rounded-[4px] bg-[#2D2D2D] pr-3 text-left hover:brightness-110"
             >
-              <div className="h-[60px] w-[60px] shrink-0 bg-neutral-700" />
+              <img src={songCover} alt="" className="h-[60px] w-[60px] shrink-0 object-cover" />
               <span className="truncate text-sm font-semibold text-white">{m.title}</span>
             </button>
           ))}
@@ -62,7 +67,7 @@ function Home({ onArtistClick }: HomeProps) {
         <div className="flex gap-3">
           {playlistTiles.map((p) => (
             <div key={p.id} className="flex h-[172px] w-[132px] flex-col gap-2">
-              <div className="h-[132px] w-[132px] rounded-[2px] bg-neutral-700" />
+              <img src={p.name === 'Músicas Curtidas' ? favoritesCover : playlistCover} alt="" className="h-[132px] w-[132px] rounded-[2px] object-cover" />
               <div className="min-w-0">
                 <p className="truncate text-xs font-semibold leading-tight text-white">{p.name}</p>
                 <p className="truncate text-[11px] font-normal leading-tight text-neutral-400">
@@ -86,7 +91,7 @@ function Home({ onArtistClick }: HomeProps) {
               onClick={() => onArtistClick(a)}
               className="flex h-[172px] w-[132px] flex-col gap-2 text-left"
             >
-              <div className="h-[132px] w-[132px] rounded-full bg-neutral-700" />
+              <img src={artistCover} alt="" className="h-[132px] w-[132px] rounded-full object-cover" />
               <div className="min-w-0">
                 <p className="truncate text-xs font-semibold leading-tight text-white">{a.name}</p>
                 <p className="truncate text-[11px] font-normal leading-tight text-neutral-400">Artista</p>
@@ -101,7 +106,7 @@ function Home({ onArtistClick }: HomeProps) {
         <div className="flex gap-3">
           {albumTiles.map((a) => (
             <div key={a.id} className="flex w-[140px] flex-col gap-1.5 rounded-[4px] p-1">
-              <div className="h-[132px] w-[132px] rounded-[2px] bg-neutral-700" />
+              <img src={albumCover} alt="" className="h-[132px] w-[132px] rounded-[2px] object-cover" />
               <div className="min-w-0">
                 <p className="truncate text-xs font-semibold leading-tight text-white">{a.title}</p>
                 <p className="truncate text-[11px] font-normal leading-tight text-neutral-400">

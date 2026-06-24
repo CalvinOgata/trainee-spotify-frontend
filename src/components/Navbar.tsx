@@ -1,3 +1,4 @@
+import profilePhoto from '../assets/images/profile_default.png'
 import { Spotify, Home, Search, X, Bell, Download } from './icons'
 
 type NavbarProps = {
@@ -52,8 +53,10 @@ function Navbar({ query, onQueryChange, onHomeClick, onProfileClick }: NavbarPro
         <button
           onClick={onProfileClick}
           aria-label="Perfil"
-          className="h-9 w-9 rounded-full border-4 border-black bg-neutral-700 hover:brightness-110"
-        />
+          className="h-9 w-9 overflow-hidden rounded-full border-4 border-black hover:brightness-110"
+        >
+          <img src={profilePhoto} alt="" className="h-full w-full object-cover" />
+        </button>
       </div>
     </header>
   )

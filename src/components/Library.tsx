@@ -1,4 +1,8 @@
 import { useState } from 'react'
+import albumCover from '../assets/images/album_default.png'
+import artistCover from '../assets/images/artist_default.png'
+import favoritesCover from '../assets/images/favorites_default.png'
+import playlistCover from '../assets/images/playlist_default.png'
 import { Search } from './icons'
 import Pill from './Pill'
 import { useApi } from '../lib/useApi'
@@ -69,13 +73,18 @@ function Library({ onArtistClick }: LibraryProps) {
         <Search />
         <span className="text-xs">Buscar em Sua Biblioteca</span>
       </div>
-      <ul className="flex min-h-0 flex-col overflow-hidden px-2">
+      <ul className="flex min-h-0 flex-1 flex-col overflow-y-auto px-2 [scrollbar-width:thin] [scrollbar-color:#4d4d4d_transparent]">
         {rows.map((row) => {
           const isArtist = row.kind === 'artist'
-          const thumbClass = `h-10 w-10 shrink-0 bg-neutral-700 ${isArtist ? 'rounded-full' : 'rounded'}`
+          const thumbClass = `h-10 w-10 shrink-0 ${isArtist ? 'rounded-full' : 'rounded'} object-cover`
+          const src =
+            row.kind === 'playlist' ? (row.title === 'Músicas Curtidas' ? favoritesCover : playlistCover) :
+            row.kind === 'album' ? albumCover :
+            artistCover
+          const thumb = <img src={src} alt="" className={thumbClass} />
           const content = (
             <>
-              <div className={thumbClass} />
+              {thumb}
               <div className="min-w-0 flex-1">
                 <p className="truncate text-sm font-normal text-neutral-100">{row.title}</p>
                 <p className="truncate text-xs text-neutral-400">{row.sub}</p>

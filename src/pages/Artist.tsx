@@ -1,3 +1,6 @@
+import albumCover from '../assets/images/album_default.png'
+import artistBanner from '../assets/images/artist_banner.png'
+import songCover from '../assets/images/song_default.png'
 import { Verified } from '../components/icons'
 import { useApi } from '../lib/useApi'
 import { getArtistAlbums, getArtistPopularMusics } from '../lib/endpoints'
@@ -28,7 +31,12 @@ function Artist({ artist }: ArtistProps) {
 
   return (
     <div className="flex h-full flex-col gap-3">
-      <div className="-mx-5 -mt-6 flex h-[280px] flex-col justify-end bg-gradient-to-b from-[#938D8E] to-[#3E3939] px-5 pt-10 pb-4">
+      <div
+        className="-mx-5 -mt-6 flex h-[280px] flex-col justify-end bg-cover bg-center px-5 pt-10 pb-4"
+        style={{
+          backgroundImage: `linear-gradient(to bottom, rgba(65, 65, 65, 0) 0%, rgba(0, 0, 0, 0.4) 100%), url(${artistBanner})`,
+        }}
+      >
         <h1 className="text-7xl font-bold leading-none text-white">{artist.name}</h1>
         <p className="mt-3 flex items-center gap-1.5 text-xs font-normal text-white">
           <Verified />
@@ -60,7 +68,7 @@ function Artist({ artist }: ArtistProps) {
               className="grid h-9 w-[455px] grid-cols-[12px_36px_1fr_auto_auto_auto] items-center gap-2.5"
             >
               <span className="text-xs font-normal text-neutral-400">{i + 1}</span>
-              <div className="h-9 w-9 rounded bg-neutral-700" />
+              <img src={songCover} alt="" className="h-9 w-9 rounded object-cover" />
               <div className="flex min-w-0 flex-col gap-0.5">
                 <p className="truncate text-xs font-semibold leading-none text-white">{t.title}</p>
                 {t.explicit && (
@@ -88,7 +96,7 @@ function Artist({ artist }: ArtistProps) {
         <div className="flex gap-3">
           {discography.map((d) => (
             <div key={d.id} className="flex h-[172px] w-[132px] flex-col gap-2">
-              <div className="h-[132px] w-[132px] rounded bg-neutral-700" />
+              <img src={albumCover} alt="" className="h-[132px] w-[132px] rounded object-cover" />
               <div className="min-w-0">
                 <p className="truncate text-xs font-semibold leading-tight text-white">{d.title}</p>
                 <p className="truncate text-[11px] font-normal leading-tight text-neutral-400">

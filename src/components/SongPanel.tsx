@@ -1,4 +1,6 @@
 import { useEffect, useState } from 'react'
+import artistCover from '../assets/images/artist_default.png'
+import songCover from '../assets/images/song_default.png'
 import { Dots, Verified, X } from './icons'
 
 const credits = [
@@ -93,7 +95,7 @@ function SongPanel() {
           <h2 className="text-sm font-semibold text-white">you know</h2>
           <Dots />
         </div>
-        <div className="aspect-square w-full bg-neutral-700" />
+        <img src={songCover} alt="" className="aspect-square w-full object-cover" />
         <div className="px-3 pt-3 pb-3">
           <p className="text-lg font-bold text-white">Never Let Go</p>
           <p className="text-sm font-normal text-neutral-400">LNGSHOT</p>
@@ -101,7 +103,7 @@ function SongPanel() {
 
         <div className="mx-3 mb-3 rounded-lg bg-neutral-900 p-3">
           <p className="mb-2 text-xs font-semibold text-neutral-300">Sobre o artista</p>
-          <div className="aspect-[4/3] w-full rounded bg-neutral-700" />
+          <img src={artistCover} alt="" className="aspect-[4/3] w-full rounded object-cover" />
           <div className="mt-3 flex items-center gap-1">
             <p className="text-sm font-semibold text-white">LNGSHOT</p>
             <Verified />

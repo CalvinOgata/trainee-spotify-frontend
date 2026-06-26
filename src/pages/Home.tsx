@@ -5,6 +5,7 @@ import favoritesCover from '../assets/images/favorites_default.png'
 import playlistCover from '../assets/images/playlist_default.png'
 import songCover from '../assets/images/song_default.png'
 import { useApi } from '../lib/useApi'
+import { usePlayer } from '../lib/PlayerContext'
 import {
   getRecentAlbums,
   getRecentArtists,
@@ -24,11 +25,14 @@ function Home({ onArtistClick }: HomeProps) {
   const { data: playlists } = useApi(getUserPlaylists)
   const { data: recentArtists } = useApi(getRecentArtists)
   const { data: recentAlbums } = useApi(getRecentAlbums)
+  const { play } = usePlayer()
 
   const recentItems = (recentMusics ?? []).slice(0, 8)
   const playlistTiles = (playlists ?? []).slice(0, 7)
   const artistTiles = (recentArtists ?? []).slice(0, 9)
   const albumTiles = (recentAlbums ?? []).slice(0, 7)
+
+  const artistById = new Map((recentArtists ?? []).map((a) => [a.id, a]))
 
   return (
     <div className="flex h-full flex-col gap-5">
@@ -53,6 +57,7 @@ function Home({ onArtistClick }: HomeProps) {
           {recentItems.map((m) => (
             <button
               key={m.id}
+              onClick={() => play(m, { artist: artistById.get(m.artistId) })}
               className="flex h-[60px] w-[295px] items-center gap-2.5 overflow-hidden rounded-[4px] bg-[#2D2D2D] pr-3 text-left hover:brightness-110"
             >
               <img src={songCover} alt="" className="h-[60px] w-[60px] shrink-0 object-cover" />

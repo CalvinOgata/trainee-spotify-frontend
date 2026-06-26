@@ -1,29 +1,29 @@
 import { useEffect, useState } from 'react'
-import artistCover from '../assets/images/artist_default.png'
+import artistAboutCover from '../assets/images/artist_about.png'
 import songCover from '../assets/images/song_default.png'
 import { Dots, Verified, X } from './icons'
+import { usePlayer } from '../lib/PlayerContext'
+import { formatPlays } from '../lib/format'
 
-const credits = [
-  { name: 'LNGSHOT', role: 'Artista Principal', follow: true },
+const composers = [
   { name: 'WOOJIN of LNGSHOT', role: 'Arranjos • Autores • Letrista' },
   { name: 'LOUIS of LNGSHOT', role: 'Arranjos • Autores • Letrista' },
+  { name: 'RYUL of LNGSHOT', role: 'Arranjos • Autores • Letrista' },
+  { name: 'OHUL of LNGSHOT', role: 'Arranjos • Autores • Letrista' },
+  { name: 'OHUL of LNGSHOT', role: 'Arranjos • Autores • Letrista' },
+  { name: 'Mehti', role: 'Autores' },
+  { name: 'Eric Minz', role: 'Autores • Letrista' },
 ]
 
-const fullCredits = {
-  artist: { name: 'LNGSHOT', role: 'Artista Principal' },
-  composers: [
-    { name: 'WOOJIN of LNGSHOT', role: 'Arranjos • Autores • Letrista' },
-    { name: 'LOUIS of LNGSHOT', role: 'Arranjos • Autores • Letrista' },
-    { name: 'RYUL of LNGSHOT', role: 'Arranjos • Autores • Letrista' },
-    { name: 'OHUL of LNGSHOT', role: 'Arranjos • Autores • Letrista' },
-    { name: 'OHUL of LNGSHOT', role: 'Arranjos • Autores • Letrista' },
-    { name: 'Mehti', role: 'Autores' },
-    { name: 'Eric Minz', role: 'Autores • Letrista' },
-  ],
-  sources: ['MORE VISION'],
+const sources = ['MORE VISION']
+
+type CreditsModalProps = {
+  onClose: () => void
+  title: string
+  artistName: string
 }
 
-function CreditsModal({ onClose }: { onClose: () => void }) {
+function CreditsModal({ onClose, title, artistName }: CreditsModalProps) {
   useEffect(() => {
     const handleKey = (e: KeyboardEvent) => {
       if (e.key === 'Escape') onClose()
@@ -44,7 +44,7 @@ function CreditsModal({ onClose }: { onClose: () => void }) {
         <div className="mb-4 flex items-start justify-between">
           <div>
             <h2 className="text-lg font-bold text-white">Créditos</h2>
-            <p className="text-sm font-semibold text-white">Never Let Go</p>
+            <p className="text-sm font-semibold text-white">{title}</p>
           </div>
           <button onClick={onClose} aria-label="Fechar" className="text-neutral-400 hover:text-white">
             <X className="h-4 w-4" />
@@ -55,8 +55,8 @@ function CreditsModal({ onClose }: { onClose: () => void }) {
           <h3 className="mb-3 text-base font-bold text-white">Artista</h3>
           <div className="flex items-center justify-between gap-3">
             <div className="min-w-0">
-              <p className="truncate text-sm font-semibold text-white">{fullCredits.artist.name}</p>
-              <p className="truncate text-xs font-normal text-neutral-400">{fullCredits.artist.role}</p>
+              <p className="truncate text-sm font-semibold text-white">{artistName}</p>
+              <p className="truncate text-xs font-normal text-neutral-400">Artista Principal</p>
             </div>
             <button className="shrink-0 rounded-full border border-neutral-500 px-3 py-1 text-xs font-semibold text-white hover:border-white">
               Deixar de seguir
@@ -67,7 +67,7 @@ function CreditsModal({ onClose }: { onClose: () => void }) {
         <section className="mb-5">
           <h3 className="mb-3 text-base font-bold text-white">Composição e letra</h3>
           <ul className="flex flex-col gap-3">
-            {fullCredits.composers.map((c, i) => (
+            {composers.map((c, i) => (
               <li key={i}>
                 <p className="truncate text-sm font-semibold text-white">{c.name}</p>
                 <p className="truncate text-xs font-normal text-neutral-400">{c.role}</p>
@@ -78,7 +78,7 @@ function CreditsModal({ onClose }: { onClose: () => void }) {
 
         <section>
           <h3 className="mb-2 text-base font-bold text-white">Fontes</h3>
-          <p className="text-xs font-normal text-neutral-400">{fullCredits.sources.join(' • ')}</p>
+          <p className="text-xs font-normal text-neutral-400">{sources.join(' • ')}</p>
         </section>
       </div>
     </div>
@@ -87,6 +87,10 @@ function CreditsModal({ onClose }: { onClose: () => void }) {
 
 function SongPanel() {
   const [creditsOpen, setCreditsOpen] = useState(false)
+  const { current, currentArtist } = usePlayer()
+
+  const title = current?.title ?? 'Nenhuma música'
+  const subtitle = current ? currentArtist?.name ?? 'Artista' : ''
 
   return (
     <>
@@ -97,25 +101,27 @@ function SongPanel() {
         </div>
         <img src={songCover} alt="" className="aspect-square w-full object-cover" />
         <div className="px-3 pt-3 pb-3">
-          <p className="text-lg font-bold text-white">Never Let Go</p>
-          <p className="text-sm font-normal text-neutral-400">LNGSHOT</p>
+          <p className="text-lg font-bold text-white">{title}</p>
+          <p className="text-sm font-normal text-neutral-400">{subtitle}</p>
         </div>
 
         <div className="mx-3 mb-3 rounded-lg bg-neutral-900 p-3">
           <p className="mb-2 text-xs font-semibold text-neutral-300">Sobre o artista</p>
-          <img src={artistCover} alt="" className="aspect-[4/3] w-full rounded object-cover" />
+          <img src={artistAboutCover} alt="" className="aspect-square w-full rounded object-cover" />
           <div className="mt-3 flex items-center gap-1">
-            <p className="text-sm font-semibold text-white">LNGSHOT</p>
+            <p className="text-sm font-semibold text-white">{currentArtist?.name ?? '—'}</p>
             <Verified />
           </div>
           <div className="mt-2 flex items-center justify-between">
-            <p className="text-xs text-neutral-400">4.965.405 ouvintes mensais</p>
+            <p className="text-xs text-neutral-400">
+              {currentArtist ? `${formatPlays(currentArtist.listeners)} ouvintes mensais` : ''}
+            </p>
             <button className="rounded-full border border-neutral-500 px-3 py-0.5 text-[10px] font-semibold text-white hover:border-white">
               Deixar de seguir
             </button>
           </div>
           <p className="mt-2 line-clamp-3 text-xs font-normal text-neutral-400">
-            LNGSHOT is the first boy group introduced by Jay Park, a defining figure in hiphop, R&B, and Korean pop culture, and the executive producer shaping MORE…
+            {currentArtist?.about ?? ''}
           </p>
         </div>
 
@@ -130,23 +136,35 @@ function SongPanel() {
             </button>
           </div>
           <ul className="flex flex-col gap-2">
-            {credits.map((c, i) => (
+            {currentArtist && (
+              <li className="flex items-center justify-between gap-2">
+                <div className="min-w-0">
+                  <p className="truncate text-xs font-semibold text-white">{currentArtist.name}</p>
+                  <p className="truncate text-[10px] font-normal text-neutral-400">Artista Principal</p>
+                </div>
+                <button className="shrink-0 rounded-full border border-neutral-500 px-3 py-0.5 text-[10px] font-semibold text-white hover:border-white">
+                  Deixar de seguir
+                </button>
+              </li>
+            )}
+            {composers.slice(0, 2).map((c, i) => (
               <li key={i} className="flex items-center justify-between gap-2">
                 <div className="min-w-0">
                   <p className="truncate text-xs font-semibold text-white">{c.name}</p>
                   <p className="truncate text-[10px] font-normal text-neutral-400">{c.role}</p>
                 </div>
-                {c.follow && (
-                  <button className="shrink-0 rounded-full border border-neutral-500 px-3 py-0.5 text-[10px] font-semibold text-white hover:border-white">
-                    Deixar de seguir
-                  </button>
-                )}
               </li>
             ))}
           </ul>
         </div>
       </aside>
-      {creditsOpen && <CreditsModal onClose={() => setCreditsOpen(false)} />}
+      {creditsOpen && (
+        <CreditsModal
+          onClose={() => setCreditsOpen(false)}
+          title={title}
+          artistName={currentArtist?.name ?? '—'}
+        />
+      )}
     </>
   )
 }

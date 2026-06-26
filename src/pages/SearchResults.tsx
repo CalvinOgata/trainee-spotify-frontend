@@ -5,18 +5,18 @@ import playlistCover from '../assets/images/playlist_default.png'
 import songCover from '../assets/images/song_default.png'
 import { Dots, Plus } from '../components/icons'
 import { useApi } from '../lib/useApi'
+import { usePlayer } from '../lib/PlayerContext'
 import {
   getRecentAlbums,
   getRecentArtists,
   getRecentMusics,
   getUserPlaylists,
 } from '../lib/endpoints'
-import type { Artist } from '../lib/types'
-
-type ResultPill = 'Música' | 'Playlist' | 'Álbum' | 'Artista'
+import type { Artist, Music } from '../lib/types'
 
 type Result =
-  | { key: string; title: string; sub: string; pill: Exclude<ResultPill, 'Artista'>; action: 'add' }
+  | { key: string; title: string; sub: string; pill: 'Música'; action: 'add'; music: Music }
+  | { key: string; title: string; sub: string; pill: 'Playlist' | 'Álbum'; action: 'add' }
   | { key: string; title: string; sub: string; pill: 'Artista'; action: 'follow'; artist: Artist }
 
 type SearchResultsProps = { query: string; onArtistClick: (artist: Artist) => void }
@@ -26,6 +26,9 @@ function SearchResults({ query, onArtistClick }: SearchResultsProps) {
   const { data: playlists } = useApi(getUserPlaylists)
   const { data: artists } = useApi(getRecentArtists)
   const { data: albums } = useApi(getRecentAlbums)
+  const { play } = usePlayer()
+
+  const artistById = new Map((artists ?? []).map((a) => [a.id, a]))
 
   const all: Result[] = [
     ...(musics ?? []).map<Result>((m) => ({
@@ -34,6 +37,7 @@ function SearchResults({ query, onArtistClick }: SearchResultsProps) {
       sub: 'Música',
       pill: 'Música',
       action: 'add',
+      music: m,
     })),
     ...(playlists ?? []).map<Result>((p) => ({
       key: `p-${p.id}`,
@@ -84,6 +88,13 @@ function SearchResults({ query, onArtistClick }: SearchResultsProps) {
             {r.pill === 'Artista' ? (
               <button
                 onClick={() => onArtistClick(r.artist)}
+                className="block w-full truncate text-left text-base font-semibold text-white hover:underline"
+              >
+                {r.title}
+              </button>
+            ) : r.pill === 'Música' ? (
+              <button
+                onClick={() => play(r.music, { artist: artistById.get(r.music.artistId) })}
                 className="block w-full truncate text-left text-base font-semibold text-white hover:underline"
               >
                 {r.title}

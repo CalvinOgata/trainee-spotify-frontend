@@ -3,6 +3,7 @@ import artistBanner from '../assets/images/artist_banner.png'
 import songCover from '../assets/images/song_default.png'
 import { Verified } from '../components/icons'
 import { useApi } from '../lib/useApi'
+import { usePlayer } from '../lib/PlayerContext'
 import { getArtistAlbums, getArtistPopularMusics } from '../lib/endpoints'
 import { formatDuration, formatPlays } from '../lib/format'
 import type { Artist as ArtistDTO } from '../lib/types'
@@ -25,6 +26,7 @@ type ArtistProps = { artist: ArtistDTO }
 function Artist({ artist }: ArtistProps) {
   const { data: popular } = useApi(() => getArtistPopularMusics(artist.id), [artist.id])
   const { data: albums } = useApi(() => getArtistAlbums(artist.id), [artist.id])
+  const { play } = usePlayer()
 
   const popularTracks = popular ?? []
   const discography = albums ?? []
@@ -65,7 +67,8 @@ function Artist({ artist }: ArtistProps) {
           {popularTracks.map((t, i) => (
             <li
               key={t.id}
-              className="grid h-9 w-[455px] grid-cols-[12px_36px_1fr_auto_auto_auto] items-center gap-2.5"
+              onClick={() => play(t, { artist })}
+              className="grid h-9 w-[455px] cursor-pointer grid-cols-[12px_36px_1fr_auto_auto_auto] items-center gap-2.5 hover:bg-neutral-900"
             >
               <span className="text-xs font-normal text-neutral-400">{i + 1}</span>
               <img src={songCover} alt="" className="h-9 w-9 rounded object-cover" />

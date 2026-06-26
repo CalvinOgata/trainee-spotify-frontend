@@ -4,6 +4,7 @@ import playlistCover from '../assets/images/playlist_default.png'
 import profilePhoto from '../assets/images/profile_default.png'
 import songCover from '../assets/images/song_default.png'
 import { useApi } from '../lib/useApi'
+import { usePlayer } from '../lib/PlayerContext'
 import {
   getFollowers,
   getMostPlayedArtists,
@@ -20,12 +21,15 @@ function Profile({ onArtistClick }: ProfileProps) {
   const { data: followers } = useApi(getFollowers)
   const { data: topArtists } = useApi(getMostPlayedArtists)
   const { data: topMusics } = useApi(getMostPlayedMusics)
+  const { play } = usePlayer()
 
   const playlistCount = playlists?.length ?? 0
   const followerCount = followers?.length ?? 0
   const artistTiles = (topArtists ?? []).slice(0, 3)
   const musicRows = (topMusics ?? []).slice(0, 4)
   const playlistTiles = (playlists ?? []).slice(0, 7)
+
+  const artistById = new Map((topArtists ?? []).map((a) => [a.id, a]))
 
   return (
     <div className="flex h-full flex-col gap-3">
@@ -71,7 +75,8 @@ function Profile({ onArtistClick }: ProfileProps) {
           {musicRows.map((t, i) => (
             <li
               key={t.id}
-              className="grid h-9 w-[455px] grid-cols-[12px_36px_1fr_auto_auto] items-center gap-2.5"
+              onClick={() => play(t, { artist: artistById.get(t.artistId) })}
+              className="grid h-9 w-[455px] cursor-pointer grid-cols-[12px_36px_1fr_auto_auto] items-center gap-2.5 hover:bg-neutral-900"
             >
               <span className="text-xs font-normal text-neutral-400">{i + 1}</span>
               <img src={songCover} alt="" className="h-9 w-9 rounded object-cover" />

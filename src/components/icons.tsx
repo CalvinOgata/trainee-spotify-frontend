@@ -120,11 +120,18 @@ export const Verified = () => (
   </svg>
 )
 
-export const Play = ({ className = 'h-6 w-6' }: IconProps) => (
+export const Pause = ({ className = 'h-6 w-6' }: IconProps) => (
   <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className={className}>
     <circle cx="12" cy="12" r="12" fill="white" />
     <path d="M8 7H10.5V18H8V7Z" fill="black" />
     <path d="M13 7H15.5V18H13V7Z" fill="black" />
+  </svg>
+)
+
+export const Play = ({ className = 'h-6 w-6' }: IconProps) => (
+  <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className={className}>
+    <circle cx="12" cy="12" r="12" fill="white" />
+    <path d="M9 7L18 12L9 17V7Z" fill="black" />
   </svg>
 )
 

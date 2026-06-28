@@ -8,23 +8,24 @@ import { Dots, Plus } from '../components/icons'
 import { useApi } from '../lib/useApi'
 import { usePlayer } from '../lib/PlayerContext'
 import { search } from '../lib/endpoints'
-import type { Artist, Music, PlaylistSummary, SearchResponse } from '../lib/types'
+import type { AlbumSummary, Artist, Music, PlaylistSummary, SearchResponse } from '../lib/types'
 
 type Result =
   | { key: string; title: string; sub: string; pill: 'Música'; action: 'add'; music: Music }
   | { key: string; title: string; sub: string; pill: 'Playlist'; action: 'add'; playlist: PlaylistSummary }
-  | { key: string; title: string; sub: string; pill: 'Álbum'; action: 'add' }
+  | { key: string; title: string; sub: string; pill: 'Álbum'; action: 'add'; album: AlbumSummary }
   | { key: string; title: string; sub: string; pill: 'Artista'; action: 'follow'; artist: Artist }
 
 type SearchResultsProps = {
   query: string
   onArtistClick: (artist: Artist) => void
   onPlaylistClick: (playlist: PlaylistSummary) => void
+  onAlbumClick: (album: AlbumSummary) => void
 }
 
 const EMPTY: SearchResponse = { musics: [], playlists: [], artists: [], albums: [] }
 
-function SearchResults({ query, onArtistClick, onPlaylistClick }: SearchResultsProps) {
+function SearchResults({ query, onArtistClick, onPlaylistClick, onAlbumClick }: SearchResultsProps) {
   const [debouncedQ, setDebouncedQ] = useState(query.trim())
   useEffect(() => {
     const t = setTimeout(() => setDebouncedQ(query.trim()), 250)
@@ -64,6 +65,7 @@ function SearchResults({ query, onArtistClick, onPlaylistClick }: SearchResultsP
       sub: `Álbum • ${a.artistName}`,
       pill: 'Álbum',
       action: 'add',
+      album: a,
     })),
     ...artists.map<Result>((a) => ({
       key: `ar-${a.id}`,
@@ -130,7 +132,12 @@ function SearchResults({ query, onArtistClick, onPlaylistClick }: SearchResultsP
                 {r.title}
               </button>
             ) : (
-              <p className="truncate text-base font-semibold text-white">{r.title}</p>
+              <button
+                onClick={() => onAlbumClick(r.album)}
+                className="block w-full truncate text-left text-base font-semibold text-white hover:underline"
+              >
+                {r.title}
+              </button>
             )}
             <p className="truncate text-sm font-normal text-neutral-400">{r.sub}</p>
           </div>

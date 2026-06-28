@@ -12,7 +12,7 @@ import {
   getRecentMusics,
   getUserPlaylists,
 } from '../lib/endpoints'
-import type { Artist, PlaylistSummary } from '../lib/types'
+import type { AlbumSummary, Artist, PlaylistSummary } from '../lib/types'
 
 const filters = ['Tudo', 'Música', 'Playlists'] as const
 type Filter = (typeof filters)[number]
@@ -20,9 +20,10 @@ type Filter = (typeof filters)[number]
 type HomeProps = {
   onArtistClick: (artist: Artist) => void
   onPlaylistClick: (playlist: PlaylistSummary) => void
+  onAlbumClick: (album: AlbumSummary) => void
 }
 
-function Home({ onArtistClick, onPlaylistClick }: HomeProps) {
+function Home({ onArtistClick, onPlaylistClick, onAlbumClick }: HomeProps) {
   const [activeFilter, setActiveFilter] = useState<Filter>('Tudo')
   const { data: recentMusics } = useApi(getRecentMusics)
   const { data: playlists } = useApi(getUserPlaylists)
@@ -117,7 +118,11 @@ function Home({ onArtistClick, onPlaylistClick }: HomeProps) {
         <h3 className="text-base font-bold text-white">Álbuns recentes</h3>
         <div className="flex gap-3">
           {albumTiles.map((a) => (
-            <div key={a.id} className="flex w-[140px] flex-col gap-1.5 rounded-[4px] p-1">
+            <button
+              key={a.id}
+              onClick={() => onAlbumClick(a)}
+              className="flex w-[140px] flex-col gap-1.5 rounded-[4px] p-1 text-left hover:brightness-110"
+            >
               <img src={albumCover} alt="" className="h-[132px] w-[132px] rounded-[2px] object-cover" />
               <div className="min-w-0">
                 <p className="truncate text-xs font-semibold leading-tight text-white">{a.title}</p>
@@ -125,7 +130,7 @@ function Home({ onArtistClick, onPlaylistClick }: HomeProps) {
                   {a.year ? `${a.year} • Álbum` : 'Álbum'}
                 </p>
               </div>
-            </div>
+            </button>
           ))}
         </div>
       </section>

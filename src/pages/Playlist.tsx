@@ -218,6 +218,12 @@ function Playlist({ playlist, playlistsKey, onDeleted, onUpdated, onTracksChange
     }
   }
 
+  const handlePlayAll = () => {
+    if (tracks.length === 0) return
+    const first = tracks[0]
+    play(first, { artist: artistById.get(first.artistId), queue: tracks })
+  }
+
   const handleSaveEdit = async (input: { name: string; description: string }) => {
     try {
       const updated = await updatePlaylistAttributes(playlist.id, input)
@@ -260,6 +266,7 @@ function Playlist({ playlist, playlistsKey, onDeleted, onUpdated, onTracksChange
           <div />
         ) : (
           <button
+            onClick={handlePlayAll}
             className="grid h-10 w-10 place-items-center rounded-full bg-[#1FDF64] text-black transition hover:scale-105"
             aria-label="Reproduzir"
           >

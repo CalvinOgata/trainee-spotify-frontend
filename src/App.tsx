@@ -4,15 +4,16 @@ import Navbar from './components/Navbar'
 import Frame from './components/Frame'
 import Player from './components/Player'
 import PlayingSong from './pages/PlayingSong'
-import type { Artist, PlaylistSummary } from './lib/types'
+import type { AlbumSummary, Artist, PlaylistSummary } from './lib/types'
 
-export type Page = 'home' | 'search' | 'profile' | 'artist' | 'playlist'
+export type Page = 'home' | 'search' | 'profile' | 'artist' | 'playlist' | 'album'
 
 function App() {
   const [query, setQuery] = useState('')
   const [page, setPage] = useState<Page>('home')
   const [selectedArtist, setSelectedArtist] = useState<Artist | null>(null)
   const [selectedPlaylist, setSelectedPlaylist] = useState<PlaylistSummary | null>(null)
+  const [selectedAlbum, setSelectedAlbum] = useState<AlbumSummary | null>(null)
   const [isFullscreen, setIsFullscreen] = useState(false)
   const [playlistsKey, setPlaylistsKey] = useState(0)
   const refreshPlaylists = () => setPlaylistsKey((k) => k + 1)
@@ -42,6 +43,12 @@ function App() {
     setQuery('')
     setSelectedPlaylist(playlist)
     setPage('playlist')
+  }
+
+  const goAlbum = (album: AlbumSummary) => {
+    setQuery('')
+    setSelectedAlbum(album)
+    setPage('album')
   }
 
   const handlePlaylistDeleted = () => {
@@ -88,8 +95,10 @@ function App() {
             page={page}
             selectedArtist={selectedArtist}
             selectedPlaylist={selectedPlaylist}
+            selectedAlbum={selectedAlbum}
             onArtistClick={goArtist}
             onPlaylistClick={goPlaylist}
+            onAlbumClick={goAlbum}
             onPlaylistDeleted={handlePlaylistDeleted}
             onPlaylistUpdated={handlePlaylistUpdated}
             playlistsKey={playlistsKey}

@@ -6,16 +6,19 @@ import SearchResults from '../pages/SearchResults'
 import Profile from '../pages/Profile'
 import Artist from '../pages/Artist'
 import Playlist from '../pages/Playlist'
+import Album from '../pages/Album'
 import type { Page } from '../App'
-import type { Artist as ArtistDTO, PlaylistSummary } from '../lib/types'
+import type { AlbumSummary, Artist as ArtistDTO, PlaylistSummary } from '../lib/types'
 
 type FrameProps = {
   query: string
   page: Page
   selectedArtist: ArtistDTO | null
   selectedPlaylist: PlaylistSummary | null
+  selectedAlbum: AlbumSummary | null
   onArtistClick: (artist: ArtistDTO) => void
   onPlaylistClick: (playlist: PlaylistSummary) => void
+  onAlbumClick: (album: AlbumSummary) => void
   onPlaylistDeleted: () => void
   onPlaylistUpdated: (updated: PlaylistSummary) => void
   playlistsKey: number
@@ -27,8 +30,10 @@ function Frame({
   page,
   selectedArtist,
   selectedPlaylist,
+  selectedAlbum,
   onArtistClick,
   onPlaylistClick,
+  onAlbumClick,
   onPlaylistDeleted,
   onPlaylistUpdated,
   playlistsKey,
@@ -39,24 +44,32 @@ function Frame({
       <Library
         onArtistClick={onArtistClick}
         onPlaylistClick={onPlaylistClick}
+        onAlbumClick={onAlbumClick}
         playlistsKey={playlistsKey}
         onPlaylistCreated={onPlaylistCreated}
       />
       <MainSection>
         {page === 'home' && (
-          <Home onArtistClick={onArtistClick} onPlaylistClick={onPlaylistClick} />
+          <Home
+            onArtistClick={onArtistClick}
+            onPlaylistClick={onPlaylistClick}
+            onAlbumClick={onAlbumClick}
+          />
         )}
         {page === 'search' && (
           <SearchResults
             query={query}
             onArtistClick={onArtistClick}
             onPlaylistClick={onPlaylistClick}
+            onAlbumClick={onAlbumClick}
           />
         )}
         {page === 'profile' && (
           <Profile onArtistClick={onArtistClick} onPlaylistClick={onPlaylistClick} />
         )}
-        {page === 'artist' && selectedArtist && <Artist artist={selectedArtist} />}
+        {page === 'artist' && selectedArtist && (
+          <Artist artist={selectedArtist} onAlbumClick={onAlbumClick} />
+        )}
         {page === 'playlist' && selectedPlaylist && (
           <Playlist
             playlist={selectedPlaylist}
@@ -66,6 +79,7 @@ function Frame({
             onTracksChanged={onPlaylistCreated}
           />
         )}
+        {page === 'album' && selectedAlbum && <Album album={selectedAlbum} />}
       </MainSection>
       <SongPanel />
     </div>

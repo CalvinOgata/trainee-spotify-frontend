@@ -6,7 +6,7 @@ import { useApi } from '../lib/useApi'
 import { usePlayer } from '../lib/PlayerContext'
 import { getArtistAlbums, getArtistPopularMusics } from '../lib/endpoints'
 import { formatDuration, formatPlays } from '../lib/format'
-import type { Artist as ArtistDTO } from '../lib/types'
+import type { AlbumSummary, Artist as ArtistDTO } from '../lib/types'
 
 const PlayArrow = () => (
   <svg viewBox="0 0 24 24" fill="currentColor" className="h-5 w-5">
@@ -21,9 +21,12 @@ const GreenCheck = () => (
   </svg>
 )
 
-type ArtistProps = { artist: ArtistDTO }
+type ArtistProps = {
+  artist: ArtistDTO
+  onAlbumClick: (album: AlbumSummary) => void
+}
 
-function Artist({ artist }: ArtistProps) {
+function Artist({ artist, onAlbumClick }: ArtistProps) {
   const { data: popular } = useApi(() => getArtistPopularMusics(artist.id), [artist.id])
   const { data: albums } = useApi(() => getArtistAlbums(artist.id), [artist.id])
   const { play } = usePlayer()
@@ -98,7 +101,11 @@ function Artist({ artist }: ArtistProps) {
         </div>
         <div className="flex gap-3">
           {discography.map((d) => (
-            <div key={d.id} className="flex h-[172px] w-[132px] flex-col gap-2">
+            <button
+              key={d.id}
+              onClick={() => onAlbumClick(d)}
+              className="flex h-[172px] w-[132px] flex-col gap-2 text-left hover:brightness-110"
+            >
               <img src={albumCover} alt="" className="h-[132px] w-[132px] rounded object-cover" />
               <div className="min-w-0">
                 <p className="truncate text-xs font-semibold leading-tight text-white">{d.title}</p>
@@ -106,7 +113,7 @@ function Artist({ artist }: ArtistProps) {
                   {d.year ? `${d.year} • Álbum` : 'Álbum'}
                 </p>
               </div>
-            </div>
+            </button>
           ))}
         </div>
       </section>

@@ -12,19 +12,20 @@ import {
   getRecentArtists,
   getUserPlaylists,
 } from '../lib/endpoints'
-import type { Artist, PlaylistSummary } from '../lib/types'
+import type { AlbumSummary, Artist, PlaylistSummary } from '../lib/types'
 
 type LibraryFilter = 'Tudo' | 'Playlists' | 'Álbuns' | 'Artistas'
 const filters: LibraryFilter[] = ['Tudo', 'Playlists', 'Álbuns', 'Artistas']
 
 type Row =
   | { key: string; kind: 'playlist'; title: string; sub: string; playlist: PlaylistSummary }
-  | { key: string; kind: 'album'; title: string; sub: string }
+  | { key: string; kind: 'album'; title: string; sub: string; album: AlbumSummary }
   | { key: string; kind: 'artist'; title: string; sub: string; artist: Artist }
 
 type LibraryProps = {
   onArtistClick: (artist: Artist) => void
   onPlaylistClick: (playlist: PlaylistSummary) => void
+  onAlbumClick: (album: AlbumSummary) => void
   playlistsKey: number
   onPlaylistCreated: () => void
 }
@@ -39,7 +40,7 @@ function nextPlaylistName(playlists: PlaylistSummary[]): string {
   return `Minha playlist nº ${max + 1}`
 }
 
-function Library({ onArtistClick, onPlaylistClick, playlistsKey, onPlaylistCreated }: LibraryProps) {
+function Library({ onArtistClick, onPlaylistClick, onAlbumClick, playlistsKey, onPlaylistCreated }: LibraryProps) {
   const [activeFilter, setActiveFilter] = useState<LibraryFilter>('Tudo')
   const { data: playlists } = useApi(getUserPlaylists, [playlistsKey])
   const { data: artists } = useApi(getRecentArtists)
@@ -86,6 +87,7 @@ function Library({ onArtistClick, onPlaylistClick, playlistsKey, onPlaylistCreat
         kind: 'album',
         title: a.title,
         sub: `Álbum • ${a.artistName}`,
+        album: a,
       })
     }
   }
@@ -155,8 +157,13 @@ function Library({ onArtistClick, onPlaylistClick, playlistsKey, onPlaylistCreat
             )
           }
           return (
-            <li key={row.key} className="flex items-center gap-3 rounded-md px-2 py-1.5 hover:bg-neutral-900">
-              {content}
+            <li key={row.key}>
+              <button
+                onClick={() => onAlbumClick(row.album)}
+                className="flex w-full items-center gap-3 rounded-md px-2 py-1.5 text-left hover:bg-neutral-900"
+              >
+                {content}
+              </button>
             </li>
           )
         })}

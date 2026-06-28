@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react'
 import albumCover from '../assets/images/album_default.png'
 import artistCover from '../assets/images/artist_default.png'
 import favoritesCover from '../assets/images/favorites_default.png'
@@ -6,13 +7,8 @@ import songCover from '../assets/images/song_default.png'
 import { Dots, Plus } from '../components/icons'
 import { useApi } from '../lib/useApi'
 import { usePlayer } from '../lib/PlayerContext'
-import {
-  getRecentAlbums,
-  getRecentArtists,
-  getRecentMusics,
-  getUserPlaylists,
-} from '../lib/endpoints'
-import type { Artist, Music, PlaylistSummary } from '../lib/types'
+import { search } from '../lib/endpoints'
+import type { Artist, Music, PlaylistSummary, SearchResponse } from '../lib/types'
 
 type Result =
   | { key: string; title: string; sub: string; pill: 'Música'; action: 'add'; music: Music }
@@ -26,17 +22,27 @@ type SearchResultsProps = {
   onPlaylistClick: (playlist: PlaylistSummary) => void
 }
 
+const EMPTY: SearchResponse = { musics: [], playlists: [], artists: [], albums: [] }
+
 function SearchResults({ query, onArtistClick, onPlaylistClick }: SearchResultsProps) {
-  const { data: musics } = useApi(getRecentMusics)
-  const { data: playlists } = useApi(getUserPlaylists)
-  const { data: artists } = useApi(getRecentArtists)
-  const { data: albums } = useApi(getRecentAlbums)
+  const [debouncedQ, setDebouncedQ] = useState(query.trim())
+  useEffect(() => {
+    const t = setTimeout(() => setDebouncedQ(query.trim()), 250)
+    return () => clearTimeout(t)
+  }, [query])
+
+  const { data: results } = useApi<SearchResponse | null>(
+    () => (debouncedQ ? search(debouncedQ) : Promise.resolve(null)),
+    [debouncedQ],
+  )
   const { play } = usePlayer()
 
-  const artistById = new Map((artists ?? []).map((a) => [a.id, a]))
+  const { musics, playlists, artists, albums } = results ?? EMPTY
+
+  const artistById = new Map(artists.map((a) => [a.id, a]))
 
   const all: Result[] = [
-    ...(musics ?? []).map<Result>((m) => ({
+    ...musics.map<Result>((m) => ({
       key: `m-${m.id}`,
       title: m.title,
       sub: 'Música',
@@ -44,7 +50,7 @@ function SearchResults({ query, onArtistClick, onPlaylistClick }: SearchResultsP
       action: 'add',
       music: m,
     })),
-    ...(playlists ?? []).map<Result>((p) => ({
+    ...playlists.map<Result>((p) => ({
       key: `p-${p.id}`,
       title: p.name,
       sub: p.description ? `Playlist • ${p.description}` : 'Playlist',
@@ -52,14 +58,14 @@ function SearchResults({ query, onArtistClick, onPlaylistClick }: SearchResultsP
       action: 'add',
       playlist: p,
     })),
-    ...(albums ?? []).map<Result>((a) => ({
+    ...albums.map<Result>((a) => ({
       key: `al-${a.id}`,
       title: a.title,
       sub: `Álbum • ${a.artistName}`,
       pill: 'Álbum',
       action: 'add',
     })),
-    ...(artists ?? []).map<Result>((a) => ({
+    ...artists.map<Result>((a) => ({
       key: `ar-${a.id}`,
       title: a.name,
       sub: 'Artista',
@@ -69,14 +75,25 @@ function SearchResults({ query, onArtistClick, onPlaylistClick }: SearchResultsP
     })),
   ]
 
-  const q = query.trim().toLowerCase()
-  const filtered = q
-    ? all.filter((r) => r.title.toLowerCase().includes(q) || r.sub.toLowerCase().includes(q))
-    : all
+  if (!debouncedQ) {
+    return (
+      <p className="text-sm font-normal text-neutral-400">
+        Digite algo na barra de pesquisa para começar.
+      </p>
+    )
+  }
+
+  if (results && all.length === 0) {
+    return (
+      <p className="text-sm font-normal text-neutral-400">
+        Nenhum resultado para <span className="font-semibold text-white">{debouncedQ}</span>.
+      </p>
+    )
+  }
 
   return (
     <ul className="flex flex-col gap-2">
-      {filtered.map((r) => (
+      {all.map((r) => (
         <li
           key={r.key}
           className="grid grid-cols-[64px_1fr_auto_auto_auto] items-center gap-4 rounded-md px-2 py-1 hover:bg-neutral-900"

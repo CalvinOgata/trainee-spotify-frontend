@@ -8,6 +8,7 @@ import type {
   Playlist,
   PlaylistSummary,
   PutPlaylistInput,
+  SearchResponse,
 } from './types'
 
 // /user
@@ -40,3 +41,9 @@ export const getArtistAlbums = (artistId: string) =>
 // /album
 export const getAlbumMusics = (albumId: string) =>
   api.get<Music[]>(`/album/${albumId}/musics`)
+
+// /search
+export const search = (q: string, limit?: number) =>
+  api.get<SearchResponse>(
+    `/search?q=${encodeURIComponent(q)}${limit ? `&limit=${limit}` : ''}`,
+  )

@@ -65,3 +65,10 @@ export type PutPlaylistInput = {
   name: string
   description: string
 }
+
+export type SearchResponse = {
+  musics: Music[]
+  playlists: PlaylistSummary[]
+  artists: Artist[]
+  albums: AlbumSummary[]
+}

@@ -56,9 +56,15 @@ function Library({ onArtistClick, onPlaylistClick, playlistsKey, onPlaylistCreat
     }
   }
 
+  const sortedPlaylists = [...(playlists ?? [])].sort((a, b) => {
+    if (a.name === 'Músicas Curtidas') return -1
+    if (b.name === 'Músicas Curtidas') return 1
+    return 0
+  })
+
   const rows: Row[] = []
   if (activeFilter === 'Tudo' || activeFilter === 'Playlists') {
-    for (const p of playlists ?? []) {
+    for (const p of sortedPlaylists) {
       rows.push({
         key: `pl-${p.id}`,
         kind: 'playlist',

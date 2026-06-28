@@ -3,7 +3,7 @@ import favoritesCover from '../assets/images/favorites_default.png'
 import playlistCover from '../assets/images/playlist_default.png'
 import profilePhoto from '../assets/images/profile_default.png'
 import songCover from '../assets/images/song_default.png'
-import { Clock, Dots, Lock, MusicNote, Pen, Trash, X } from '../components/icons'
+import { Clock, Lock, MusicNote, Pen, Trash, X } from '../components/icons'
 import { useApi } from '../lib/useApi'
 import { usePlayer } from '../lib/PlayerContext'
 import {
@@ -11,6 +11,7 @@ import {
   getPlaylist,
   getRecentAlbums,
   getRecentArtists,
+  removeMusicFromPlaylist,
   updatePlaylistAttributes,
 } from '../lib/endpoints'
 import { formatDuration, formatPlaylistDuration, formatPtDate } from '../lib/format'
@@ -173,17 +174,28 @@ function EditDetails({ playlist, cover, isEmpty, onClose, onSave }: EditDetailsP
 
 type PlaylistProps = {
   playlist: PlaylistSummary
+  playlistsKey: number
   onDeleted: () => void
   onUpdated: (updated: PlaylistSummary) => void
+  onTracksChanged: () => void
 }
 
-function Playlist({ playlist, onDeleted, onUpdated }: PlaylistProps) {
-  const { data: full } = useApi(() => getPlaylist(playlist.id), [playlist.id])
+function Playlist({ playlist, playlistsKey, onDeleted, onUpdated, onTracksChanged }: PlaylistProps) {
+  const { data: full } = useApi(() => getPlaylist(playlist.id), [playlist.id, playlistsKey])
   const { data: artists } = useApi(getRecentArtists)
   const { data: albums } = useApi(getRecentAlbums)
   const { play } = usePlayer()
   const [confirmOpen, setConfirmOpen] = useState(false)
   const [editOpen, setEditOpen] = useState(false)
+
+  const handleRemoveTrack = async (musicId: string) => {
+    try {
+      await removeMusicFromPlaylist(playlist.id, musicId)
+      onTracksChanged()
+    } catch {
+      // ignore
+    }
+  }
 
   const tracks = full?.musics ?? []
   const artistById = new Map((artists ?? []).map((a) => [a.id, a]))
@@ -193,7 +205,8 @@ function Playlist({ playlist, onDeleted, onUpdated }: PlaylistProps) {
   const duration = full?.duration ?? playlist.duration
   const isEmpty = musicQtd === 0
 
-  const cover = playlist.name === 'Músicas Curtidas' ? favoritesCover : playlistCover
+  const isLikedPlaylist = playlist.name === 'Músicas Curtidas'
+  const cover = isLikedPlaylist ? favoritesCover : playlistCover
 
   const handleDelete = async () => {
     setConfirmOpen(false)
@@ -262,14 +275,16 @@ function Playlist({ playlist, onDeleted, onUpdated }: PlaylistProps) {
           >
             <Pen />
           </button>
-          <button
-            onClick={() => setConfirmOpen(true)}
-            className="text-neutral-400 hover:text-white"
-            aria-label="Excluir playlist"
-            title="Excluir playlist"
-          >
-            <Trash />
-          </button>
+          {!isLikedPlaylist && (
+            <button
+              onClick={() => setConfirmOpen(true)}
+              className="text-neutral-400 hover:text-white"
+              aria-label="Excluir playlist"
+              title="Excluir playlist"
+            >
+              <Trash />
+            </button>
+          )}
         </div>
       </div>
 
@@ -313,11 +328,15 @@ function Playlist({ playlist, onDeleted, onUpdated }: PlaylistProps) {
                     <p className="truncate text-neutral-400">{formatPtDate(t.createdAt)}</p>
                     <p className="text-right text-neutral-400">{formatDuration(t.duration)}</p>
                     <button
-                      onClick={(e) => e.stopPropagation()}
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        handleRemoveTrack(t.id)
+                      }}
                       className="text-neutral-400 hover:text-white"
-                      aria-label="Mais opções"
+                      aria-label="Remover desta playlist"
+                      title="Remover desta playlist"
                     >
-                      <Dots />
+                      <X className="h-3.5 w-3.5" />
                     </button>
                   </li>
                 )

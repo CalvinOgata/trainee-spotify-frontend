@@ -110,6 +110,15 @@ function Artist({ artist }: ArtistProps) {
           ))}
         </div>
       </section>
+
+      {artist.about && (
+        <section className="flex w-[457px] flex-col gap-2.5">
+          <h2 className="text-base font-bold leading-tight text-white">Sobre</h2>
+          <p className="whitespace-pre-line text-sm font-normal leading-relaxed text-neutral-300">
+            {artist.about}
+          </p>
+        </section>
+      )}
     </div>
   )
 }

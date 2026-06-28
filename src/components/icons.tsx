@@ -181,3 +181,56 @@ export const Prev = ({ className = 'h-[11px] w-[11px]' }: IconProps) => (
     <rect x="8.5" width="2" height="11" fill="currentColor" />
   </svg>
 )
+
+export const Heart = ({ className = 'h-4 w-4', filled = false }: IconProps & { filled?: boolean }) => (
+  <svg viewBox="0 0 24 24" className={className}>
+    <path
+      d="M12 21s-7-4.5-9.5-9A5.5 5.5 0 0 1 12 6a5.5 5.5 0 0 1 9.5 6c-2.5 4.5-9.5 9-9.5 9Z"
+      fill={filled ? 'currentColor' : 'none'}
+      stroke="currentColor"
+      strokeWidth="1.5"
+      strokeLinejoin="round"
+    />
+  </svg>
+)
+
+export const Bookmark = ({ className = 'h-4 w-4', filled = false }: IconProps & { filled?: boolean }) => (
+  <svg viewBox="0 0 24 24" className={className}>
+    <path
+      d="M6 3h12v18l-6-4-6 4V3Z"
+      fill={filled ? 'currentColor' : 'none'}
+      stroke="currentColor"
+      strokeWidth="1.5"
+      strokeLinejoin="round"
+    />
+  </svg>
+)
+
+export const PlusCircle = ({ className = 'h-4 w-4' }: IconProps) => (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className={className}>
+    <circle cx="12" cy="12" r="9" />
+    <path d="M12 8v8M8 12h8" strokeLinecap="round" />
+  </svg>
+)
+
+export const VolumeHigh = ({ className = 'h-4 w-4' }: IconProps) => (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className={className}>
+    <path d="M3 10v4h3l5 4V6L6 10H3Z" strokeLinejoin="round" />
+    <path d="M15 9a4 4 0 0 1 0 6" strokeLinecap="round" />
+    <path d="M17.5 6.5a8 8 0 0 1 0 11" strokeLinecap="round" />
+  </svg>
+)
+
+export const VolumeLow = ({ className = 'h-4 w-4' }: IconProps) => (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className={className}>
+    <path d="M3 10v4h3l5 4V6L6 10H3Z" strokeLinejoin="round" />
+    <path d="M15 9a4 4 0 0 1 0 6" strokeLinecap="round" />
+  </svg>
+)
+
+export const VolumeMute = ({ className = 'h-4 w-4' }: IconProps) => (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className={className}>
+    <path d="M3 10v4h3l5 4V6L6 10H3Z" strokeLinejoin="round" />
+    <path d="M15 9l5 6M20 9l-5 6" strokeLinecap="round" />
+  </svg>
+)

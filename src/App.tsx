@@ -97,7 +97,12 @@ function App() {
           />
         </>
       )}
-      <Player onFullscreenClick={toggleFullscreen} isFullscreen={isFullscreen} />
+      <Player
+        onFullscreenClick={toggleFullscreen}
+        isFullscreen={isFullscreen}
+        playlistsKey={playlistsKey}
+        onPlaylistsChanged={refreshPlaylists}
+      />
     </div>
   )
 }

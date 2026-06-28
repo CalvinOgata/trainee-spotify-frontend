@@ -60,8 +60,10 @@ function Frame({
         {page === 'playlist' && selectedPlaylist && (
           <Playlist
             playlist={selectedPlaylist}
+            playlistsKey={playlistsKey}
             onDeleted={onPlaylistDeleted}
             onUpdated={onPlaylistUpdated}
+            onTracksChanged={onPlaylistCreated}
           />
         )}
       </MainSection>

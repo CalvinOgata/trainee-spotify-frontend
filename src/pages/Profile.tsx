@@ -12,11 +12,14 @@ import {
   getUserPlaylists,
 } from '../lib/endpoints'
 import { formatDuration, formatPlays } from '../lib/format'
-import type { Artist } from '../lib/types'
+import type { Artist, PlaylistSummary } from '../lib/types'
 
-type ProfileProps = { onArtistClick: (artist: Artist) => void }
+type ProfileProps = {
+  onArtistClick: (artist: Artist) => void
+  onPlaylistClick: (playlist: PlaylistSummary) => void
+}
 
-function Profile({ onArtistClick }: ProfileProps) {
+function Profile({ onArtistClick, onPlaylistClick }: ProfileProps) {
   const { data: playlists } = useApi(getUserPlaylists)
   const { data: followers } = useApi(getFollowers)
   const { data: topArtists } = useApi(getMostPlayedArtists)
@@ -99,10 +102,14 @@ function Profile({ onArtistClick }: ProfileProps) {
         <h2 className="text-base font-bold leading-tight text-white">Playlists públicas</h2>
         <div className="flex gap-3">
           {playlistTiles.map((p) => (
-            <div key={p.id} className="flex h-[172px] w-[132px] flex-col gap-2">
+            <button
+              key={p.id}
+              onClick={() => onPlaylistClick(p)}
+              className="flex h-[172px] w-[132px] flex-col gap-2 text-left"
+            >
               <img src={p.name === 'Músicas Curtidas' ? favoritesCover : playlistCover} alt="" className="h-[132px] w-[132px] rounded object-cover" />
               <p className="truncate text-xs font-semibold text-white">{p.name}</p>
-            </div>
+            </button>
           ))}
         </div>
       </section>

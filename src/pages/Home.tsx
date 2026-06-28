@@ -12,14 +12,17 @@ import {
   getRecentMusics,
   getUserPlaylists,
 } from '../lib/endpoints'
-import type { Artist } from '../lib/types'
+import type { Artist, PlaylistSummary } from '../lib/types'
 
 const filters = ['Tudo', 'Música', 'Playlists'] as const
 type Filter = (typeof filters)[number]
 
-type HomeProps = { onArtistClick: (artist: Artist) => void }
+type HomeProps = {
+  onArtistClick: (artist: Artist) => void
+  onPlaylistClick: (playlist: PlaylistSummary) => void
+}
 
-function Home({ onArtistClick }: HomeProps) {
+function Home({ onArtistClick, onPlaylistClick }: HomeProps) {
   const [activeFilter, setActiveFilter] = useState<Filter>('Tudo')
   const { data: recentMusics } = useApi(getRecentMusics)
   const { data: playlists } = useApi(getUserPlaylists)
@@ -71,7 +74,11 @@ function Home({ onArtistClick }: HomeProps) {
         <h3 className="text-base font-bold text-white">Suas Playlists</h3>
         <div className="flex gap-3">
           {playlistTiles.map((p) => (
-            <div key={p.id} className="flex h-[172px] w-[132px] flex-col gap-2">
+            <button
+              key={p.id}
+              onClick={() => onPlaylistClick(p)}
+              className="flex h-[172px] w-[132px] flex-col gap-2 text-left"
+            >
               <img src={p.name === 'Músicas Curtidas' ? favoritesCover : playlistCover} alt="" className="h-[132px] w-[132px] rounded-[2px] object-cover" />
               <div className="min-w-0">
                 <p className="truncate text-xs font-semibold leading-tight text-white">{p.name}</p>
@@ -79,7 +86,7 @@ function Home({ onArtistClick }: HomeProps) {
                   {p.description ? `Playlist • ${p.description}` : 'Playlist'}
                 </p>
               </div>
-            </div>
+            </button>
           ))}
         </div>
       </section>

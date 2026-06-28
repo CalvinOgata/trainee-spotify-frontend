@@ -4,15 +4,18 @@ import Navbar from './components/Navbar'
 import Frame from './components/Frame'
 import Player from './components/Player'
 import PlayingSong from './pages/PlayingSong'
-import type { Artist } from './lib/types'
+import type { Artist, PlaylistSummary } from './lib/types'
 
-export type Page = 'home' | 'search' | 'profile' | 'artist'
+export type Page = 'home' | 'search' | 'profile' | 'artist' | 'playlist'
 
 function App() {
   const [query, setQuery] = useState('')
   const [page, setPage] = useState<Page>('home')
   const [selectedArtist, setSelectedArtist] = useState<Artist | null>(null)
+  const [selectedPlaylist, setSelectedPlaylist] = useState<PlaylistSummary | null>(null)
   const [isFullscreen, setIsFullscreen] = useState(false)
+  const [playlistsKey, setPlaylistsKey] = useState(0)
+  const refreshPlaylists = () => setPlaylistsKey((k) => k + 1)
 
   const handleQueryChange = (q: string) => {
     setQuery(q)
@@ -33,6 +36,23 @@ function App() {
     setQuery('')
     setSelectedArtist(artist)
     setPage('artist')
+  }
+
+  const goPlaylist = (playlist: PlaylistSummary) => {
+    setQuery('')
+    setSelectedPlaylist(playlist)
+    setPage('playlist')
+  }
+
+  const handlePlaylistDeleted = () => {
+    setSelectedPlaylist(null)
+    refreshPlaylists()
+    setPage('home')
+  }
+
+  const handlePlaylistUpdated = (updated: PlaylistSummary) => {
+    setSelectedPlaylist(updated)
+    refreshPlaylists()
   }
 
   const toggleFullscreen = () => {
@@ -67,7 +87,13 @@ function App() {
             query={query}
             page={page}
             selectedArtist={selectedArtist}
+            selectedPlaylist={selectedPlaylist}
             onArtistClick={goArtist}
+            onPlaylistClick={goPlaylist}
+            onPlaylistDeleted={handlePlaylistDeleted}
+            onPlaylistUpdated={handlePlaylistUpdated}
+            playlistsKey={playlistsKey}
+            onPlaylistCreated={refreshPlaylists}
           />
         </>
       )}

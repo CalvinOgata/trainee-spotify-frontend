@@ -12,16 +12,21 @@ import {
   getRecentMusics,
   getUserPlaylists,
 } from '../lib/endpoints'
-import type { Artist, Music } from '../lib/types'
+import type { Artist, Music, PlaylistSummary } from '../lib/types'
 
 type Result =
   | { key: string; title: string; sub: string; pill: 'Música'; action: 'add'; music: Music }
-  | { key: string; title: string; sub: string; pill: 'Playlist' | 'Álbum'; action: 'add' }
+  | { key: string; title: string; sub: string; pill: 'Playlist'; action: 'add'; playlist: PlaylistSummary }
+  | { key: string; title: string; sub: string; pill: 'Álbum'; action: 'add' }
   | { key: string; title: string; sub: string; pill: 'Artista'; action: 'follow'; artist: Artist }
 
-type SearchResultsProps = { query: string; onArtistClick: (artist: Artist) => void }
+type SearchResultsProps = {
+  query: string
+  onArtistClick: (artist: Artist) => void
+  onPlaylistClick: (playlist: PlaylistSummary) => void
+}
 
-function SearchResults({ query, onArtistClick }: SearchResultsProps) {
+function SearchResults({ query, onArtistClick, onPlaylistClick }: SearchResultsProps) {
   const { data: musics } = useApi(getRecentMusics)
   const { data: playlists } = useApi(getUserPlaylists)
   const { data: artists } = useApi(getRecentArtists)
@@ -45,6 +50,7 @@ function SearchResults({ query, onArtistClick }: SearchResultsProps) {
       sub: p.description ? `Playlist • ${p.description}` : 'Playlist',
       pill: 'Playlist',
       action: 'add',
+      playlist: p,
     })),
     ...(albums ?? []).map<Result>((a) => ({
       key: `al-${a.id}`,
@@ -95,6 +101,13 @@ function SearchResults({ query, onArtistClick }: SearchResultsProps) {
             ) : r.pill === 'Música' ? (
               <button
                 onClick={() => play(r.music, { artist: artistById.get(r.music.artistId) })}
+                className="block w-full truncate text-left text-base font-semibold text-white hover:underline"
+              >
+                {r.title}
+              </button>
+            ) : r.pill === 'Playlist' ? (
+              <button
+                onClick={() => onPlaylistClick(r.playlist)}
                 className="block w-full truncate text-left text-base font-semibold text-white hover:underline"
               >
                 {r.title}

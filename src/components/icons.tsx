@@ -142,6 +142,39 @@ export const Next = ({ className = 'h-[11px] w-[11px]' }: IconProps) => (
   </svg>
 )
 
+export const Pen = ({ className = 'h-5 w-5' }: IconProps) => (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className={className}>
+    <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5Z" strokeLinecap="round" strokeLinejoin="round" />
+  </svg>
+)
+
+export const Lock = ({ className = 'h-3.5 w-3.5' }: IconProps) => (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className={className}>
+    <rect x="4" y="11" width="16" height="10" rx="2" />
+    <path d="M8 11V7a4 4 0 0 1 8 0v4" strokeLinecap="round" />
+  </svg>
+)
+
+export const Trash = ({ className = 'h-5 w-5' }: IconProps) => (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className={className}>
+    <path d="M3 6h18M8 6V4a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1v2M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" strokeLinecap="round" strokeLinejoin="round" />
+    <path d="M10 11v6M14 11v6" strokeLinecap="round" />
+  </svg>
+)
+
+export const MusicNote = ({ className = 'h-12 w-12' }: IconProps) => (
+  <svg viewBox="0 0 24 24" fill="currentColor" className={className}>
+    <path d="M19 3v10.55A4 4 0 1 0 21 17V7h-2V3h-2v2h-6V3h-2Zm-2 4h2v2h-2V7Z" />
+  </svg>
+)
+
+export const Clock = ({ className = 'h-3.5 w-3.5' }: IconProps) => (
+  <svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" className={className}>
+    <circle cx="8" cy="8" r="7" stroke="currentColor" />
+    <path d="M8 4V8L10.5 10" stroke="currentColor" strokeLinecap="round" />
+  </svg>
+)
+
 export const Prev = ({ className = 'h-[11px] w-[11px]' }: IconProps) => (
   <svg viewBox="0 0 11 11" fill="none" xmlns="http://www.w3.org/2000/svg" className={`${className} -scale-x-100`}>
     <path d="M0 0.5L1 0L10 5.5L2 10.5L1 11L0 10.5V0.5Z" fill="currentColor" />

@@ -10,7 +10,7 @@ type PlayerContextValue = {
   currentArtist: Artist | null
   isPlaying: boolean
   position: number
-  play: (music: Music, opts?: { artist?: Artist }) => void
+  play: (music: Music, opts?: { artist?: Artist; queue?: Music[] }) => void
   togglePlay: () => void
   next: () => void
   prev: () => void
@@ -29,7 +29,7 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
   const [position, setPosition] = useState(0)
 
   const play = useCallback(
-    async (music: Music, opts?: { artist?: Artist }) => {
+    async (music: Music, opts?: { artist?: Artist; queue?: Music[] }) => {
       if (current) {
         setHistory((h) => [...h, { music: current, artist: currentArtist, queue }])
       }
@@ -38,6 +38,10 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
       setCurrentArtist(opts?.artist ?? null)
       setPosition(0)
       setIsPlaying(true)
+      if (opts?.queue) {
+        setQueue(opts.queue)
+        return
+      }
       try {
         const musics = await getAlbumMusics(music.albumId)
         setQueue(musics ?? [music])

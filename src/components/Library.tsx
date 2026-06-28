@@ -6,26 +6,55 @@ import playlistCover from '../assets/images/playlist_default.png'
 import { Search } from './icons'
 import Pill from './Pill'
 import { useApi } from '../lib/useApi'
-import { getRecentAlbums, getRecentArtists, getUserPlaylists } from '../lib/endpoints'
-import type { Artist } from '../lib/types'
+import {
+  createPlaylist,
+  getRecentAlbums,
+  getRecentArtists,
+  getUserPlaylists,
+} from '../lib/endpoints'
+import type { Artist, PlaylistSummary } from '../lib/types'
 
 type LibraryFilter = 'Tudo' | 'Playlists' | 'Álbuns' | 'Artistas'
 const filters: LibraryFilter[] = ['Tudo', 'Playlists', 'Álbuns', 'Artistas']
 
 type Row =
-  | { key: string; kind: 'playlist'; title: string; sub: string }
+  | { key: string; kind: 'playlist'; title: string; sub: string; playlist: PlaylistSummary }
   | { key: string; kind: 'album'; title: string; sub: string }
   | { key: string; kind: 'artist'; title: string; sub: string; artist: Artist }
 
 type LibraryProps = {
   onArtistClick: (artist: Artist) => void
+  onPlaylistClick: (playlist: PlaylistSummary) => void
+  playlistsKey: number
+  onPlaylistCreated: () => void
 }
 
-function Library({ onArtistClick }: LibraryProps) {
+const namePattern = /^Minha playlist nº (\d+)$/
+
+function nextPlaylistName(playlists: PlaylistSummary[]): string {
+  const max = playlists.reduce((acc, p) => {
+    const m = p.name.match(namePattern)
+    return m ? Math.max(acc, parseInt(m[1], 10)) : acc
+  }, 0)
+  return `Minha playlist nº ${max + 1}`
+}
+
+function Library({ onArtistClick, onPlaylistClick, playlistsKey, onPlaylistCreated }: LibraryProps) {
   const [activeFilter, setActiveFilter] = useState<LibraryFilter>('Tudo')
-  const { data: playlists } = useApi(getUserPlaylists)
+  const { data: playlists } = useApi(getUserPlaylists, [playlistsKey])
   const { data: artists } = useApi(getRecentArtists)
   const { data: albums } = useApi(getRecentAlbums)
+
+  const handleCreate = async () => {
+    const name = nextPlaylistName(playlists ?? [])
+    try {
+      const created = await createPlaylist({ name, description: '' })
+      onPlaylistCreated()
+      onPlaylistClick(created)
+    } catch {
+      // ignore
+    }
+  }
 
   const rows: Row[] = []
   if (activeFilter === 'Tudo' || activeFilter === 'Playlists') {
@@ -35,6 +64,7 @@ function Library({ onArtistClick }: LibraryProps) {
         kind: 'playlist',
         title: p.name,
         sub: `Playlist${p.description ? ` • ${p.description}` : ''}`,
+        playlist: p,
       })
     }
   }
@@ -58,7 +88,10 @@ function Library({ onArtistClick }: LibraryProps) {
     <aside className="flex h-[927px] w-[312px] flex-col gap-3 overflow-hidden rounded-lg bg-[#121212] pb-3">
       <div className="flex items-center justify-between px-3 pt-3">
         <h2 className="text-sm font-semibold text-white">Sua Biblioteca</h2>
-        <button className="rounded-full bg-neutral-800 px-3 py-1 text-xs font-semibold text-white hover:bg-neutral-700">
+        <button
+          onClick={handleCreate}
+          className="rounded-full bg-neutral-800 px-3 py-1 text-xs font-semibold text-white hover:bg-neutral-700"
+        >
           Criar playlist
         </button>
       </div>
@@ -96,6 +129,18 @@ function Library({ onArtistClick }: LibraryProps) {
               <li key={row.key}>
                 <button
                   onClick={() => onArtistClick(row.artist)}
+                  className="flex w-full items-center gap-3 rounded-md px-2 py-1.5 text-left hover:bg-neutral-900"
+                >
+                  {content}
+                </button>
+              </li>
+            )
+          }
+          if (row.kind === 'playlist') {
+            return (
+              <li key={row.key}>
+                <button
+                  onClick={() => onPlaylistClick(row.playlist)}
                   className="flex w-full items-center gap-3 rounded-md px-2 py-1.5 text-left hover:bg-neutral-900"
                 >
                   {content}

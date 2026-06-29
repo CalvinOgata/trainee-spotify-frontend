@@ -77,34 +77,35 @@ function App() {
   }
 
   return (
-    <div className="grid h-screen w-screen grid-rows-[60px_minmax(0,1fr)_64px] bg-black font-sans text-white overflow-hidden">
+    <div className="grid h-screen grid-rows-[60px_minmax(0,1fr)_64px] bg-black font-sans text-white overflow-hidden">
+      {/* Navbar — visible always except desktop fullscreen */}
+      <div className={isFullscreen ? 'lg:hidden' : ''}>
+        <Navbar
+          query={query}
+          onQueryChange={handleQueryChange}
+          onHomeClick={goHome}
+          onProfileClick={goProfile}
+        />
+      </div>
       {isFullscreen ? (
-        <div className="row-span-2 min-h-0">
+        <div className="row-start-2 row-span-1 min-h-0 lg:row-start-1 lg:row-span-2">
           <PlayingSong />
         </div>
       ) : (
-        <>
-          <Navbar
-            query={query}
-            onQueryChange={handleQueryChange}
-            onHomeClick={goHome}
-            onProfileClick={goProfile}
-          />
-          <Frame
-            query={query}
-            page={page}
-            selectedArtist={selectedArtist}
-            selectedPlaylist={selectedPlaylist}
-            selectedAlbum={selectedAlbum}
-            onArtistClick={goArtist}
-            onPlaylistClick={goPlaylist}
-            onAlbumClick={goAlbum}
-            onPlaylistDeleted={handlePlaylistDeleted}
-            onPlaylistUpdated={handlePlaylistUpdated}
-            playlistsKey={playlistsKey}
-            onPlaylistCreated={refreshPlaylists}
-          />
-        </>
+        <Frame
+          query={query}
+          page={page}
+          selectedArtist={selectedArtist}
+          selectedPlaylist={selectedPlaylist}
+          selectedAlbum={selectedAlbum}
+          onArtistClick={goArtist}
+          onPlaylistClick={goPlaylist}
+          onAlbumClick={goAlbum}
+          onPlaylistDeleted={handlePlaylistDeleted}
+          onPlaylistUpdated={handlePlaylistUpdated}
+          playlistsKey={playlistsKey}
+          onPlaylistCreated={refreshPlaylists}
+        />
       )}
       <Player
         onFullscreenClick={toggleFullscreen}

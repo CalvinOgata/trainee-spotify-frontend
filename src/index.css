@@ -13,3 +13,33 @@
 ::view-transition-new(root) {
   animation-duration: 300ms;
 }
+
+@utility scroll-auto-hide {
+  scrollbar-width: thin;
+  scrollbar-color: transparent transparent;
+  transition: scrollbar-color 200ms ease;
+
+  &:hover,
+  &:focus-within,
+  &.is-scrolling {
+    scrollbar-color: #4d4d4d transparent;
+  }
+
+  &::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+  &::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  &::-webkit-scrollbar-thumb {
+    background: transparent;
+    border-radius: 4px;
+    transition: background-color 200ms ease;
+  }
+  &:hover::-webkit-scrollbar-thumb,
+  &:focus-within::-webkit-scrollbar-thumb,
+  &.is-scrolling::-webkit-scrollbar-thumb {
+    background: #4d4d4d;
+  }
+}

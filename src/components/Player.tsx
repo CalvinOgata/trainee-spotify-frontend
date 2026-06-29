@@ -149,9 +149,9 @@ function Player({ onFullscreenClick, isFullscreen, playlistsKey, onPlaylistsChan
   }
 
   return (
-    <footer className="flex items-center justify-between bg-black p-2.5">
-      <div className="flex items-center gap-3">
-        <div className="flex h-[35px] w-[111px] items-center gap-3">
+    <footer className="flex items-center gap-3 bg-black p-2.5">
+      <div className="flex min-w-0 flex-1 basis-0 items-center gap-3">
+        <div className="flex h-[35px] min-w-0 max-w-[200px] flex-1 items-center gap-3">
           <img
             src={songCover}
             alt=""
@@ -164,7 +164,7 @@ function Player({ onFullscreenClick, isFullscreen, playlistsKey, onPlaylistsChan
           </div>
         </div>
         {current && (
-          <div className="flex items-center gap-3 text-[#B3B3B3]">
+          <div className="hidden items-center gap-3 text-[#B3B3B3] md:flex">
             <button
               onClick={handleLikeToggle}
               disabled={!likedPlaylistId}
@@ -221,9 +221,13 @@ function Player({ onFullscreenClick, isFullscreen, playlistsKey, onPlaylistsChan
           </div>
         )}
       </div>
-      <div className="flex flex-col items-center gap-1">
-        <div className="flex h-10 w-[509px] items-center justify-center gap-3">
-          <button onClick={prev} className="text-[#B3B3B3] hover:text-white" aria-label="Anterior">
+      <div className="flex w-full max-w-[509px] shrink-0 flex-col items-center gap-1">
+        <div className="flex h-10 w-full items-center justify-center gap-3">
+          <button
+            onClick={prev}
+            className={`text-[#B3B3B3] hover:text-white ${isFullscreen ? '' : 'hidden md:inline-flex'}`}
+            aria-label="Anterior"
+          >
             <Prev />
           </button>
           <button
@@ -237,7 +241,7 @@ function Player({ onFullscreenClick, isFullscreen, playlistsKey, onPlaylistsChan
             <Next />
           </button>
         </div>
-        <div className="flex w-[509px] items-center gap-1.5">
+        <div className={`w-full items-center gap-1.5 ${isFullscreen ? 'flex' : 'hidden md:flex'}`}>
           <span className="w-[22px] text-right text-[11px] font-medium leading-3 text-[#B3B3B3]">
             {formatDuration(Math.floor(position))}
           </span>
@@ -260,10 +264,10 @@ function Player({ onFullscreenClick, isFullscreen, playlistsKey, onPlaylistsChan
           </span>
         </div>
       </div>
-      <div className="flex items-center justify-end gap-3 text-[#B3B3B3]">
+      <div className="flex min-w-0 flex-1 basis-0 items-center justify-end gap-3 text-[#B3B3B3]">
         <button
           onClick={handleMuteToggle}
-          className="hover:text-white"
+          className="hidden hover:text-white md:block"
           aria-label={volume === 0 ? 'Reativar som' : 'Silenciar'}
           title={volume === 0 ? 'Reativar som' : 'Silenciar'}
         >
@@ -272,7 +276,7 @@ function Player({ onFullscreenClick, isFullscreen, playlistsKey, onPlaylistsChan
         <div
           ref={volumeBarRef}
           onMouseDown={handleVolumeMouseDown}
-          className="group relative h-1 w-24 cursor-pointer rounded-full bg-neutral-700"
+          className="group relative hidden h-1 w-24 cursor-pointer rounded-full bg-neutral-700 md:block"
         >
           <div
             className="pointer-events-none absolute inset-y-0 left-0 rounded-full bg-white group-hover:bg-[#1FDF64]"

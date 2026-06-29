@@ -43,11 +43,11 @@ function ConfirmDelete({ playlistName, onConfirm, onCancel }: ConfirmDeleteProps
   return (
     <div
       onClick={onCancel}
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/60"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4"
     >
       <div
         onClick={(e) => e.stopPropagation()}
-        className="flex w-[420px] flex-col gap-4 rounded-lg bg-[#282828] p-5"
+        className="flex w-full max-w-[420px] flex-col gap-4 rounded-lg bg-[#282828] p-5"
       >
         <div className="flex items-start justify-between">
           <h2 className="text-lg font-bold text-white">Excluir playlist?</h2>
@@ -112,11 +112,11 @@ function EditDetails({ playlist, cover, isEmpty, onClose, onSave }: EditDetailsP
   return (
     <div
       onClick={onClose}
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/60"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4"
     >
       <div
         onClick={(e) => e.stopPropagation()}
-        className="flex w-[760px] flex-col gap-5 rounded-lg bg-[#282828] p-7"
+        className="flex max-h-[90vh] w-full max-w-[760px] flex-col gap-5 overflow-y-auto rounded-lg bg-[#282828] p-5 sm:p-7"
       >
         <div className="flex items-start justify-between">
           <h2 className="text-2xl font-bold text-white">Editar detalhes</h2>
@@ -125,15 +125,15 @@ function EditDetails({ playlist, cover, isEmpty, onClose, onSave }: EditDetailsP
           </button>
         </div>
 
-        <div className="flex gap-5">
+        <div className="flex flex-col gap-5 sm:flex-row">
           {isEmpty ? (
-            <div className="grid h-[200px] w-[200px] shrink-0 place-items-center rounded bg-[#3e3e3e] text-neutral-400 shadow-[0_4px_60px_rgba(0,0,0,0.5)]">
+            <div className="grid h-[200px] w-[200px] shrink-0 place-items-center self-center rounded bg-[#3e3e3e] text-neutral-400 shadow-[0_4px_60px_rgba(0,0,0,0.5)] sm:self-auto">
               <MusicNote className="h-16 w-16" />
             </div>
           ) : (
-            <img src={cover} alt="" className="h-[200px] w-[200px] shrink-0 rounded object-cover shadow-[0_4px_60px_rgba(0,0,0,0.5)]" />
+            <img src={cover} alt="" className="h-[200px] w-[200px] shrink-0 self-center rounded object-cover shadow-[0_4px_60px_rgba(0,0,0,0.5)] sm:self-auto" />
           )}
-          <div className="flex flex-1 flex-col gap-3">
+          <div className="flex min-w-0 flex-1 flex-col gap-3">
             <input
               value={name}
               onChange={(e) => setName(e.target.value)}
@@ -293,7 +293,7 @@ function Playlist({ playlist, playlistsKey, onDeleted, onUpdated, onTracksChange
         )}
         <div className="flex min-w-0 flex-col pb-2">
           <p className="text-xs font-semibold leading-none text-white">Playlist pública</p>
-          <h1 className="mt-2 truncate text-7xl font-bold leading-none text-white">{playlist.name}</h1>
+          <h1 className="mt-2 truncate text-4xl font-bold leading-none text-white sm:text-5xl lg:text-7xl">{playlist.name}</h1>
           <p className="mt-3 flex items-center gap-1.5 text-xs font-semibold text-white">
             <img src={profilePhoto} alt="" className="h-4 w-4 rounded-full object-cover" />
             Vitoria Tenorio

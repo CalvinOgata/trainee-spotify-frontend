@@ -1,8 +1,9 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import artistAboutCover from '../assets/images/artist_about.png'
 import songCover from '../assets/images/song_default.png'
 import { Dots, Verified, X } from './icons'
 import { usePlayer } from '../lib/PlayerContext'
+import { useAutoHideScrollbar } from '../lib/useAutoHideScrollbar'
 import { formatPlays } from '../lib/format'
 
 const composers = [
@@ -35,11 +36,11 @@ function CreditsModal({ onClose, title, artistName }: CreditsModalProps) {
   return (
     <div
       onClick={onClose}
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/60"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4"
     >
       <div
         onClick={(e) => e.stopPropagation()}
-        className="flex max-h-[85vh] w-[420px] flex-col overflow-y-auto rounded-lg bg-[#282828] p-5"
+        className="flex max-h-[85vh] w-full max-w-[420px] flex-col overflow-y-auto rounded-lg bg-[#282828] p-5"
       >
         <div className="mb-4 flex items-start justify-between">
           <div>
@@ -88,13 +89,18 @@ function CreditsModal({ onClose, title, artistName }: CreditsModalProps) {
 function SongPanel() {
   const [creditsOpen, setCreditsOpen] = useState(false)
   const { current, currentArtist } = usePlayer()
+  const ref = useRef<HTMLElement>(null)
+  useAutoHideScrollbar(ref)
 
   const title = current?.title ?? 'Nenhuma música'
   const subtitle = current ? currentArtist?.name ?? 'Artista' : ''
 
   return (
     <>
-      <aside className="flex h-[927px] w-[315px] flex-col overflow-hidden rounded-lg bg-[#121212]">
+      <aside
+        ref={ref}
+        className="scroll-auto-hide hidden h-full w-[315px] shrink-0 flex-col overflow-y-auto rounded-lg bg-[#121212] xl:flex"
+      >
         <div className="flex items-center justify-between px-3 pt-3 pb-2">
           <h2 className="text-sm font-semibold text-white">you know</h2>
           <Dots />

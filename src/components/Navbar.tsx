@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import profilePhoto from '../assets/images/profile_default.png'
 import { Spotify, Home, Search, X, Bell, Download } from './icons'
 
@@ -9,17 +10,60 @@ type NavbarProps = {
 }
 
 function Navbar({ query, onQueryChange, onHomeClick, onProfileClick }: NavbarProps) {
+  const [mobileSearchOpen, setMobileSearchOpen] = useState(false)
+
+  const handleMobileSearchOpen = () => setMobileSearchOpen(true)
+  const handleMobileSearchClose = () => {
+    setMobileSearchOpen(false)
+    onHomeClick()
+  }
+
   return (
-    <header className="flex items-center justify-between bg-black p-3 border-b border-neutral-800">
-      <button onClick={onHomeClick} className="flex items-center hover:brightness-125" aria-label="Página inicial">
+    <header className="flex items-center justify-between gap-3 bg-black p-3 border-b border-neutral-800">
+      {/* Spotify mark (desktop only) */}
+      <button
+        onClick={onHomeClick}
+        className="hidden shrink-0 items-center hover:brightness-125 md:flex"
+        aria-label="Página inicial"
+      >
         <Spotify />
       </button>
-      <div className="flex h-9 w-[395px] items-center gap-1">
-        <button onClick={onHomeClick} className="shrink-0 hover:brightness-125" aria-label="Início">
+
+      {/* Mobile icon row — collapses to just Home + Search + (spacer) + Profile */}
+      {!mobileSearchOpen && (
+        <div className="flex items-center gap-2 md:hidden">
+          <button
+            onClick={onHomeClick}
+            className="grid h-9 w-9 place-items-center rounded-full bg-[#1F1F1F] text-white hover:brightness-125"
+            aria-label="Página inicial"
+          >
+            <Home className="h-4 w-4" />
+          </button>
+          <button
+            onClick={handleMobileSearchOpen}
+            className="grid h-9 w-9 place-items-center rounded-full bg-[#1F1F1F] text-white hover:brightness-125"
+            aria-label="Pesquisar"
+          >
+            <Search className="h-4 w-4" />
+          </button>
+        </div>
+      )}
+
+      {/* Search bar — desktop always, mobile only when expanded */}
+      <div
+        className={`h-9 max-w-[395px] flex-1 items-center gap-1 ${
+          mobileSearchOpen ? 'flex' : 'hidden md:flex'
+        }`}
+      >
+        <button
+          onClick={onHomeClick}
+          className="hidden shrink-0 hover:brightness-125 md:block"
+          aria-label="Início"
+        >
           <Home />
         </button>
-        <div className="flex h-9 w-[355px] items-center justify-between rounded-2xl border border-white bg-[#1F1F1F] px-3.5 text-white">
-          <div className="flex flex-1 items-center gap-2 overflow-hidden">
+        <div className="flex h-9 min-w-0 flex-1 items-center justify-between rounded-2xl border border-white bg-[#1F1F1F] px-3.5 text-white">
+          <div className="flex min-w-0 flex-1 items-center gap-2 overflow-hidden">
             <Search className="h-4 w-[15px] shrink-0 text-[#B3B3B3]" />
             <input
               type="text"
@@ -27,14 +71,15 @@ function Navbar({ query, onQueryChange, onHomeClick, onProfileClick }: NavbarPro
               onChange={(e) => onQueryChange(e.target.value)}
               placeholder="O que você quer ouvir?"
               aria-label="Pesquisar"
-              className="flex-1 bg-transparent text-xs font-normal text-white placeholder:text-[#B3B3B3] outline-none"
+              autoFocus={mobileSearchOpen}
+              className="min-w-0 flex-1 bg-transparent text-xs font-normal text-white placeholder:text-[#B3B3B3] outline-none"
             />
           </div>
-          {query && (
+          {(query || mobileSearchOpen) && (
             <button
               type="button"
-              onClick={() => onQueryChange('')}
-              aria-label="Limpar busca"
+              onClick={mobileSearchOpen ? handleMobileSearchClose : () => onQueryChange('')}
+              aria-label={mobileSearchOpen ? 'Fechar busca' : 'Limpar busca'}
               className="shrink-0 text-[#B3B3B3] hover:text-white"
             >
               <X className="h-[12.59px] w-[12.29px]" />
@@ -42,22 +87,26 @@ function Navbar({ query, onQueryChange, onHomeClick, onProfileClick }: NavbarPro
           )}
         </div>
       </div>
-      <div className="flex h-9 items-center gap-8">
-        <button className="flex items-center gap-2 text-[#B3B3B3] hover:text-white">
-          <Download className="h-3 w-3" />
-          <span className="text-[10px] font-bold">Instalar aplicativo</span>
-        </button>
-        <button className="text-[#B3B3B3] hover:text-white">
-          <Bell className="h-3 w-3" />
-        </button>
-        <button
-          onClick={onProfileClick}
-          aria-label="Perfil"
-          className="h-9 w-9 overflow-hidden rounded-full border-4 border-black hover:brightness-110"
-        >
-          <img src={profilePhoto} alt="" className="h-full w-full object-cover" />
-        </button>
-      </div>
+
+      {/* Right cluster */}
+      {!mobileSearchOpen && (
+        <div className="flex h-9 shrink-0 items-center gap-4 md:gap-8">
+          <button className="hidden items-center gap-2 text-[#B3B3B3] hover:text-white md:flex">
+            <Download className="h-3 w-3" />
+            <span className="text-[10px] font-bold">Instalar aplicativo</span>
+          </button>
+          <button className="hidden text-[#B3B3B3] hover:text-white md:block">
+            <Bell className="h-3 w-3" />
+          </button>
+          <button
+            onClick={onProfileClick}
+            aria-label="Perfil"
+            className="h-9 w-9 shrink-0 overflow-hidden rounded-full border-4 border-black hover:brightness-110"
+          >
+            <img src={profilePhoto} alt="" className="h-full w-full object-cover" />
+          </button>
+        </div>
+      )}
     </header>
   )
 }

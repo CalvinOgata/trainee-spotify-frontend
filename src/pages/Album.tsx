@@ -42,7 +42,7 @@ function Album({ album }: AlbumProps) {
         />
         <div className="flex min-w-0 flex-col pb-2">
           <p className="text-xs font-semibold leading-none text-white">Álbum</p>
-          <h1 className="mt-2 truncate text-7xl font-bold leading-none text-white">{album.title}</h1>
+          <h1 className="mt-2 truncate text-4xl font-bold leading-none text-white sm:text-5xl lg:text-7xl">{album.title}</h1>
           <p className="mt-3 flex items-center gap-1.5 text-xs font-semibold text-white">
             {album.artistName}
             {!isEmpty && (

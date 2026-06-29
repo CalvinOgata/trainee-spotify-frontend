@@ -57,12 +57,12 @@ function Home({ onArtistClick, onPlaylistClick, onAlbumClick }: HomeProps) {
             )
           })}
         </div>
-        <div className="grid grid-cols-[repeat(4,295px)] justify-between gap-y-2">
+        <div className="grid grid-cols-[repeat(auto-fill,minmax(140px,1fr))] gap-2 md:grid-cols-[repeat(auto-fill,minmax(260px,1fr))]">
           {recentItems.map((m) => (
             <button
               key={m.id}
               onClick={() => play(m, { artist: artistById.get(m.artistId) })}
-              className="flex h-[60px] w-[295px] items-center gap-2.5 overflow-hidden rounded-[4px] bg-[#2D2D2D] pr-3 text-left hover:brightness-110"
+              className="flex h-[60px] w-full items-center gap-2.5 overflow-hidden rounded-[4px] bg-[#2D2D2D] pr-3 text-left hover:brightness-110"
             >
               <img src={songCover} alt="" className="h-[60px] w-[60px] shrink-0 object-cover" />
               <span className="truncate text-sm font-semibold text-white">{m.title}</span>
@@ -73,12 +73,12 @@ function Home({ onArtistClick, onPlaylistClick, onAlbumClick }: HomeProps) {
 
       <section className="flex flex-col gap-2">
         <h3 className="text-base font-bold text-white">Suas Playlists</h3>
-        <div className="flex gap-3">
+        <div className="flex gap-3 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden md:flex-wrap md:overflow-visible">
           {playlistTiles.map((p) => (
             <button
               key={p.id}
               onClick={() => onPlaylistClick(p)}
-              className="flex h-[172px] w-[132px] flex-col gap-2 text-left"
+              className="flex h-[172px] w-[132px] shrink-0 flex-col gap-2 text-left"
             >
               <img src={p.name === 'Músicas Curtidas' ? favoritesCover : playlistCover} alt="" className="h-[132px] w-[132px] rounded-[2px] object-cover" />
               <div className="min-w-0">
@@ -97,12 +97,12 @@ function Home({ onArtistClick, onPlaylistClick, onAlbumClick }: HomeProps) {
           <h3 className="text-base font-bold text-white">Artistas recentes</h3>
           <button className="text-xs font-semibold text-neutral-400 hover:text-white">Mostrar tudo</button>
         </div>
-        <div className="flex gap-3">
+        <div className="flex gap-3 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden md:flex-wrap md:overflow-visible">
           {artistTiles.map((a) => (
             <button
               key={a.id}
               onClick={() => onArtistClick(a)}
-              className="flex h-[172px] w-[132px] flex-col gap-2 text-left"
+              className="flex h-[172px] w-[132px] shrink-0 flex-col gap-2 text-left"
             >
               <img src={artistCover} alt="" className="h-[132px] w-[132px] rounded-full object-cover" />
               <div className="min-w-0">
@@ -116,12 +116,12 @@ function Home({ onArtistClick, onPlaylistClick, onAlbumClick }: HomeProps) {
 
       <section className="flex flex-col gap-2">
         <h3 className="text-base font-bold text-white">Álbuns recentes</h3>
-        <div className="flex gap-3">
+        <div className="flex gap-3 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden md:flex-wrap md:overflow-visible">
           {albumTiles.map((a) => (
             <button
               key={a.id}
               onClick={() => onAlbumClick(a)}
-              className="flex w-[140px] flex-col gap-1.5 rounded-[4px] p-1 text-left hover:brightness-110"
+              className="flex w-[140px] shrink-0 flex-col gap-1.5 rounded-[4px] p-1 text-left hover:brightness-110"
             >
               <img src={albumCover} alt="" className="h-[132px] w-[132px] rounded-[2px] object-cover" />
               <div className="min-w-0">

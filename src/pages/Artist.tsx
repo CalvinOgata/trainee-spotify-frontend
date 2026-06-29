@@ -42,7 +42,7 @@ function Artist({ artist, onAlbumClick }: ArtistProps) {
           backgroundImage: `linear-gradient(to bottom, rgba(65, 65, 65, 0) 0%, rgba(0, 0, 0, 0.4) 100%), url(${artistBanner})`,
         }}
       >
-        <h1 className="text-7xl font-bold leading-none text-white">{artist.name}</h1>
+        <h1 className="text-4xl font-bold leading-none text-white sm:text-5xl lg:text-7xl">{artist.name}</h1>
         <p className="mt-3 flex items-center gap-1.5 text-xs font-normal text-white">
           <Verified />
           Verified by Spotify
@@ -64,14 +64,14 @@ function Artist({ artist, onAlbumClick }: ArtistProps) {
         </button>
       </div>
 
-      <section className="flex w-[457px] flex-col gap-2.5">
+      <section className="flex w-full max-w-[457px] flex-col gap-2.5">
         <h2 className="text-base font-bold leading-tight text-white">Populares</h2>
         <ul className="flex flex-col gap-2.5">
           {popularTracks.map((t, i) => (
             <li
               key={t.id}
               onClick={() => play(t, { artist })}
-              className="grid h-9 w-[455px] cursor-pointer grid-cols-[12px_36px_1fr_auto_auto_auto] items-center gap-2.5 hover:bg-neutral-900"
+              className="grid h-9 w-full cursor-pointer grid-cols-[12px_36px_minmax(0,1fr)_auto_auto_auto] items-center gap-2.5 hover:bg-neutral-900"
             >
               <span className="text-xs font-normal text-neutral-400">{i + 1}</span>
               <img src={songCover} alt="" className="h-9 w-9 rounded object-cover" />
@@ -94,17 +94,17 @@ function Artist({ artist, onAlbumClick }: ArtistProps) {
         </button>
       </section>
 
-      <section className="flex w-[1140px] flex-col gap-2.5">
+      <section className="flex w-full flex-col gap-2.5">
         <div className="flex items-center justify-between">
           <h2 className="text-base font-bold leading-tight text-white">Discografia</h2>
           <button className="text-xs font-semibold text-neutral-400 hover:text-white">Mostrar tudo</button>
         </div>
-        <div className="flex gap-3">
+        <div className="flex gap-3 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden md:flex-wrap md:overflow-visible">
           {discography.map((d) => (
             <button
               key={d.id}
               onClick={() => onAlbumClick(d)}
-              className="flex h-[172px] w-[132px] flex-col gap-2 text-left hover:brightness-110"
+              className="flex h-[172px] w-[132px] shrink-0 flex-col gap-2 text-left hover:brightness-110"
             >
               <img src={albumCover} alt="" className="h-[132px] w-[132px] rounded object-cover" />
               <div className="min-w-0">
@@ -119,7 +119,7 @@ function Artist({ artist, onAlbumClick }: ArtistProps) {
       </section>
 
       {artist.about && (
-        <section className="flex w-[457px] flex-col gap-2.5">
+        <section className="flex w-full max-w-[457px] flex-col gap-2.5">
           <h2 className="text-base font-bold leading-tight text-white">Sobre</h2>
           <p className="whitespace-pre-line text-sm font-normal leading-relaxed text-neutral-300">
             {artist.about}

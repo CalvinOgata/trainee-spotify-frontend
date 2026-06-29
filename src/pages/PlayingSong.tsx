@@ -25,8 +25,8 @@ function PlayingSong() {
         <img
           src={songCover}
           alt=""
-          className="h-[600px] w-[600px] rounded-lg object-cover shadow-[0_20px_80px_rgba(0,0,0,0.6)]"
-          style={{ viewTransitionName: 'song-cover' }}
+          className="aspect-square rounded-lg object-cover shadow-[0_20px_80px_rgba(0,0,0,0.6)]"
+          style={{ width: 'min(600px, 70vmin)', viewTransitionName: 'song-cover' }}
         />
       </div>
     </div>

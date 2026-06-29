@@ -40,7 +40,7 @@ function Frame({
   onPlaylistCreated,
 }: FrameProps) {
   return (
-    <div className="flex justify-center gap-2 overflow-hidden py-[14.5px]">
+    <div className="flex min-h-0 gap-2 overflow-hidden px-2 py-[14.5px]">
       <Library
         onArtistClick={onArtistClick}
         onPlaylistClick={onPlaylistClick}

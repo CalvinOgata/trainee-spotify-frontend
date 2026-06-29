@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import type { DragEvent } from 'react'
 import favoritesCover from '../assets/images/favorites_default.png'
 import playlistCover from '../assets/images/playlist_default.png'
 import profilePhoto from '../assets/images/profile_default.png'
@@ -12,10 +13,11 @@ import {
   getRecentAlbums,
   getRecentArtists,
   removeMusicFromPlaylist,
+  reorderPlaylist,
   updatePlaylistAttributes,
 } from '../lib/endpoints'
 import { formatDuration, formatPlaylistDuration, formatPtDate } from '../lib/format'
-import type { PlaylistSummary } from '../lib/types'
+import type { Music, PlaylistSummary } from '../lib/types'
 
 const PlayArrow = () => (
   <svg viewBox="0 0 24 24" fill="currentColor" className="h-5 w-5">
@@ -188,6 +190,14 @@ function Playlist({ playlist, playlistsKey, onDeleted, onUpdated, onTracksChange
   const [confirmOpen, setConfirmOpen] = useState(false)
   const [editOpen, setEditOpen] = useState(false)
 
+  const [localOrder, setLocalOrder] = useState<Music[] | null>(null)
+  const [dragSrc, setDragSrc] = useState<number | null>(null)
+  const [dragOver, setDragOver] = useState<number | null>(null)
+
+  useEffect(() => {
+    if (full) setLocalOrder(null)
+  }, [full])
+
   const handleRemoveTrack = async (musicId: string) => {
     try {
       await removeMusicFromPlaylist(playlist.id, musicId)
@@ -197,7 +207,7 @@ function Playlist({ playlist, playlistsKey, onDeleted, onUpdated, onTracksChange
     }
   }
 
-  const tracks = full?.musics ?? []
+  const tracks = localOrder ?? full?.musics ?? []
   const artistById = new Map((artists ?? []).map((a) => [a.id, a]))
   const albumById = new Map((albums ?? []).map((a) => [a.id, a]))
 
@@ -222,6 +232,42 @@ function Playlist({ playlist, playlistsKey, onDeleted, onUpdated, onTracksChange
     if (tracks.length === 0) return
     const first = tracks[0]
     play(first, { artist: artistById.get(first.artistId), queue: tracks })
+  }
+
+  const handleDragStart = (i: number) => (e: DragEvent<HTMLLIElement>) => {
+    setDragSrc(i)
+    e.dataTransfer.effectAllowed = 'move'
+    e.dataTransfer.setData('text/plain', String(i))
+  }
+
+  const handleDragOver = (i: number) => (e: DragEvent<HTMLLIElement>) => {
+    if (dragSrc === null) return
+    e.preventDefault()
+    e.dataTransfer.dropEffect = 'move'
+    if (dragOver !== i) setDragOver(i)
+  }
+
+  const handleDrop = (i: number) => async (e: DragEvent<HTMLLIElement>) => {
+    e.preventDefault()
+    const src = dragSrc
+    setDragSrc(null)
+    setDragOver(null)
+    if (src === null || src === i) return
+    const reordered = [...tracks]
+    const [moved] = reordered.splice(src, 1)
+    reordered.splice(i, 0, moved)
+    setLocalOrder(reordered)
+    try {
+      await reorderPlaylist(playlist.id, reordered.map((t) => t.id))
+      onTracksChanged()
+    } catch {
+      onTracksChanged()
+    }
+  }
+
+  const handleDragEnd = () => {
+    setDragSrc(null)
+    setDragOver(null)
   }
 
   const handleSaveEdit = async (input: { name: string; description: string }) => {
@@ -318,8 +364,19 @@ function Playlist({ playlist, playlistsKey, onDeleted, onUpdated, onTracksChange
                 return (
                   <li
                     key={t.id}
+                    draggable
+                    onDragStart={handleDragStart(i)}
+                    onDragOver={handleDragOver(i)}
+                    onDrop={handleDrop(i)}
+                    onDragEnd={handleDragEnd}
                     onClick={() => play(t, { artist, queue: tracks })}
-                    className="grid h-12 cursor-pointer grid-cols-[20px_minmax(0,2fr)_minmax(0,1.5fr)_minmax(0,1.5fr)_60px_24px] items-center gap-3 rounded px-2 text-xs hover:bg-neutral-900"
+                    className={`grid h-12 cursor-pointer grid-cols-[20px_minmax(0,2fr)_minmax(0,1.5fr)_minmax(0,1.5fr)_60px_24px] items-center gap-3 rounded px-2 text-xs hover:bg-neutral-900 ${
+                      dragSrc === i ? 'opacity-40' : ''
+                    } ${
+                      dragOver === i && dragSrc !== null && dragSrc !== i
+                        ? 'shadow-[inset_0_2px_0_0_#1FDF64]'
+                        : ''
+                    }`}
                   >
                     <span className="text-neutral-400">{i + 1}</span>
                     <div className="flex min-w-0 items-center gap-2.5">

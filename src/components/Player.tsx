@@ -48,16 +48,27 @@ function Player({ onFullscreenClick, isFullscreen, playlistsKey, onPlaylistsChan
   const volumeBarRef = useRef<HTMLDivElement>(null)
   const draggingVolume = useRef(false)
 
+  const progressBarRef = useRef<HTMLDivElement>(null)
+  const draggingProgress = useRef(false)
+
   const title = current?.title ?? 'Nenhuma música'
   const subtitle = current ? currentArtist?.name ?? 'Artista' : ''
   const duration = current?.duration ?? 0
   const progress = duration > 0 ? Math.min(position / duration, 1) : 0
 
-  const handleBarClick = (e: MouseEvent<HTMLDivElement>) => {
+  const updateProgressFromClientX = (clientX: number) => {
     if (!current) return
-    const rect = e.currentTarget.getBoundingClientRect()
-    const fraction = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width))
-    seek(fraction * duration)
+    const el = progressBarRef.current
+    if (!el) return
+    const rect = el.getBoundingClientRect()
+    const fraction = Math.max(0, Math.min(1, (clientX - rect.left) / rect.width))
+    seek(fraction * current.duration)
+  }
+
+  const handleProgressMouseDown = (e: MouseEvent<HTMLDivElement>) => {
+    if (!current) return
+    draggingProgress.current = true
+    updateProgressFromClientX(e.clientX)
   }
 
   const updateVolumeFromEvent = (clientX: number) => {
@@ -76,11 +87,12 @@ function Player({ onFullscreenClick, isFullscreen, playlistsKey, onPlaylistsChan
 
   useEffect(() => {
     const handleMove = (e: globalThis.MouseEvent) => {
-      if (!draggingVolume.current) return
-      updateVolumeFromEvent(e.clientX)
+      if (draggingVolume.current) updateVolumeFromEvent(e.clientX)
+      if (draggingProgress.current) updateProgressFromClientX(e.clientX)
     }
     const handleUp = () => {
       draggingVolume.current = false
+      draggingProgress.current = false
     }
     window.addEventListener('mousemove', handleMove)
     window.addEventListener('mouseup', handleUp)
@@ -88,7 +100,7 @@ function Player({ onFullscreenClick, isFullscreen, playlistsKey, onPlaylistsChan
       window.removeEventListener('mousemove', handleMove)
       window.removeEventListener('mouseup', handleUp)
     }
-  }, [])
+  }, [current])
 
   const handleMuteToggle = () => {
     if (volume > 0) {
@@ -230,12 +242,17 @@ function Player({ onFullscreenClick, isFullscreen, playlistsKey, onPlaylistsChan
             {formatDuration(Math.floor(position))}
           </span>
           <div
-            onClick={handleBarClick}
-            className="relative h-1 flex-1 cursor-pointer rounded-full bg-neutral-700"
+            ref={progressBarRef}
+            onMouseDown={handleProgressMouseDown}
+            className="group relative h-1 flex-1 cursor-pointer rounded-full bg-neutral-700"
           >
             <div
-              className="pointer-events-none absolute inset-y-0 left-0 rounded-full bg-white"
+              className="pointer-events-none absolute inset-y-0 left-0 rounded-full bg-white group-hover:bg-[#1FDF64]"
               style={{ width: `${progress * 100}%` }}
+            />
+            <div
+              className="pointer-events-none absolute top-1/2 h-3 w-3 -translate-x-1/2 -translate-y-1/2 rounded-full bg-white opacity-0 group-hover:opacity-100"
+              style={{ left: `${progress * 100}%` }}
             />
           </div>
           <span className="w-[22px] text-[11px] font-medium leading-3 text-[#B3B3B3]">

@@ -31,8 +31,11 @@ export const togglePlaylistMusic = (playlistId: string, musicId: string) =>
 export const deletePlaylist = (id: string) => api.delete<void>(`/playlist/${id}`)
 export const removeMusicFromPlaylist = (playlistId: string, musicId: string) =>
   api.delete<void>(`/playlist/${playlistId}/${musicId}`)
-export const reorderPlaylist = (playlistId: string, musicIds: string[]) =>
-  api.put<Playlist>(`/playlist/${playlistId}/order`, { musicIds })
+export const reorderPlaylist = (
+  playlistId: string,
+  musicIds: string[],
+  options?: { keepalive?: boolean },
+) => api.put<Playlist>(`/playlist/${playlistId}/order`, { musicIds }, options)
 
 // /artist
 export const getArtistPopularMusics = (artistId: string) =>

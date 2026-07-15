@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import type { DragEvent } from 'react'
 import favoritesCover from '../assets/images/favorites_default.png'
 import playlistCover from '../assets/images/playlist_default.png'
@@ -194,9 +194,30 @@ function Playlist({ playlist, playlistsKey, onDeleted, onUpdated, onTracksChange
   const [dragSrc, setDragSrc] = useState<number | null>(null)
   const [dragOver, setDragOver] = useState<number | null>(null)
 
+  const pendingOrderRef = useRef<string[] | null>(null)
+  const debounceTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+
   useEffect(() => {
-    if (full) setLocalOrder(null)
+    if (full && pendingOrderRef.current === null) setLocalOrder(null)
   }, [full])
+
+  useEffect(() => {
+    const flushKeepalive = () => {
+      const ids = pendingOrderRef.current
+      if (!ids) return
+      pendingOrderRef.current = null
+      if (debounceTimerRef.current) {
+        clearTimeout(debounceTimerRef.current)
+        debounceTimerRef.current = null
+      }
+      reorderPlaylist(playlist.id, ids, { keepalive: true }).catch(() => {})
+    }
+    window.addEventListener('beforeunload', flushKeepalive)
+    return () => {
+      window.removeEventListener('beforeunload', flushKeepalive)
+      flushKeepalive()
+    }
+  }, [playlist.id])
 
   const handleRemoveTrack = async (musicId: string) => {
     try {
@@ -247,7 +268,20 @@ function Playlist({ playlist, playlistsKey, onDeleted, onUpdated, onTracksChange
     if (dragOver !== i) setDragOver(i)
   }
 
-  const handleDrop = (i: number) => async (e: DragEvent<HTMLLIElement>) => {
+  const scheduleFlush = () => {
+    if (debounceTimerRef.current) clearTimeout(debounceTimerRef.current)
+    debounceTimerRef.current = setTimeout(() => {
+      const ids = pendingOrderRef.current
+      debounceTimerRef.current = null
+      if (!ids) return
+      pendingOrderRef.current = null
+      reorderPlaylist(playlist.id, ids)
+        .then(() => onTracksChanged())
+        .catch(() => {})
+    }, 3000)
+  }
+
+  const handleDrop = (i: number) => (e: DragEvent<HTMLLIElement>) => {
     e.preventDefault()
     const src = dragSrc
     setDragSrc(null)
@@ -257,12 +291,8 @@ function Playlist({ playlist, playlistsKey, onDeleted, onUpdated, onTracksChange
     const [moved] = reordered.splice(src, 1)
     reordered.splice(i, 0, moved)
     setLocalOrder(reordered)
-    try {
-      await reorderPlaylist(playlist.id, reordered.map((t) => t.id))
-      onTracksChanged()
-    } catch {
-      onTracksChanged()
-    }
+    pendingOrderRef.current = reordered.map((t) => t.id)
+    scheduleFlush()
   }
 
   const handleDragEnd = () => {

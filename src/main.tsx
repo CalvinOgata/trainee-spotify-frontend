@@ -7,11 +7,14 @@ import '@fontsource/poppins/700.css'
 import './index.css'
 import App from './App.tsx'
 import { PlayerProvider } from './lib/PlayerContext'
+import { LibraryProvider } from './lib/LibraryContext'
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <PlayerProvider>
-      <App />
+      <LibraryProvider>
+        <App />
+      </LibraryProvider>
     </PlayerProvider>
   </StrictMode>,
 )

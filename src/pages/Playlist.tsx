@@ -4,9 +4,14 @@ import favoritesCover from '../assets/images/favorites_default.png'
 import playlistCover from '../assets/images/playlist_default.png'
 import profilePhoto from '../assets/images/profile_default.png'
 import songCover from '../assets/images/song_default.png'
-import { Clock, Lock, MusicNote, Pen, Trash, X } from '../components/icons'
+import { Clock, MusicNote, Pen, Trash, X } from '../components/icons'
+import ConfirmDeletePlaylistModal from '../components/ConfirmDeletePlaylistModal'
+import EditPlaylistDetailsModal from '../components/EditPlaylistDetailsModal'
 import { useApi } from '../lib/useApi'
 import { usePlayer } from '../lib/PlayerContext'
+import { useSongContextMenu } from '../lib/SongContextMenuContext'
+import { usePlaylistContextMenu } from '../lib/PlaylistContextMenuContext'
+import { useLibrary } from '../lib/LibraryContext'
 import {
   deletePlaylist,
   getPlaylist,
@@ -25,155 +30,6 @@ const PlayArrow = () => (
   </svg>
 )
 
-type ConfirmDeleteProps = {
-  playlistName: string
-  onConfirm: () => void
-  onCancel: () => void
-}
-
-function ConfirmDelete({ playlistName, onConfirm, onCancel }: ConfirmDeleteProps) {
-  useEffect(() => {
-    const handleKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') onCancel()
-    }
-    window.addEventListener('keydown', handleKey)
-    return () => window.removeEventListener('keydown', handleKey)
-  }, [onCancel])
-
-  return (
-    <div
-      onClick={onCancel}
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4"
-    >
-      <div
-        onClick={(e) => e.stopPropagation()}
-        className="flex w-full max-w-[420px] flex-col gap-4 rounded-lg bg-[#282828] p-5"
-      >
-        <div className="flex items-start justify-between">
-          <h2 className="text-lg font-bold text-white">Excluir playlist?</h2>
-          <button onClick={onCancel} aria-label="Fechar" className="text-neutral-400 hover:text-white">
-            <X className="h-4 w-4" />
-          </button>
-        </div>
-        <p className="text-sm font-normal text-neutral-300">
-          Tem certeza que deseja excluir <span className="font-semibold text-white">{playlistName}</span>? Esta ação não pode ser desfeita.
-        </p>
-        <div className="flex justify-end gap-3 pt-2">
-          <button
-            onClick={onCancel}
-            className="rounded-full border border-neutral-500 px-4 py-1.5 text-xs font-semibold text-white hover:border-white"
-          >
-            Cancelar
-          </button>
-          <button
-            onClick={onConfirm}
-            className="rounded-full bg-[#e34a4a] px-4 py-1.5 text-xs font-semibold text-white hover:bg-[#c93b3b]"
-          >
-            Excluir
-          </button>
-        </div>
-      </div>
-    </div>
-  )
-}
-
-type EditDetailsProps = {
-  playlist: PlaylistSummary
-  cover: string
-  isEmpty: boolean
-  onClose: () => void
-  onSave: (input: { name: string; description: string }) => Promise<void>
-}
-
-function EditDetails({ playlist, cover, isEmpty, onClose, onSave }: EditDetailsProps) {
-  const [name, setName] = useState(playlist.name)
-  const [description, setDescription] = useState(playlist.description ?? '')
-  const [saving, setSaving] = useState(false)
-
-  useEffect(() => {
-    const handleKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') onClose()
-    }
-    window.addEventListener('keydown', handleKey)
-    return () => window.removeEventListener('keydown', handleKey)
-  }, [onClose])
-
-  const handleSave = async () => {
-    const trimmed = name.trim()
-    if (!trimmed) return
-    setSaving(true)
-    try {
-      await onSave({ name: trimmed, description: description.trim() })
-    } finally {
-      setSaving(false)
-    }
-  }
-
-  return (
-    <div
-      onClick={onClose}
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4"
-    >
-      <div
-        onClick={(e) => e.stopPropagation()}
-        className="flex max-h-[90vh] w-full max-w-[760px] flex-col gap-5 overflow-y-auto rounded-lg bg-[#282828] p-5 sm:p-7"
-      >
-        <div className="flex items-start justify-between">
-          <h2 className="text-2xl font-bold text-white">Editar detalhes</h2>
-          <button onClick={onClose} aria-label="Fechar" className="text-neutral-400 hover:text-white">
-            <X className="h-4 w-4" />
-          </button>
-        </div>
-
-        <div className="flex flex-col gap-5 sm:flex-row">
-          {isEmpty ? (
-            <div className="grid h-[200px] w-[200px] shrink-0 place-items-center self-center rounded bg-[#3e3e3e] text-neutral-400 shadow-[0_4px_60px_rgba(0,0,0,0.5)] sm:self-auto">
-              <MusicNote className="h-16 w-16" />
-            </div>
-          ) : (
-            <img src={cover} alt="" className="h-[200px] w-[200px] shrink-0 self-center rounded object-cover shadow-[0_4px_60px_rgba(0,0,0,0.5)] sm:self-auto" />
-          )}
-          <div className="flex min-w-0 flex-1 flex-col gap-3">
-            <input
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              placeholder="Nome"
-              className="rounded bg-[#3e3e3e] px-3 py-3 text-base text-white outline-none focus:bg-[#4a4a4a]"
-            />
-            <textarea
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              placeholder="Adicione uma descrição opcional"
-              className="h-[140px] resize-none rounded bg-[#3e3e3e] px-3 py-3 text-base text-white outline-none focus:bg-[#4a4a4a]"
-            />
-          </div>
-        </div>
-
-        <div className="flex items-center justify-between gap-3">
-          <button
-            type="button"
-            className="flex items-center gap-2 rounded-full border border-neutral-500 px-4 py-1.5 text-xs font-semibold text-white hover:border-white"
-          >
-            <Lock />
-            Tornar privada
-          </button>
-          <button
-            onClick={handleSave}
-            disabled={saving || !name.trim()}
-            className="rounded-full bg-white px-6 py-2 text-sm font-bold text-black hover:scale-[1.03] disabled:cursor-not-allowed disabled:opacity-60"
-          >
-            Salvar
-          </button>
-        </div>
-
-        <p className="text-xs font-bold leading-snug text-white">
-          Ao continuar, você autoriza o Spotify a acessar a imagem enviada. Certifique-se de que você tem o direito de fazer o upload dessa imagem.
-        </p>
-      </div>
-    </div>
-  )
-}
-
 type PlaylistProps = {
   playlist: PlaylistSummary
   playlistsKey: number
@@ -187,6 +43,9 @@ function Playlist({ playlist, playlistsKey, onDeleted, onUpdated, onTracksChange
   const { data: artists } = useApi(getRecentArtists)
   const { data: albums } = useApi(getRecentAlbums)
   const { play } = usePlayer()
+  const { openSongMenu } = useSongContextMenu()
+  const { openPlaylistMenu } = usePlaylistContextMenu()
+  const { isPlaylistPrivate } = useLibrary()
   const [confirmOpen, setConfirmOpen] = useState(false)
   const [editOpen, setEditOpen] = useState(false)
 
@@ -313,7 +172,10 @@ function Playlist({ playlist, playlistsKey, onDeleted, onUpdated, onTracksChange
   return (
     <>
     <div className="flex h-full flex-col gap-3">
-      <div className="-mx-5 -mt-6 flex items-end gap-4 bg-gradient-to-b from-[#535353] to-[#1a1a1a] px-5 pt-10 pb-4">
+      <div
+        onContextMenu={(e) => openPlaylistMenu(e, playlist)}
+        className="-mx-5 -mt-6 flex items-end gap-4 bg-gradient-to-b from-[#535353] to-[#1a1a1a] px-5 pt-10 pb-4"
+      >
         {isEmpty ? (
           <div className="grid h-[160px] w-[160px] shrink-0 place-items-center rounded bg-[#282828] text-neutral-400 shadow-[0_4px_60px_rgba(0,0,0,0.5)]">
             <MusicNote className="h-14 w-14" />
@@ -322,7 +184,9 @@ function Playlist({ playlist, playlistsKey, onDeleted, onUpdated, onTracksChange
           <img src={cover} alt="" className="h-[160px] w-[160px] shrink-0 rounded shadow-[0_4px_60px_rgba(0,0,0,0.5)] object-cover" />
         )}
         <div className="flex min-w-0 flex-col pb-2">
-          <p className="text-xs font-semibold leading-none text-white">Playlist pública</p>
+          <p className="text-xs font-semibold leading-none text-white">
+            {isPlaylistPrivate(playlist.id) ? 'Playlist particular' : 'Playlist pública'}
+          </p>
           <h1 className="mt-2 truncate text-4xl font-bold leading-none text-white sm:text-5xl lg:text-7xl">{playlist.name}</h1>
           <p className="mt-3 flex items-center gap-1.5 text-xs font-semibold text-white">
             <img src={profilePhoto} alt="" className="h-4 w-4 rounded-full object-cover" />
@@ -400,6 +264,14 @@ function Playlist({ playlist, playlistsKey, onDeleted, onUpdated, onTracksChange
                     onDrop={handleDrop(i)}
                     onDragEnd={handleDragEnd}
                     onClick={() => play(t, { artist, queue: tracks })}
+                    onContextMenu={(e) =>
+                      openSongMenu(e, {
+                        music: t,
+                        artist: artist ?? null,
+                        album: album ?? null,
+                        playlistId: playlist.id,
+                      })
+                    }
                     className={`grid h-12 cursor-pointer grid-cols-[20px_minmax(0,2fr)_minmax(0,1.5fr)_minmax(0,1.5fr)_60px_24px] items-center gap-3 rounded px-2 text-xs hover:bg-neutral-900 ${
                       dragSrc === i ? 'opacity-40' : ''
                     } ${
@@ -441,17 +313,15 @@ function Playlist({ playlist, playlistsKey, onDeleted, onUpdated, onTracksChange
       )}
     </div>
     {confirmOpen && (
-      <ConfirmDelete
+      <ConfirmDeletePlaylistModal
         playlistName={playlist.name}
         onConfirm={handleDelete}
         onCancel={() => setConfirmOpen(false)}
       />
     )}
     {editOpen && (
-      <EditDetails
+      <EditPlaylistDetailsModal
         playlist={playlist}
-        cover={cover}
-        isEmpty={isEmpty}
         onClose={() => setEditOpen(false)}
         onSave={handleSaveEdit}
       />

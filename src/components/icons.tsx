@@ -228,6 +228,53 @@ export const VolumeLow = ({ className = 'h-4 w-4' }: IconProps) => (
   </svg>
 )
 
+export const MinusCircle = ({ className = 'h-4 w-4' }: IconProps) => (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className={className}>
+    <circle cx="12" cy="12" r="9" />
+    <path d="M8 12h8" strokeLinecap="round" />
+  </svg>
+)
+
+export const CheckCircle = ({ className = 'h-4 w-4' }: IconProps) => (
+  <svg viewBox="0 0 24 24" fill="currentColor" className={className}>
+    <circle cx="12" cy="12" r="10" />
+    <path d="m7.5 12 3 3 6-6" stroke="black" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round" />
+  </svg>
+)
+
+export const Person = ({ className = 'h-4 w-4' }: IconProps) => (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className={className}>
+    <circle cx="12" cy="8" r="3.5" />
+    <path d="M4.5 20a7.5 7.5 0 0 1 15 0" strokeLinecap="round" />
+  </svg>
+)
+
+export const Disc = ({ className = 'h-4 w-4' }: IconProps) => (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className={className}>
+    <circle cx="12" cy="12" r="9" />
+    <circle cx="12" cy="12" r="2.5" fill="currentColor" />
+  </svg>
+)
+
+export const CreditsMenu = ({ className = 'h-4 w-4' }: IconProps) => (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className={className}>
+    <rect x="4" y="4" width="16" height="16" rx="1.5" />
+    <path d="M8 9h8M8 13h8M8 17h5" strokeLinecap="round" />
+  </svg>
+)
+
+export const Pin = ({ className = 'h-4 w-4' }: IconProps) => (
+  <svg viewBox="0 0 24 24" fill="currentColor" className={className}>
+    <path d="M14.5 2.5 21.5 9.5 18.6 12.4 17 10.8 12.8 15 14 20 12.5 21.5 8.5 17.5 4.5 21.5 3.5 20.5 7.5 16.5 3.5 12.5 5 11 10 12.2 14.2 8 12.6 6.4 14.5 4.5 14.5 2.5Z" />
+  </svg>
+)
+
+export const ChevronRight = ({ className = 'h-3 w-3' }: IconProps) => (
+  <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="1.5" className={className}>
+    <path d="m4 2 4 4-4 4" strokeLinecap="round" strokeLinejoin="round" />
+  </svg>
+)
+
 export const VolumeMute = ({ className = 'h-4 w-4' }: IconProps) => (
   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className={className}>
     <path d="M3 10v4h3l5 4V6L6 10H3Z" strokeLinejoin="round" />

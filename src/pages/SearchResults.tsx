@@ -7,6 +7,10 @@ import songCover from '../assets/images/song_default.png'
 import { Dots, Plus } from '../components/icons'
 import { useApi } from '../lib/useApi'
 import { usePlayer } from '../lib/PlayerContext'
+import { useSongContextMenu } from '../lib/SongContextMenuContext'
+import { useArtistContextMenu } from '../lib/ArtistContextMenuContext'
+import { usePlaylistContextMenu } from '../lib/PlaylistContextMenuContext'
+import { useAlbumContextMenu } from '../lib/AlbumContextMenuContext'
 import { search } from '../lib/endpoints'
 import type { AlbumSummary, Artist, Music, PlaylistSummary, SearchResponse } from '../lib/types'
 
@@ -37,10 +41,15 @@ function SearchResults({ query, onArtistClick, onPlaylistClick, onAlbumClick }: 
     [debouncedQ],
   )
   const { play } = usePlayer()
+  const { openSongMenu } = useSongContextMenu()
+  const { openArtistMenu } = useArtistContextMenu()
+  const { openPlaylistMenu } = usePlaylistContextMenu()
+  const { openAlbumMenu } = useAlbumContextMenu()
 
   const { musics, playlists, artists, albums } = results ?? EMPTY
 
   const artistById = new Map(artists.map((a) => [a.id, a]))
+  const albumById = new Map(albums.map((a) => [a.id, a]))
 
   const all: Result[] = [
     ...musics.map<Result>((m) => ({
@@ -98,6 +107,21 @@ function SearchResults({ query, onArtistClick, onPlaylistClick, onAlbumClick }: 
       {all.map((r) => (
         <li
           key={r.key}
+          onContextMenu={(e) => {
+            if (r.pill === 'Música') {
+              openSongMenu(e, {
+                music: r.music,
+                artist: artistById.get(r.music.artistId) ?? null,
+                album: albumById.get(r.music.albumId) ?? null,
+              })
+            } else if (r.pill === 'Artista') {
+              openArtistMenu(e, r.artist)
+            } else if (r.pill === 'Playlist') {
+              openPlaylistMenu(e, r.playlist)
+            } else if (r.pill === 'Álbum') {
+              openAlbumMenu(e, r.album)
+            }
+          }}
           className="grid grid-cols-[64px_1fr_auto_auto_auto] items-center gap-4 rounded-md px-2 py-1 hover:bg-neutral-900"
         >
           {(() => {

@@ -4,6 +4,9 @@ import songCover from '../assets/images/song_default.png'
 import { Verified } from '../components/icons'
 import { useApi } from '../lib/useApi'
 import { usePlayer } from '../lib/PlayerContext'
+import { useSongContextMenu } from '../lib/SongContextMenuContext'
+import { useArtistContextMenu } from '../lib/ArtistContextMenuContext'
+import { useAlbumContextMenu } from '../lib/AlbumContextMenuContext'
 import { getArtistAlbums, getArtistPopularMusics } from '../lib/endpoints'
 import { formatDuration, formatPlays } from '../lib/format'
 import type { AlbumSummary, Artist as ArtistDTO } from '../lib/types'
@@ -30,13 +33,18 @@ function Artist({ artist, onAlbumClick }: ArtistProps) {
   const { data: popular } = useApi(() => getArtistPopularMusics(artist.id), [artist.id])
   const { data: albums } = useApi(() => getArtistAlbums(artist.id), [artist.id])
   const { play } = usePlayer()
+  const { openSongMenu } = useSongContextMenu()
+  const { openArtistMenu } = useArtistContextMenu()
+  const { openAlbumMenu } = useAlbumContextMenu()
 
   const popularTracks = popular ?? []
   const discography = albums ?? []
+  const albumById = new Map((albums ?? []).map((a) => [a.id, a]))
 
   return (
     <div className="flex h-full flex-col gap-3">
       <div
+        onContextMenu={(e) => openArtistMenu(e, artist)}
         className="-mx-5 -mt-6 flex h-[280px] flex-col justify-end bg-cover bg-center px-5 pt-10 pb-4"
         style={{
           backgroundImage: `linear-gradient(to bottom, rgba(65, 65, 65, 0) 0%, rgba(0, 0, 0, 0.4) 100%), url(${artistBanner})`,
@@ -71,6 +79,13 @@ function Artist({ artist, onAlbumClick }: ArtistProps) {
             <li
               key={t.id}
               onClick={() => play(t, { artist })}
+              onContextMenu={(e) =>
+                openSongMenu(e, {
+                  music: t,
+                  artist,
+                  album: albumById.get(t.albumId) ?? null,
+                })
+              }
               className="grid h-9 w-full cursor-pointer grid-cols-[12px_36px_minmax(0,1fr)_auto_auto_auto] items-center gap-2.5 hover:bg-neutral-900"
             >
               <span className="text-xs font-normal text-neutral-400">{i + 1}</span>
@@ -104,6 +119,7 @@ function Artist({ artist, onAlbumClick }: ArtistProps) {
             <button
               key={d.id}
               onClick={() => onAlbumClick(d)}
+              onContextMenu={(e) => openAlbumMenu(e, d)}
               className="flex h-[172px] w-[132px] shrink-0 flex-col gap-2 text-left hover:brightness-110"
             >
               <img src={albumCover} alt="" className="h-[132px] w-[132px] rounded object-cover" />

@@ -4,6 +4,10 @@ import Navbar from './components/Navbar'
 import Frame from './components/Frame'
 import Player from './components/Player'
 import PlayingSong from './pages/PlayingSong'
+import { SongContextMenuProvider } from './lib/SongContextMenuContext'
+import { ArtistContextMenuProvider } from './lib/ArtistContextMenuContext'
+import { PlaylistContextMenuProvider } from './lib/PlaylistContextMenuContext'
+import { AlbumContextMenuProvider } from './lib/AlbumContextMenuContext'
 import type { AlbumSummary, Artist, PlaylistSummary } from './lib/types'
 
 export type Page = 'home' | 'search' | 'profile' | 'artist' | 'playlist' | 'album'
@@ -62,6 +66,21 @@ function App() {
     refreshPlaylists()
   }
 
+  const handleMenuPlaylistDeleted = (deletedId: string) => {
+    refreshPlaylists()
+    if (selectedPlaylist?.id === deletedId) {
+      setSelectedPlaylist(null)
+      setPage('home')
+    }
+  }
+
+  const handleMenuPlaylistUpdated = (updated: PlaylistSummary) => {
+    refreshPlaylists()
+    if (selectedPlaylist?.id === updated.id) {
+      setSelectedPlaylist(updated)
+    }
+  }
+
   const toggleFullscreen = () => {
     const next = !isFullscreen
     const doc = document as Document & {
@@ -77,43 +96,54 @@ function App() {
   }
 
   return (
-    <div className="grid h-screen grid-rows-[60px_minmax(0,1fr)_64px] bg-black font-sans text-white overflow-hidden">
-      {/* Navbar — visible always except desktop fullscreen */}
-      <div className={isFullscreen ? 'lg:hidden' : ''}>
-        <Navbar
-          query={query}
-          onQueryChange={handleQueryChange}
-          onHomeClick={goHome}
-          onProfileClick={goProfile}
-        />
-      </div>
-      {isFullscreen ? (
-        <div className="row-start-2 row-span-1 min-h-0 lg:row-start-1 lg:row-span-2">
-          <PlayingSong />
+    <ArtistContextMenuProvider>
+    <AlbumContextMenuProvider onArtistClick={goArtist}>
+    <PlaylistContextMenuProvider
+      onDeleted={handleMenuPlaylistDeleted}
+      onUpdated={handleMenuPlaylistUpdated}
+    >
+    <SongContextMenuProvider
+      playlistsKey={playlistsKey}
+      onTracksChanged={refreshPlaylists}
+      onArtistClick={goArtist}
+      onAlbumClick={goAlbum}
+    >
+      <div className="grid h-screen grid-rows-[60px_minmax(0,1fr)_64px] bg-black font-sans text-white overflow-hidden">
+        {/* Navbar — visible always except desktop fullscreen */}
+        <div className={isFullscreen ? 'lg:hidden' : ''}>
+          <Navbar
+            query={query}
+            onQueryChange={handleQueryChange}
+            onHomeClick={goHome}
+            onProfileClick={goProfile}
+          />
         </div>
-      ) : (
-        <Frame
-          query={query}
-          page={page}
-          selectedArtist={selectedArtist}
-          selectedPlaylist={selectedPlaylist}
-          selectedAlbum={selectedAlbum}
-          onArtistClick={goArtist}
-          onPlaylistClick={goPlaylist}
-          onAlbumClick={goAlbum}
-          onPlaylistDeleted={handlePlaylistDeleted}
-          onPlaylistUpdated={handlePlaylistUpdated}
-          playlistsKey={playlistsKey}
-          onPlaylistCreated={refreshPlaylists}
-        />
-      )}
-      <Player
-        onFullscreenClick={toggleFullscreen}
-        isFullscreen={isFullscreen}
-        playlistsKey={playlistsKey}
-        onPlaylistsChanged={refreshPlaylists}
-      />
-    </div>
+        {isFullscreen ? (
+          <div className="row-start-2 row-span-1 min-h-0 lg:row-start-1 lg:row-span-2">
+            <PlayingSong />
+          </div>
+        ) : (
+          <Frame
+            query={query}
+            page={page}
+            selectedArtist={selectedArtist}
+            selectedPlaylist={selectedPlaylist}
+            selectedAlbum={selectedAlbum}
+            onArtistClick={goArtist}
+            onPlaylistClick={goPlaylist}
+            onAlbumClick={goAlbum}
+            onPlaylistDeleted={handlePlaylistDeleted}
+            onPlaylistUpdated={handlePlaylistUpdated}
+            playlistsKey={playlistsKey}
+            onPlaylistCreated={refreshPlaylists}
+          />
+        )}
+        <Player onFullscreenClick={toggleFullscreen} isFullscreen={isFullscreen} />
+      </div>
+    </SongContextMenuProvider>
+    </PlaylistContextMenuProvider>
+    </AlbumContextMenuProvider>
+    </ArtistContextMenuProvider>
   )
 }
 

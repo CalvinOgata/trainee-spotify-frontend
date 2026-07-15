@@ -2,46 +2,25 @@ import { useEffect, useRef, useState } from 'react'
 import type { MouseEvent } from 'react'
 import songCover from '../assets/images/song_default.png'
 import {
-  Bookmark,
-  Heart,
   MinimizedPlayer,
   Next,
   Pause,
   Play,
-  Plus,
   Prev,
   VolumeHigh,
   VolumeLow,
   VolumeMute,
 } from './icons'
 import { usePlayer } from '../lib/PlayerContext'
-import { useApi } from '../lib/useApi'
-import { getPlaylist, getUserPlaylists, togglePlaylistMusic } from '../lib/endpoints'
 import { formatDuration } from '../lib/format'
-import type { Playlist as PlaylistType } from '../lib/types'
-
-const LIKED_PLAYLIST_NAME = 'Músicas Curtidas'
 
 type PlayerProps = {
   onFullscreenClick: () => void
   isFullscreen: boolean
-  playlistsKey: number
-  onPlaylistsChanged: () => void
 }
 
-function Player({ onFullscreenClick, isFullscreen, playlistsKey, onPlaylistsChanged }: PlayerProps) {
+function Player({ onFullscreenClick, isFullscreen }: PlayerProps) {
   const { current, currentArtist, isPlaying, position, togglePlay, next, prev, seek } = usePlayer()
-  const { data: playlists } = useApi(getUserPlaylists, [playlistsKey])
-
-  const likedPlaylistId = (playlists ?? []).find((p) => p.name === LIKED_PLAYLIST_NAME)?.id
-  const { data: likedPlaylist } = useApi<PlaylistType | null>(
-    () => (likedPlaylistId ? getPlaylist(likedPlaylistId) : Promise.resolve(null)),
-    [likedPlaylistId, playlistsKey],
-  )
-  const liked = !!(current && likedPlaylist?.musics?.some((m) => m.id === current.id))
-
-  const [saved, setSaved] = useState(false)
-  const [menuOpen, setMenuOpen] = useState(false)
 
   const [volume, setVolume] = useState(0.75)
   const [lastVolume, setLastVolume] = useState(0.75)
@@ -113,41 +92,6 @@ function Player({ onFullscreenClick, isFullscreen, playlistsKey, onPlaylistsChan
 
   const VolumeIcon = volume === 0 ? VolumeMute : volume < 0.5 ? VolumeLow : VolumeHigh
 
-  useEffect(() => {
-    if (!menuOpen) return
-    const handleKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') setMenuOpen(false)
-    }
-    const handleClick = () => setMenuOpen(false)
-    window.addEventListener('keydown', handleKey)
-    window.addEventListener('click', handleClick)
-    return () => {
-      window.removeEventListener('keydown', handleKey)
-      window.removeEventListener('click', handleClick)
-    }
-  }, [menuOpen])
-
-  const handleAddToPlaylist = async (playlistId: string) => {
-    if (!current) return
-    setMenuOpen(false)
-    try {
-      await togglePlaylistMusic(playlistId, current.id)
-      onPlaylistsChanged()
-    } catch {
-      // ignore
-    }
-  }
-
-  const handleLikeToggle = async () => {
-    if (!current || !likedPlaylistId) return
-    try {
-      await togglePlaylistMusic(likedPlaylistId, current.id)
-      onPlaylistsChanged()
-    } catch {
-      // ignore
-    }
-  }
-
   return (
     <footer className="flex items-center gap-3 bg-black p-2.5">
       <div className="flex min-w-0 flex-1 basis-0 items-center gap-3">
@@ -163,63 +107,6 @@ function Player({ onFullscreenClick, isFullscreen, playlistsKey, onPlaylistsChan
             <p className="truncate text-[10px] font-normal text-neutral-400">{subtitle}</p>
           </div>
         </div>
-        {current && (
-          <div className="hidden items-center gap-3 text-[#B3B3B3] md:flex">
-            <button
-              onClick={handleLikeToggle}
-              disabled={!likedPlaylistId}
-              className={liked ? 'text-[#1FDF64]' : 'hover:text-white disabled:opacity-40'}
-              aria-label={liked ? 'Remover dos curtidos' : 'Curtir'}
-              title={liked ? 'Remover dos curtidos' : 'Curtir'}
-            >
-              <Heart filled={liked} />
-            </button>
-            <button
-              onClick={() => setSaved((v) => !v)}
-              className={saved ? 'text-white' : 'hover:text-white'}
-              aria-label={saved ? 'Remover da biblioteca' : 'Salvar na biblioteca'}
-              title={saved ? 'Remover da biblioteca' : 'Salvar na biblioteca'}
-            >
-              <Bookmark filled={saved} />
-            </button>
-            <div className="relative">
-              <button
-                onClick={(e) => {
-                  e.stopPropagation()
-                  setMenuOpen((v) => !v)
-                }}
-                className="hover:text-white"
-                aria-label="Adicionar à playlist"
-                title="Adicionar à playlist"
-              >
-                <Plus />
-              </button>
-              {menuOpen && (
-                <div
-                  onClick={(e) => e.stopPropagation()}
-                  className="absolute bottom-7 left-0 z-50 flex max-h-72 w-56 flex-col overflow-y-auto rounded-md bg-[#282828] py-1 shadow-[0_8px_24px_rgba(0,0,0,0.5)]"
-                >
-                  <p className="px-3 py-1.5 text-[11px] font-semibold uppercase tracking-wide text-neutral-400">
-                    Adicionar à playlist
-                  </p>
-                  {(playlists ?? []).length === 0 ? (
-                    <p className="px-3 py-2 text-xs text-neutral-400">Nenhuma playlist</p>
-                  ) : (
-                    (playlists ?? []).map((p) => (
-                      <button
-                        key={p.id}
-                        onClick={() => handleAddToPlaylist(p.id)}
-                        className="truncate px-3 py-2 text-left text-xs text-white hover:bg-neutral-700"
-                      >
-                        {p.name}
-                      </button>
-                    ))
-                  )}
-                </div>
-              )}
-            </div>
-          </div>
-        )}
       </div>
       <div className="flex w-full max-w-[509px] shrink-0 flex-col items-center gap-1">
         <div className="flex h-10 w-full items-center justify-center gap-3">

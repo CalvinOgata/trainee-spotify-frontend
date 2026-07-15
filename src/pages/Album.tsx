@@ -3,6 +3,8 @@ import songCover from '../assets/images/song_default.png'
 import { Clock } from '../components/icons'
 import { useApi } from '../lib/useApi'
 import { usePlayer } from '../lib/PlayerContext'
+import { useSongContextMenu } from '../lib/SongContextMenuContext'
+import { useAlbumContextMenu } from '../lib/AlbumContextMenuContext'
 import { getAlbumMusics } from '../lib/endpoints'
 import { formatDuration, formatPlaylistDuration } from '../lib/format'
 import type { AlbumSummary, Artist } from '../lib/types'
@@ -18,6 +20,8 @@ type AlbumProps = { album: AlbumSummary }
 function Album({ album }: AlbumProps) {
   const { data: musics } = useApi(() => getAlbumMusics(album.id), [album.id])
   const { play } = usePlayer()
+  const { openSongMenu } = useSongContextMenu()
+  const { openAlbumMenu } = useAlbumContextMenu()
 
   const tracks = musics ?? []
   const totalDuration = tracks.reduce((sum, t) => sum + t.duration, 0)
@@ -34,7 +38,10 @@ function Album({ album }: AlbumProps) {
 
   return (
     <div className="flex h-full flex-col gap-3">
-      <div className="-mx-5 -mt-6 flex items-end gap-4 bg-gradient-to-b from-[#535353] to-[#1a1a1a] px-5 pt-10 pb-4">
+      <div
+        onContextMenu={(e) => openAlbumMenu(e, album)}
+        className="-mx-5 -mt-6 flex items-end gap-4 bg-gradient-to-b from-[#535353] to-[#1a1a1a] px-5 pt-10 pb-4"
+      >
         <img
           src={albumCover}
           alt=""
@@ -78,6 +85,9 @@ function Album({ album }: AlbumProps) {
               <li
                 key={t.id}
                 onClick={() => play(t, { artist, queue: tracks })}
+                onContextMenu={(e) =>
+                  openSongMenu(e, { music: t, artist, album })
+                }
                 className="grid h-12 cursor-pointer grid-cols-[20px_minmax(0,2fr)_60px] items-center gap-3 rounded px-2 text-xs hover:bg-neutral-900"
               >
                 <span className="text-neutral-400">{i + 1}</span>

@@ -6,6 +6,10 @@ import playlistCover from '../assets/images/playlist_default.png'
 import songCover from '../assets/images/song_default.png'
 import { useApi } from '../lib/useApi'
 import { usePlayer } from '../lib/PlayerContext'
+import { useSongContextMenu } from '../lib/SongContextMenuContext'
+import { useArtistContextMenu } from '../lib/ArtistContextMenuContext'
+import { usePlaylistContextMenu } from '../lib/PlaylistContextMenuContext'
+import { useAlbumContextMenu } from '../lib/AlbumContextMenuContext'
 import {
   getRecentAlbums,
   getRecentArtists,
@@ -30,13 +34,21 @@ function Home({ onArtistClick, onPlaylistClick, onAlbumClick }: HomeProps) {
   const { data: recentArtists } = useApi(getRecentArtists)
   const { data: recentAlbums } = useApi(getRecentAlbums)
   const { play } = usePlayer()
+  const { openSongMenu } = useSongContextMenu()
+  const { openArtistMenu } = useArtistContextMenu()
+  const { openPlaylistMenu } = usePlaylistContextMenu()
+  const { openAlbumMenu } = useAlbumContextMenu()
 
   const recentItems = (recentMusics ?? []).slice(0, 8)
   const playlistTiles = (playlists ?? []).slice(0, 7)
   const artistTiles = (recentArtists ?? []).slice(0, 9)
   const albumTiles = (recentAlbums ?? []).slice(0, 7)
 
+  const showMusic = activeFilter === 'Tudo' || activeFilter === 'Música'
+  const showPlaylists = activeFilter === 'Tudo' || activeFilter === 'Playlists'
+
   const artistById = new Map((recentArtists ?? []).map((a) => [a.id, a]))
+  const albumById = new Map((recentAlbums ?? []).map((a) => [a.id, a]))
 
   return (
     <div className="flex h-full flex-col gap-5">
@@ -57,11 +69,19 @@ function Home({ onArtistClick, onPlaylistClick, onAlbumClick }: HomeProps) {
             )
           })}
         </div>
+        {showMusic && (
         <div className="grid grid-cols-[repeat(auto-fill,minmax(140px,1fr))] gap-2 md:grid-cols-[repeat(auto-fill,minmax(260px,1fr))]">
           {recentItems.map((m) => (
             <button
               key={m.id}
               onClick={() => play(m, { artist: artistById.get(m.artistId) })}
+              onContextMenu={(e) =>
+                openSongMenu(e, {
+                  music: m,
+                  artist: artistById.get(m.artistId) ?? null,
+                  album: albumById.get(m.albumId) ?? null,
+                })
+              }
               className="flex h-[60px] w-full items-center gap-2.5 overflow-hidden rounded-[4px] bg-[#2D2D2D] pr-3 text-left hover:brightness-110"
             >
               <img src={songCover} alt="" className="h-[60px] w-[60px] shrink-0 object-cover" />
@@ -69,8 +89,10 @@ function Home({ onArtistClick, onPlaylistClick, onAlbumClick }: HomeProps) {
             </button>
           ))}
         </div>
+        )}
       </section>
 
+      {showPlaylists && (
       <section className="flex flex-col gap-2">
         <h3 className="text-base font-bold text-white">Suas Playlists</h3>
         <div className="flex gap-3 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden md:flex-wrap md:overflow-visible">
@@ -78,6 +100,7 @@ function Home({ onArtistClick, onPlaylistClick, onAlbumClick }: HomeProps) {
             <button
               key={p.id}
               onClick={() => onPlaylistClick(p)}
+              onContextMenu={(e) => openPlaylistMenu(e, p)}
               className="flex h-[172px] w-[132px] shrink-0 flex-col gap-2 text-left"
             >
               <img src={p.name === 'Músicas Curtidas' ? favoritesCover : playlistCover} alt="" className="h-[132px] w-[132px] rounded-[2px] object-cover" />
@@ -91,7 +114,9 @@ function Home({ onArtistClick, onPlaylistClick, onAlbumClick }: HomeProps) {
           ))}
         </div>
       </section>
+      )}
 
+      {showMusic && (
       <section className="flex flex-col gap-2">
         <div className="flex items-center justify-between">
           <h3 className="text-base font-bold text-white">Artistas recentes</h3>
@@ -102,6 +127,7 @@ function Home({ onArtistClick, onPlaylistClick, onAlbumClick }: HomeProps) {
             <button
               key={a.id}
               onClick={() => onArtistClick(a)}
+              onContextMenu={(e) => openArtistMenu(e, a)}
               className="flex h-[172px] w-[132px] shrink-0 flex-col gap-2 text-left"
             >
               <img src={artistCover} alt="" className="h-[132px] w-[132px] rounded-full object-cover" />
@@ -113,7 +139,9 @@ function Home({ onArtistClick, onPlaylistClick, onAlbumClick }: HomeProps) {
           ))}
         </div>
       </section>
+      )}
 
+      {showMusic && (
       <section className="flex flex-col gap-2">
         <h3 className="text-base font-bold text-white">Álbuns recentes</h3>
         <div className="flex gap-3 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden md:flex-wrap md:overflow-visible">
@@ -121,6 +149,7 @@ function Home({ onArtistClick, onPlaylistClick, onAlbumClick }: HomeProps) {
             <button
               key={a.id}
               onClick={() => onAlbumClick(a)}
+              onContextMenu={(e) => openAlbumMenu(e, a)}
               className="flex w-[140px] shrink-0 flex-col gap-1.5 rounded-[4px] p-1 text-left hover:brightness-110"
             >
               <img src={albumCover} alt="" className="h-[132px] w-[132px] rounded-[2px] object-cover" />
@@ -134,6 +163,7 @@ function Home({ onArtistClick, onPlaylistClick, onAlbumClick }: HomeProps) {
           ))}
         </div>
       </section>
+      )}
     </div>
   )
 }

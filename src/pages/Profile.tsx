@@ -5,6 +5,9 @@ import profilePhoto from '../assets/images/profile_default.png'
 import songCover from '../assets/images/song_default.png'
 import { useApi } from '../lib/useApi'
 import { usePlayer } from '../lib/PlayerContext'
+import { useSongContextMenu } from '../lib/SongContextMenuContext'
+import { useArtistContextMenu } from '../lib/ArtistContextMenuContext'
+import { usePlaylistContextMenu } from '../lib/PlaylistContextMenuContext'
 import {
   getFollowers,
   getMostPlayedArtists,
@@ -29,6 +32,9 @@ function Profile({ onArtistClick, onPlaylistClick }: ProfileProps) {
   const { data: topArtists } = useApi(getMostPlayedArtists)
   const { data: topMusics } = useApi(getMostPlayedMusics)
   const { play } = usePlayer()
+  const { openSongMenu } = useSongContextMenu()
+  const { openArtistMenu } = useArtistContextMenu()
+  const { openPlaylistMenu } = usePlaylistContextMenu()
 
   const playlistCount = playlists?.length ?? 0
   const followerCount = followers?.length ?? 0
@@ -65,7 +71,12 @@ function Profile({ onArtistClick, onPlaylistClick }: ProfileProps) {
         </div>
         <div className={carouselClass}>
           {artistTiles.map((a) => (
-            <button key={a.id} onClick={() => onArtistClick(a)} className={tileClass}>
+            <button
+              key={a.id}
+              onClick={() => onArtistClick(a)}
+              onContextMenu={(e) => openArtistMenu(e, a)}
+              className={tileClass}
+            >
               <img src={artistCover} alt="" className="h-[132px] w-[132px] rounded-full object-cover" />
               <div className="min-w-0">
                 <p className="truncate text-xs font-semibold leading-tight text-white">{a.name}</p>
@@ -86,6 +97,13 @@ function Profile({ onArtistClick, onPlaylistClick }: ProfileProps) {
             <li
               key={t.id}
               onClick={() => play(t, { artist: artistById.get(t.artistId) })}
+              onContextMenu={(e) =>
+                openSongMenu(e, {
+                  music: t,
+                  artist: artistById.get(t.artistId) ?? null,
+                  album: null,
+                })
+              }
               className="grid h-9 w-full cursor-pointer grid-cols-[12px_36px_minmax(0,1fr)_auto_auto] items-center gap-2.5 hover:bg-neutral-900"
             >
               <span className="text-xs font-normal text-neutral-400">{i + 1}</span>
@@ -112,7 +130,12 @@ function Profile({ onArtistClick, onPlaylistClick }: ProfileProps) {
         </div>
         <div className={carouselClass}>
           {playlistTiles.map((p) => (
-            <button key={p.id} onClick={() => onPlaylistClick(p)} className={tileClass}>
+            <button
+              key={p.id}
+              onClick={() => onPlaylistClick(p)}
+              onContextMenu={(e) => openPlaylistMenu(e, p)}
+              className={tileClass}
+            >
               <img
                 src={p.name === 'Músicas Curtidas' ? favoritesCover : playlistCover}
                 alt=""

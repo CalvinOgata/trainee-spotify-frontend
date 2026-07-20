@@ -12,6 +12,7 @@ import {
   VolumeLow,
   VolumeMute,
 } from './icons'
+import { resolveImageUrl } from '../lib/api'
 import { usePlayer } from '../lib/PlayerContext'
 import { formatDuration } from '../lib/format'
 
@@ -98,14 +99,14 @@ function Player({ onFullscreenClick, isFullscreen }: PlayerProps) {
       <div className="flex min-w-0 flex-1 basis-0 items-center gap-3">
         <div className="flex h-[35px] w-[111px] shrink-0 items-center gap-3">
           <img
-            src={songCover}
+            src={resolveImageUrl(current?.imageUrl) ?? songCover}
             alt=""
             className="h-[35px] w-9 shrink-0 rounded-[2px] object-cover"
             style={isFullscreen ? undefined : { viewTransitionName: 'song-cover' }}
           />
           <div className="flex min-w-0 flex-col gap-[10px]">
-            <p className="h-[12px] w-[63px] truncate text-[10px] font-bold leading-3 text-white">{title}</p>
-            <p className="h-[12px] w-[49px] truncate text-[10px] font-bold leading-3 text-[#B3B3B3]">{subtitle}</p>
+            <p className="font-[Inter] h-[12px] w-[63px] truncate text-[10px] font-bold leading-3 text-white">{title}</p>
+            <p className="font-[Inter] h-[12px] w-[49px] truncate text-[10px] font-bold leading-3 text-[#B3B3B3]">{subtitle}</p>
           </div>
         </div>
       </div>

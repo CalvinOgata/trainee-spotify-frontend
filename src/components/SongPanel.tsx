@@ -1,9 +1,11 @@
 import { useRef, useState } from 'react'
 import artistAboutCover from '../assets/images/artist_about.png'
 import songCover from '../assets/images/song_default.png'
+import followingButton from '../assets/icons/FollowingButton.svg'
 import iconButtons from '../assets/icons/IconButtons.svg'
 import CreditsModal from './CreditsModal'
 import { Verified } from './icons'
+import { resolveImageUrl } from '../lib/api'
 import { usePlayer } from '../lib/PlayerContext'
 import { useAutoHideScrollbar } from '../lib/useAutoHideScrollbar'
 import { formatPlays } from '../lib/format'
@@ -41,59 +43,68 @@ function SongPanel() {
             <img src={iconButtons} alt="" className="h-6 w-6" />
           </button>
         </div>
-        <img src={songCover} alt="" className="aspect-square w-full object-cover" />
+        <img src={resolveImageUrl(current.imageUrl) ?? songCover} alt="" className="aspect-square w-full object-cover" />
         <div className="px-3 pt-3 pb-3">
-          <p className="text-lg font-bold text-white">{title}</p>
-          <p className="text-sm font-normal text-neutral-400">{subtitle}</p>
+          <p className="font-[Inter] text-lg font-extrabold text-white">{title}</p>
+          <p className="font-[Inter] text-sm font-semibold text-neutral-400">{subtitle}</p>
         </div>
 
-        <div className="mx-3 mb-3 rounded-lg bg-neutral-900 p-3">
-          <p className="mb-2 text-xs font-semibold text-neutral-300">Sobre o artista</p>
-          <img src={artistAboutCover} alt="" className="aspect-square w-full rounded object-cover" />
-          <div className="mt-3 flex items-center gap-1">
-            <p className="text-sm font-semibold text-white">{currentArtist?.name ?? '—'}</p>
-            <Verified />
+        <div className="mx-3 mb-3 flex h-[303px] w-[291px] flex-col overflow-hidden rounded-lg bg-neutral-900">
+          <div className="relative h-[180px] w-full shrink-0">
+            <img
+              src={resolveImageUrl(currentArtist?.imageUrl) ?? artistAboutCover}
+              alt=""
+              className="absolute inset-0 h-full w-full object-cover"
+            />
+            <div className="absolute inset-0 bg-black/40" />
+            <p className="font-[Inter] absolute top-3 left-3 text-sm font-bold text-white">Sobre o artista</p>
           </div>
-          <div className="mt-2 flex items-center justify-between">
-            <p className="text-xs text-neutral-400">
-              {currentArtist ? `${formatPlays(currentArtist.listeners)} ouvintes mensais` : ''}
+          <div className="flex flex-col gap-2 p-3">
+            <div className="flex items-center gap-1">
+              <p className="font-[Inter] text-base font-bold text-white">{currentArtist?.name ?? '—'}</p>
+              <Verified />
+            </div>
+            <div className="flex items-center justify-between gap-2">
+              <p className="font-[Inter] text-xs font-medium text-white">
+                {currentArtist ? `${formatPlays(currentArtist.listeners)} ouvintes mensais` : ''}
+              </p>
+              <button aria-label="Deixar de seguir" className="shrink-0">
+                <img src={followingButton} alt="" className="h-6 w-[104px]" />
+              </button>
+            </div>
+            <p className="font-[Inter] line-clamp-3 text-xs font-medium text-neutral-400">
+              {currentArtist?.about ?? ''}
             </p>
-            <button className="rounded-full border border-neutral-500 px-3 py-0.5 text-[10px] font-semibold text-white hover:border-white">
-              Deixar de seguir
-            </button>
           </div>
-          <p className="mt-2 line-clamp-3 text-xs font-normal text-neutral-400">
-            {currentArtist?.about ?? ''}
-          </p>
         </div>
 
-        <div className="mx-3 mb-3 rounded-lg bg-neutral-900 p-3">
-          <div className="mb-2 flex items-center justify-between">
-            <p className="text-xs font-semibold text-neutral-300">Créditos</p>
+        <div className="mx-3 mb-3 flex h-[168px] w-[291px] flex-col gap-3 rounded-lg bg-neutral-900 p-3">
+          <div className="flex items-center justify-between">
+            <p className="font-[Inter] text-xs font-bold text-white">Créditos</p>
             <button
               onClick={() => setCreditsOpen(true)}
-              className="text-[10px] text-neutral-400 hover:text-white"
+              className="font-[Inter] text-[10px] font-bold text-[#B3B3B3] hover:text-white"
             >
               Mostrar tudo
             </button>
           </div>
-          <ul className="flex flex-col gap-2">
+          <ul className="flex flex-col gap-3">
             {currentArtist && (
               <li className="flex items-center justify-between gap-2">
                 <div className="min-w-0">
-                  <p className="truncate text-xs font-semibold text-white">{currentArtist.name}</p>
-                  <p className="truncate text-[10px] font-normal text-neutral-400">Artista Principal</p>
+                  <p className="font-[Inter] truncate text-xs font-medium text-white">{currentArtist.name}</p>
+                  <p className="font-[Inter] truncate text-[10px] font-medium text-[#B3B3B3]">Artista Principal</p>
                 </div>
-                <button className="shrink-0 rounded-full border border-neutral-500 px-3 py-0.5 text-[10px] font-semibold text-white hover:border-white">
-                  Deixar de seguir
+                <button aria-label="Deixar de seguir" className="shrink-0">
+                  <img src={followingButton} alt="" className="h-6 w-[104px]" />
                 </button>
               </li>
             )}
             {composers.slice(0, 2).map((c, i) => (
               <li key={i} className="flex items-center justify-between gap-2">
                 <div className="min-w-0">
-                  <p className="truncate text-xs font-semibold text-white">{c.name}</p>
-                  <p className="truncate text-[10px] font-normal text-neutral-400">{c.role}</p>
+                  <p className="font-[Inter] truncate text-xs font-medium text-white">{c.name}</p>
+                  <p className="font-[Inter] truncate text-[10px] font-medium text-[#B3B3B3]">{c.role}</p>
                 </div>
               </li>
             ))}

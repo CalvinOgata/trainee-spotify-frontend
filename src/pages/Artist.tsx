@@ -3,6 +3,7 @@ import albumCover from '../assets/images/album_default.png'
 import artistBanner from '../assets/images/artist_banner.png'
 import songCover from '../assets/images/song_default.png'
 import { Verified } from '../components/icons'
+import { resolveImageUrl } from '../lib/api'
 import { useApi } from '../lib/useApi'
 import { usePlayer } from '../lib/PlayerContext'
 import { useSongContextMenu } from '../lib/SongContextMenuContext'
@@ -57,7 +58,7 @@ function Artist({ artist, onAlbumClick }: ArtistProps) {
         onContextMenu={(e) => openArtistMenu(e, artist)}
         className="-mx-5 -mt-6 flex h-[280px] flex-col justify-end bg-cover bg-center px-5 pt-10 pb-4"
         style={{
-          backgroundImage: `linear-gradient(to bottom, rgba(65, 65, 65, 0) 0%, rgba(0, 0, 0, 0.4) 100%), url(${artistBanner})`,
+          backgroundImage: `linear-gradient(to bottom, rgba(65, 65, 65, 0) 0%, rgba(0, 0, 0, 0.4) 100%), url(${resolveImageUrl(artist.imageUrl) ?? artistBanner})`,
         }}
       >
         <h1 className="text-4xl font-bold leading-none text-white sm:text-5xl lg:text-7xl">{artist.name}</h1>
@@ -101,7 +102,7 @@ function Artist({ artist, onAlbumClick }: ArtistProps) {
               className="grid h-9 w-full cursor-pointer grid-cols-[12px_36px_minmax(0,1fr)_auto_auto_auto] items-center gap-2.5 hover:bg-neutral-900"
             >
               <span className="text-xs font-normal text-neutral-400">{i + 1}</span>
-              <img src={songCover} alt="" className="h-9 w-9 rounded object-cover" />
+              <img src={resolveImageUrl(t.imageUrl) ?? songCover} alt="" className="h-9 w-9 rounded object-cover" />
               <div className="flex min-w-0 flex-col gap-0.5">
                 <p className="truncate text-xs font-semibold leading-none text-white">{t.title}</p>
                 {t.explicit && (
@@ -139,7 +140,7 @@ function Artist({ artist, onAlbumClick }: ArtistProps) {
               onContextMenu={(e) => openAlbumMenu(e, d)}
               className="flex h-[172px] w-[132px] shrink-0 flex-col gap-2 text-left hover:brightness-110"
             >
-              <img src={albumCover} alt="" className="h-[132px] w-[132px] rounded object-cover" />
+              <img src={resolveImageUrl(d.imageUrl) ?? albumCover} alt="" className="h-[132px] w-[132px] rounded object-cover" />
               <div className="min-w-0">
                 <p className="truncate text-xs font-semibold leading-tight text-white">{d.title}</p>
                 <p className="truncate text-[11px] font-normal leading-tight text-neutral-400">

@@ -5,6 +5,7 @@ import favoritesCover from '../assets/images/favorites_default.png'
 import playlistCover from '../assets/images/playlist_default.png'
 import { Pin, Search, X } from './icons'
 import Pill from './Pill'
+import { resolveImageUrl } from '../lib/api'
 import { useApi } from '../lib/useApi'
 import { useAutoHideScrollbar } from '../lib/useAutoHideScrollbar'
 import { useArtistContextMenu } from '../lib/ArtistContextMenuContext'
@@ -165,10 +166,15 @@ function Library({ onArtistClick, onPlaylistClick, onAlbumClick, playlistsKey, o
         {rows.map((row) => {
           const isArtist = row.kind === 'artist'
           const thumbClass = `h-10 w-10 shrink-0 ${isArtist ? 'rounded-full' : 'rounded'} object-cover`
-          const src =
+          const remote =
+            row.kind === 'playlist' ? resolveImageUrl(row.playlist.imageUrl) :
+            row.kind === 'album' ? resolveImageUrl(row.album.imageUrl) :
+            resolveImageUrl(row.artist.imageUrl)
+          const fallback =
             row.kind === 'playlist' ? (row.title === 'Músicas Curtidas' ? favoritesCover : playlistCover) :
             row.kind === 'album' ? albumCover :
             artistCover
+          const src = remote ?? fallback
           const thumb = <img src={src} alt={row.title} title={row.title} className={thumbClass} />
           const content = (
             <>

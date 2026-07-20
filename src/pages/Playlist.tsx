@@ -7,6 +7,7 @@ import songCover from '../assets/images/song_default.png'
 import { Clock, MusicNote, Pen, Trash, X } from '../components/icons'
 import ConfirmDeletePlaylistModal from '../components/ConfirmDeletePlaylistModal'
 import EditPlaylistDetailsModal from '../components/EditPlaylistDetailsModal'
+import { resolveImageUrl } from '../lib/api'
 import { useApi } from '../lib/useApi'
 import { usePlayer } from '../lib/PlayerContext'
 import { useSongContextMenu } from '../lib/SongContextMenuContext'
@@ -96,7 +97,7 @@ function Playlist({ playlist, playlistsKey, onDeleted, onUpdated, onTracksChange
   const isEmpty = musicQtd === 0
 
   const isLikedPlaylist = playlist.name === 'Músicas Curtidas'
-  const cover = isLikedPlaylist ? favoritesCover : playlistCover
+  const cover = resolveImageUrl(playlist.imageUrl) ?? (isLikedPlaylist ? favoritesCover : playlistCover)
 
   const handleDelete = async () => {
     setConfirmOpen(false)
@@ -282,7 +283,7 @@ function Playlist({ playlist, playlistsKey, onDeleted, onUpdated, onTracksChange
                   >
                     <span className="text-neutral-400">{i + 1}</span>
                     <div className="flex min-w-0 items-center gap-2.5">
-                      <img src={songCover} alt="" className="h-9 w-9 shrink-0 rounded object-cover" />
+                      <img src={resolveImageUrl(t.imageUrl) ?? songCover} alt="" className="h-9 w-9 shrink-0 rounded object-cover" />
                       <div className="min-w-0">
                         <p className="truncate text-sm font-semibold leading-tight text-white">{t.title}</p>
                         <p className="truncate text-[11px] font-normal leading-tight text-neutral-400">

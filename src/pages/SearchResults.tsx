@@ -5,6 +5,7 @@ import favoritesCover from '../assets/images/favorites_default.png'
 import playlistCover from '../assets/images/playlist_default.png'
 import songCover from '../assets/images/song_default.png'
 import { Dots, Plus } from '../components/icons'
+import { resolveImageUrl } from '../lib/api'
 import { useApi } from '../lib/useApi'
 import { usePlayer } from '../lib/PlayerContext'
 import { useSongContextMenu } from '../lib/SongContextMenuContext'
@@ -125,13 +126,18 @@ function SearchResults({ query, onArtistClick, onPlaylistClick, onAlbumClick }: 
           className="grid grid-cols-[64px_1fr_auto_auto_auto] items-center gap-4 rounded-md px-2 py-1 hover:bg-neutral-900"
         >
           {(() => {
-            const src =
+            const remote =
+              r.pill === 'Playlist' ? resolveImageUrl(r.playlist.imageUrl) :
+              r.pill === 'Álbum' ? resolveImageUrl(r.album.imageUrl) :
+              r.pill === 'Artista' ? resolveImageUrl(r.artist.imageUrl) :
+              resolveImageUrl(r.music.imageUrl)
+            const fallback =
               r.pill === 'Playlist' ? (r.title === 'Músicas Curtidas' ? favoritesCover : playlistCover) :
               r.pill === 'Álbum' ? albumCover :
               r.pill === 'Artista' ? artistCover :
               songCover
             const shape = r.pill === 'Artista' ? 'rounded-full' : 'rounded'
-            return <img src={src} alt="" className={`h-16 w-16 ${shape} object-cover`} />
+            return <img src={remote ?? fallback} alt="" className={`h-16 w-16 ${shape} object-cover`} />
           })()}
           <div className="min-w-0">
             {r.pill === 'Artista' ? (

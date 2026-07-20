@@ -3,6 +3,7 @@ import favoritesCover from '../assets/images/favorites_default.png'
 import playlistCover from '../assets/images/playlist_default.png'
 import profilePhoto from '../assets/images/profile_default.png'
 import songCover from '../assets/images/song_default.png'
+import { resolveImageUrl } from '../lib/api'
 import { useApi } from '../lib/useApi'
 import { usePlayer } from '../lib/PlayerContext'
 import { useSongContextMenu } from '../lib/SongContextMenuContext'
@@ -77,7 +78,7 @@ function Profile({ onArtistClick, onPlaylistClick }: ProfileProps) {
               onContextMenu={(e) => openArtistMenu(e, a)}
               className={tileClass}
             >
-              <img src={artistCover} alt="" className="h-[132px] w-[132px] rounded-full object-cover" />
+              <img src={resolveImageUrl(a.imageUrl) ?? artistCover} alt="" className="h-[132px] w-[132px] rounded-full object-cover" />
               <div className="min-w-0">
                 <p className="truncate text-xs font-semibold leading-tight text-white">{a.name}</p>
                 <p className="truncate text-[11px] font-normal leading-tight text-neutral-400">Artista</p>
@@ -107,7 +108,7 @@ function Profile({ onArtistClick, onPlaylistClick }: ProfileProps) {
               className="grid h-9 w-full cursor-pointer grid-cols-[12px_36px_minmax(0,1fr)_auto_auto] items-center gap-2.5 hover:bg-neutral-900"
             >
               <span className="text-xs font-normal text-neutral-400">{i + 1}</span>
-              <img src={songCover} alt="" className="h-9 w-9 rounded object-cover" />
+              <img src={resolveImageUrl(t.imageUrl) ?? songCover} alt="" className="h-9 w-9 rounded object-cover" />
               <div className="flex min-w-0 flex-col gap-0.5">
                 <p className="truncate text-xs font-semibold leading-none text-white">{t.title}</p>
                 {t.explicit && (
@@ -137,7 +138,7 @@ function Profile({ onArtistClick, onPlaylistClick }: ProfileProps) {
               className={tileClass}
             >
               <img
-                src={p.name === 'Músicas Curtidas' ? favoritesCover : playlistCover}
+                src={resolveImageUrl(p.imageUrl) ?? (p.name === 'Músicas Curtidas' ? favoritesCover : playlistCover)}
                 alt=""
                 className="h-[132px] w-[132px] rounded object-cover"
               />

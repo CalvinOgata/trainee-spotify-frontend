@@ -4,6 +4,7 @@ import artistCover from '../assets/images/artist_default.png'
 import favoritesCover from '../assets/images/favorites_default.png'
 import playlistCover from '../assets/images/playlist_default.png'
 import songCover from '../assets/images/song_default.png'
+import { resolveImageUrl } from '../lib/api'
 import { useApi } from '../lib/useApi'
 import { usePlayer } from '../lib/PlayerContext'
 import { useSongContextMenu } from '../lib/SongContextMenuContext'
@@ -84,7 +85,7 @@ function Home({ onArtistClick, onPlaylistClick, onAlbumClick }: HomeProps) {
               }
               className="flex h-[60px] w-full items-center gap-2.5 overflow-hidden rounded-[4px] bg-[#2D2D2D] pr-3 text-left hover:brightness-110"
             >
-              <img src={songCover} alt="" className="h-[60px] w-[60px] shrink-0 object-cover" />
+              <img src={resolveImageUrl(m.imageUrl) ?? songCover} alt="" className="h-[60px] w-[60px] shrink-0 object-cover" />
               <span className="truncate text-sm font-semibold text-white">{m.title}</span>
             </button>
           ))}
@@ -103,7 +104,7 @@ function Home({ onArtistClick, onPlaylistClick, onAlbumClick }: HomeProps) {
               onContextMenu={(e) => openPlaylistMenu(e, p)}
               className="flex h-[172px] w-[132px] shrink-0 flex-col gap-2 text-left"
             >
-              <img src={p.name === 'Músicas Curtidas' ? favoritesCover : playlistCover} alt="" className="h-[132px] w-[132px] rounded-[2px] object-cover" />
+              <img src={resolveImageUrl(p.imageUrl) ?? (p.name === 'Músicas Curtidas' ? favoritesCover : playlistCover)} alt="" className="h-[132px] w-[132px] rounded-[2px] object-cover" />
               <div className="min-w-0">
                 <p className="truncate text-xs font-semibold leading-tight text-white">{p.name}</p>
                 <p className="truncate text-[11px] font-normal leading-tight text-neutral-400">
@@ -130,7 +131,7 @@ function Home({ onArtistClick, onPlaylistClick, onAlbumClick }: HomeProps) {
               onContextMenu={(e) => openArtistMenu(e, a)}
               className="flex h-[172px] w-[132px] shrink-0 flex-col gap-2 text-left"
             >
-              <img src={artistCover} alt="" className="h-[132px] w-[132px] rounded-full object-cover" />
+              <img src={resolveImageUrl(a.imageUrl) ?? artistCover} alt="" className="h-[132px] w-[132px] rounded-full object-cover" />
               <div className="min-w-0">
                 <p className="truncate text-xs font-semibold leading-tight text-white">{a.name}</p>
                 <p className="truncate text-[11px] font-normal leading-tight text-neutral-400">Artista</p>
@@ -152,7 +153,7 @@ function Home({ onArtistClick, onPlaylistClick, onAlbumClick }: HomeProps) {
               onContextMenu={(e) => openAlbumMenu(e, a)}
               className="flex w-[140px] shrink-0 flex-col gap-1.5 rounded-[4px] p-1 text-left hover:brightness-110"
             >
-              <img src={albumCover} alt="" className="h-[132px] w-[132px] rounded-[2px] object-cover" />
+              <img src={resolveImageUrl(a.imageUrl) ?? albumCover} alt="" className="h-[132px] w-[132px] rounded-[2px] object-cover" />
               <div className="min-w-0">
                 <p className="truncate text-xs font-semibold leading-tight text-white">{a.title}</p>
                 <p className="truncate text-[11px] font-normal leading-tight text-neutral-400">

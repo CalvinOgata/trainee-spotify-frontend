@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import favoritesCover from '../assets/images/favorites_default.png'
 import playlistCover from '../assets/images/playlist_default.png'
 import { Lock, MusicNote, X } from './icons'
+import { resolveImageUrl } from '../lib/api'
 import type { PlaylistSummary } from '../lib/types'
 
 type EditPlaylistDetailsModalProps = {
@@ -16,7 +17,7 @@ function EditPlaylistDetailsModal({ playlist, onClose, onSave }: EditPlaylistDet
   const [saving, setSaving] = useState(false)
 
   const isLikedPlaylist = playlist.name === 'Músicas Curtidas'
-  const cover = isLikedPlaylist ? favoritesCover : playlistCover
+  const cover = resolveImageUrl(playlist.imageUrl) ?? (isLikedPlaylist ? favoritesCover : playlistCover)
   const isEmpty = playlist.musicQtd === 0
 
   useEffect(() => {

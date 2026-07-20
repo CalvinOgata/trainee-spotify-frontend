@@ -1,5 +1,10 @@
 const BASE_URL = import.meta.env.VITE_API_BASE ?? '/api'
 
+export function resolveImageUrl(imageUrl: string | null | undefined): string | null {
+  if (!imageUrl) return null
+  return `${BASE_URL}${imageUrl}`
+}
+
 export class ApiError extends Error {
   status: number
   body: string

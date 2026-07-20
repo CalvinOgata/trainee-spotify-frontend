@@ -92,6 +92,7 @@ function AlbumContextMenu({ album, x, y, onClose, onArtistClick }: AlbumContextM
       name: album.artistName,
       listeners: 0,
       about: null,
+      imageUrl: null,
       createdAt: album.createdAt,
       updatedAt: null,
     }

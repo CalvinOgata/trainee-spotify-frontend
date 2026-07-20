@@ -4,6 +4,7 @@ export type PlaylistSummary = {
   description: string | null
   musicQtd: number
   duration: number
+  imageUrl: string | null
   createdAt: string
   updatedAt: string | null
 }
@@ -18,6 +19,7 @@ export type Music = {
   releaseDate: string
   timesListen: number
   explicit: boolean | null
+  imageUrl: string | null
   createdAt: string
   updatedAt: string | null
 }
@@ -29,6 +31,7 @@ export type Playlist = {
   musicQtd: number
   duration: number
   musics: Music[]
+  imageUrl: string | null
   createdAt: string
   updatedAt: string | null
 }
@@ -38,6 +41,7 @@ export type Artist = {
   name: string
   listeners: number
   about: string | null
+  imageUrl: string | null
   createdAt: string
   updatedAt: string | null
 }
@@ -48,6 +52,7 @@ export type AlbumSummary = {
   year: string | null
   artistId: string
   artistName: string
+  imageUrl: string | null
   createdAt: string
   updatedAt: string | null
 }

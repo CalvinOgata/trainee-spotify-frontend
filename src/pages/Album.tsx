@@ -1,6 +1,7 @@
 import albumCover from '../assets/images/album_default.png'
 import songCover from '../assets/images/song_default.png'
 import { Clock } from '../components/icons'
+import { resolveImageUrl } from '../lib/api'
 import { useApi } from '../lib/useApi'
 import { usePlayer } from '../lib/PlayerContext'
 import { useSongContextMenu } from '../lib/SongContextMenuContext'
@@ -32,6 +33,7 @@ function Album({ album }: AlbumProps) {
     name: album.artistName,
     listeners: 0,
     about: null,
+    imageUrl: null,
     createdAt: album.createdAt,
     updatedAt: null,
   }
@@ -43,7 +45,7 @@ function Album({ album }: AlbumProps) {
         className="-mx-5 -mt-6 flex items-end gap-4 bg-gradient-to-b from-[#535353] to-[#1a1a1a] px-5 pt-10 pb-4"
       >
         <img
-          src={albumCover}
+          src={resolveImageUrl(album.imageUrl) ?? albumCover}
           alt=""
           className="h-[160px] w-[160px] shrink-0 rounded shadow-[0_4px_60px_rgba(0,0,0,0.5)] object-cover"
         />
@@ -92,7 +94,7 @@ function Album({ album }: AlbumProps) {
               >
                 <span className="text-neutral-400">{i + 1}</span>
                 <div className="flex min-w-0 items-center gap-2.5">
-                  <img src={songCover} alt="" className="h-9 w-9 shrink-0 rounded object-cover" />
+                  <img src={resolveImageUrl(t.imageUrl) ?? songCover} alt="" className="h-9 w-9 shrink-0 rounded object-cover" />
                   <div className="min-w-0">
                     <p className="truncate text-sm font-semibold leading-tight text-white">{t.title}</p>
                     <p className="truncate text-[11px] font-normal leading-tight text-neutral-400">

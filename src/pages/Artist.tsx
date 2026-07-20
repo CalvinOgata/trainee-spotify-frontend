@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import albumCover from '../assets/images/album_default.png'
 import artistBanner from '../assets/images/artist_banner.png'
 import songCover from '../assets/images/song_default.png'
@@ -9,7 +10,7 @@ import { useArtistContextMenu } from '../lib/ArtistContextMenuContext'
 import { useAlbumContextMenu } from '../lib/AlbumContextMenuContext'
 import { getArtistAlbums, getArtistPopularMusics } from '../lib/endpoints'
 import { formatDuration, formatPlays } from '../lib/format'
-import type { AlbumSummary, Artist as ArtistDTO } from '../lib/types'
+import type { AlbumSummary, Artist as ArtistDTO, Music } from '../lib/types'
 
 const PlayArrow = () => (
   <svg viewBox="0 0 24 24" fill="currentColor" className="h-5 w-5">
@@ -30,6 +31,7 @@ type ArtistProps = {
 }
 
 function Artist({ artist, onAlbumClick }: ArtistProps) {
+  const [showAllSongs, setShowAllSongs] = useState(false)
   const { data: popular } = useApi(() => getArtistPopularMusics(artist.id), [artist.id])
   const { data: albums } = useApi(() => getArtistAlbums(artist.id), [artist.id])
   const { play } = usePlayer()
@@ -40,6 +42,14 @@ function Artist({ artist, onAlbumClick }: ArtistProps) {
   const popularTracks = popular ?? []
   const discography = albums ?? []
   const albumById = new Map((albums ?? []).map((a) => [a.id, a]))
+
+  const allSongsById = new Map<string, Music>()
+  for (const a of discography) {
+    for (const m of a.musics) allSongsById.set(m.id, m)
+  }
+  const allSongs = Array.from(allSongsById.values())
+  const displayedTracks = showAllSongs ? allSongs : popularTracks
+  const canExpand = allSongs.length > popularTracks.length
 
   return (
     <div className="flex h-full flex-col gap-3">
@@ -73,12 +83,14 @@ function Artist({ artist, onAlbumClick }: ArtistProps) {
       </div>
 
       <section className="flex w-full max-w-[457px] flex-col gap-2.5">
-        <h2 className="text-base font-bold leading-tight text-white">Populares</h2>
+        <h2 className="text-base font-bold leading-tight text-white">
+          {showAllSongs ? 'Todas as músicas' : 'Populares'}
+        </h2>
         <ul className="flex flex-col gap-2.5">
-          {popularTracks.map((t, i) => (
+          {displayedTracks.map((t, i) => (
             <li
               key={t.id}
-              onClick={() => play(t, { artist })}
+              onClick={() => play(t, { artist, queue: displayedTracks })}
               onContextMenu={(e) =>
                 openSongMenu(e, {
                   music: t,
@@ -104,9 +116,14 @@ function Artist({ artist, onAlbumClick }: ArtistProps) {
             </li>
           ))}
         </ul>
-        <button className="self-start text-xs font-semibold text-neutral-400 hover:text-white">
-          Mostrar tudo
-        </button>
+        {(canExpand || showAllSongs) && (
+          <button
+            onClick={() => setShowAllSongs((v) => !v)}
+            className="self-start text-xs font-semibold text-neutral-400 hover:text-white"
+          >
+            {showAllSongs ? 'Mostrar menos' : 'Mostrar tudo'}
+          </button>
+        )}
       </section>
 
       <section className="flex w-full flex-col gap-2.5">

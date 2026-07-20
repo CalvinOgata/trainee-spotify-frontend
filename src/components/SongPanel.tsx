@@ -1,8 +1,9 @@
 import { useRef, useState } from 'react'
 import artistAboutCover from '../assets/images/artist_about.png'
 import songCover from '../assets/images/song_default.png'
+import iconButtons from '../assets/icons/IconButtons.svg'
 import CreditsModal from './CreditsModal'
-import { Dots, Verified } from './icons'
+import { Verified } from './icons'
 import { usePlayer } from '../lib/PlayerContext'
 import { useAutoHideScrollbar } from '../lib/useAutoHideScrollbar'
 import { formatPlays } from '../lib/format'
@@ -23,8 +24,10 @@ function SongPanel() {
   const ref = useRef<HTMLElement>(null)
   useAutoHideScrollbar(ref)
 
-  const title = current?.title ?? 'Nenhuma música'
-  const subtitle = current ? currentArtist?.name ?? 'Artista' : ''
+  if (!current) return null
+
+  const title = current.title
+  const subtitle = currentArtist?.name ?? 'Artista'
 
   return (
     <>
@@ -34,7 +37,9 @@ function SongPanel() {
       >
         <div className="flex items-center justify-between px-3 pt-3 pb-2">
           <h2 className="text-sm font-semibold text-white">you know</h2>
-          <Dots />
+          <button aria-label="Mais opções">
+            <img src={iconButtons} alt="" className="h-6 w-6" />
+          </button>
         </div>
         <img src={songCover} alt="" className="aspect-square w-full object-cover" />
         <div className="px-3 pt-3 pb-3">

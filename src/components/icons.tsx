@@ -102,6 +102,27 @@ export const MinimizedPlayer = ({ className = 'h-[11px] w-3' }: IconProps) => (
   </svg>
 )
 
+export const MaximizedPlayer = ({ className = 'h-[11px] w-3' }: IconProps) => (
+  <svg viewBox="0 0 12 11" fill="none" xmlns="http://www.w3.org/2000/svg" className={className}>
+    <path
+      d="M1.20056 4.27661L1.20042 2.77621C1.20037 2.22383 1.6482 1.77603 2.20058 1.77612L4.90052 1.77654"
+      stroke="currentColor"
+    />
+    <path
+      d="M10.6005 4.27661L10.6006 2.77621C10.6007 2.22383 10.1528 1.77603 9.60045 1.77612L6.9005 1.77654"
+      stroke="currentColor"
+    />
+    <path
+      d="M1.20056 6.62866L1.20042 8.12906C1.20037 8.68145 1.6482 9.12925 2.20058 9.12916L4.90052 9.12873"
+      stroke="currentColor"
+    />
+    <path
+      d="M10.6005 6.62866L10.6006 8.12906C10.6007 8.68145 10.1528 9.12925 9.60045 9.12916L6.9005 9.12873"
+      stroke="currentColor"
+    />
+  </svg>
+)
+
 export const Dots = () => (
   <span className="text-neutral-400 text-lg leading-none">···</span>
 )

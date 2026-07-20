@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import type { MouseEvent } from 'react'
 import songCover from '../assets/images/song_default.png'
 import {
+  MaximizedPlayer,
   MinimizedPlayer,
   Next,
   Pause,
@@ -93,18 +94,18 @@ function Player({ onFullscreenClick, isFullscreen }: PlayerProps) {
   const VolumeIcon = volume === 0 ? VolumeMute : volume < 0.5 ? VolumeLow : VolumeHigh
 
   return (
-    <footer className="flex items-center gap-3 bg-black p-2.5">
+    <footer className="flex h-16 shrink-0 items-center gap-3 bg-black px-2.5 py-1">
       <div className="flex min-w-0 flex-1 basis-0 items-center gap-3">
-        <div className="flex h-[35px] min-w-0 max-w-[200px] flex-1 items-center gap-3">
+        <div className="flex h-[35px] w-[111px] shrink-0 items-center gap-3">
           <img
             src={songCover}
             alt=""
             className="h-[35px] w-9 shrink-0 rounded-[2px] object-cover"
             style={isFullscreen ? undefined : { viewTransitionName: 'song-cover' }}
           />
-          <div className="min-w-0">
-            <p className="truncate text-[10px] font-semibold text-white">{title}</p>
-            <p className="truncate text-[10px] font-normal text-neutral-400">{subtitle}</p>
+          <div className="flex min-w-0 flex-col gap-[10px]">
+            <p className="h-[12px] w-[63px] truncate text-[10px] font-bold leading-3 text-white">{title}</p>
+            <p className="h-[12px] w-[49px] truncate text-[10px] font-bold leading-3 text-[#B3B3B3]">{subtitle}</p>
           </div>
         </div>
       </div>
@@ -174,8 +175,12 @@ function Player({ onFullscreenClick, isFullscreen }: PlayerProps) {
             style={{ left: `${volume * 100}%` }}
           />
         </div>
-        <button onClick={onFullscreenClick} className="hover:text-white" aria-label="Tela cheia">
-          <MinimizedPlayer />
+        <button
+          onClick={onFullscreenClick}
+          className="hover:text-white"
+          aria-label={isFullscreen ? 'Sair da tela cheia' : 'Tela cheia'}
+        >
+          {isFullscreen ? <MaximizedPlayer /> : <MinimizedPlayer />}
         </button>
       </div>
     </footer>

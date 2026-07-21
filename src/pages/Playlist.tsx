@@ -264,7 +264,7 @@ function Playlist({ playlist, playlistsKey, onDeleted, onUpdated, onTracksChange
                     onDragOver={handleDragOver(i)}
                     onDrop={handleDrop(i)}
                     onDragEnd={handleDragEnd}
-                    onClick={() => play(t, { artist, queue: tracks })}
+                    onClick={() => play(t, { artist, queue: tracks, source: { kind: 'playlist', playlist } })}
                     onContextMenu={(e) =>
                       openSongMenu(e, {
                         music: t,

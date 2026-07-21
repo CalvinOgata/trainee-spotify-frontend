@@ -28,7 +28,7 @@ type SearchResultsProps = {
   onAlbumClick: (album: AlbumSummary) => void
 }
 
-const EMPTY: SearchResponse = { musics: [], playlists: [], artists: [], albums: [] }
+const EMPTY: SearchResponse = { musics: [], playlists: [], artists: [], albums: [], musicAlbums: [], musicArtists: [] }
 
 function SearchResults({ query, onArtistClick, onPlaylistClick, onAlbumClick }: SearchResultsProps) {
   const [debouncedQ, setDebouncedQ] = useState(query.trim())
@@ -47,10 +47,10 @@ function SearchResults({ query, onArtistClick, onPlaylistClick, onAlbumClick }: 
   const { openPlaylistMenu } = usePlaylistContextMenu()
   const { openAlbumMenu } = useAlbumContextMenu()
 
-  const { musics, playlists, artists, albums } = results ?? EMPTY
+  const { musics, playlists, artists, albums, musicAlbums, musicArtists } = results ?? EMPTY
 
-  const artistById = new Map(artists.map((a) => [a.id, a]))
-  const albumById = new Map(albums.map((a) => [a.id, a]))
+  const artistById = new Map([...artists, ...musicArtists].map((a) => [a.id, a]))
+  const albumById = new Map([...albums, ...musicAlbums].map((a) => [a.id, a]))
 
   const all: Result[] = [
     ...musics.map<Result>((m) => ({
@@ -149,7 +149,12 @@ function SearchResults({ query, onArtistClick, onPlaylistClick, onAlbumClick }: 
               </button>
             ) : r.pill === 'Música' ? (
               <button
-                onClick={() => play(r.music, { artist: artistById.get(r.music.artistId) })}
+                onClick={() =>
+                  play(r.music, {
+                    artist: artistById.get(r.music.artistId),
+                    source: { kind: 'music', album: albumById.get(r.music.albumId) ?? null },
+                  })
+                }
                 className="block w-full truncate text-left text-base font-semibold text-white hover:underline"
               >
                 {r.title}

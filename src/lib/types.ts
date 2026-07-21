@@ -76,4 +76,6 @@ export type SearchResponse = {
   playlists: PlaylistSummary[]
   artists: Artist[]
   albums: AlbumSummary[]
+  musicAlbums: AlbumSummary[]
+  musicArtists: Artist[]
 }

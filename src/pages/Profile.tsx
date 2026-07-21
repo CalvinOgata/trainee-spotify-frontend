@@ -97,7 +97,12 @@ function Profile({ onArtistClick, onPlaylistClick }: ProfileProps) {
           {musicRows.map((t, i) => (
             <li
               key={t.id}
-              onClick={() => play(t, { artist: artistById.get(t.artistId) })}
+              onClick={() =>
+                play(t, {
+                  artist: artistById.get(t.artistId),
+                  source: { kind: 'music', album: null },
+                })
+              }
               onContextMenu={(e) =>
                 openSongMenu(e, {
                   music: t,

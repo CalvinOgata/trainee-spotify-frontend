@@ -75,7 +75,12 @@ function Home({ onArtistClick, onPlaylistClick, onAlbumClick }: HomeProps) {
           {recentItems.map((m) => (
             <button
               key={m.id}
-              onClick={() => play(m, { artist: artistById.get(m.artistId) })}
+              onClick={() =>
+                play(m, {
+                  artist: artistById.get(m.artistId),
+                  source: { kind: 'music', album: albumById.get(m.albumId) ?? null },
+                })
+              }
               onContextMenu={(e) =>
                 openSongMenu(e, {
                   music: m,

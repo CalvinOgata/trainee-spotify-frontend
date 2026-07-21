@@ -91,7 +91,13 @@ function Artist({ artist, onAlbumClick }: ArtistProps) {
           {displayedTracks.map((t, i) => (
             <li
               key={t.id}
-              onClick={() => play(t, { artist, queue: displayedTracks })}
+              onClick={() =>
+                play(t, {
+                  artist,
+                  queue: displayedTracks,
+                  source: { kind: 'music', album: albumById.get(t.albumId) ?? null },
+                })
+              }
               onContextMenu={(e) =>
                 openSongMenu(e, {
                   music: t,

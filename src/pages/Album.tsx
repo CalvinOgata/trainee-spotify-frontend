@@ -66,7 +66,7 @@ function Album({ album }: AlbumProps) {
       {!isEmpty && (
         <div className="flex items-center">
           <button
-            onClick={() => play(tracks[0], { artist, queue: tracks })}
+            onClick={() => play(tracks[0], { artist, queue: tracks, source: { kind: 'album', album } })}
             className="grid h-10 w-10 place-items-center rounded-full bg-[#1FDF64] text-black transition hover:scale-105"
             aria-label="Reproduzir"
           >
@@ -86,7 +86,7 @@ function Album({ album }: AlbumProps) {
             {tracks.map((t, i) => (
               <li
                 key={t.id}
-                onClick={() => play(t, { artist, queue: tracks })}
+                onClick={() => play(t, { artist, queue: tracks, source: { kind: 'album', album } })}
                 onContextMenu={(e) =>
                   openSongMenu(e, { music: t, artist, album })
                 }

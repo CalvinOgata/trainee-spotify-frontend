@@ -81,7 +81,11 @@ function Frame({
         )}
         {page === 'album' && selectedAlbum && <Album album={selectedAlbum} />}
       </MainSection>
-      <SongPanel />
+      <SongPanel
+        onAlbumClick={onAlbumClick}
+        onPlaylistClick={onPlaylistClick}
+        onArtistClick={onArtistClick}
+      />
     </div>
   )
 }

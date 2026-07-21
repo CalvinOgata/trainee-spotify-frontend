@@ -1,16 +1,28 @@
 import { createContext, useCallback, useContext, useEffect, useState } from 'react'
 import type { ReactNode } from 'react'
 import { getAlbumMusics } from './endpoints'
-import type { Artist, Music } from './types'
+import type { AlbumSummary, Artist, Music, PlaylistSummary } from './types'
 
 type HistoryEntry = { music: Music; artist: Artist | null; queue: Music[] }
+
+type NextUp = { music: Music; artist: Artist | null }
+
+export type PlaybackSource =
+  | { kind: 'album'; album: AlbumSummary }
+  | { kind: 'playlist'; playlist: PlaylistSummary }
+  | { kind: 'music'; album: AlbumSummary | null }
 
 type PlayerContextValue = {
   current: Music | null
   currentArtist: Artist | null
+  currentSource: PlaybackSource | null
+  nextUp: NextUp | null
   isPlaying: boolean
   position: number
-  play: (music: Music, opts?: { artist?: Artist; queue?: Music[] }) => void
+  play: (
+    music: Music,
+    opts?: { artist?: Artist; queue?: Music[]; source?: PlaybackSource },
+  ) => void
   togglePlay: () => void
   next: () => void
   prev: () => void
@@ -22,6 +34,7 @@ const PlayerContext = createContext<PlayerContextValue | null>(null)
 export function PlayerProvider({ children }: { children: ReactNode }) {
   const [current, setCurrent] = useState<Music | null>(null)
   const [currentArtist, setCurrentArtist] = useState<Artist | null>(null)
+  const [currentSource, setCurrentSource] = useState<PlaybackSource | null>(null)
   const [queue, setQueue] = useState<Music[]>([])
   const [history, setHistory] = useState<HistoryEntry[]>([])
   const [future, setFuture] = useState<HistoryEntry[]>([])
@@ -29,13 +42,17 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
   const [position, setPosition] = useState(0)
 
   const play = useCallback(
-    async (music: Music, opts?: { artist?: Artist; queue?: Music[] }) => {
+    async (
+      music: Music,
+      opts?: { artist?: Artist; queue?: Music[]; source?: PlaybackSource },
+    ) => {
       if (current) {
         setHistory((h) => [...h, { music: current, artist: currentArtist, queue }])
       }
       setFuture([])
       setCurrent(music)
       setCurrentArtist(opts?.artist ?? null)
+      setCurrentSource(opts?.source ?? null)
       setPosition(0)
       setIsPlaying(true)
       if (opts?.queue) {
@@ -121,11 +138,25 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
     }
   }, [position, current, next])
 
+  const nextUp: NextUp | null = (() => {
+    if (!current) return null
+    if (future.length > 0) {
+      return { music: future[0].music, artist: future[0].artist }
+    }
+    const idx = queue.findIndex((m) => m.id === current.id)
+    if (idx >= 0 && idx < queue.length - 1) {
+      return { music: queue[idx + 1], artist: currentArtist }
+    }
+    return null
+  })()
+
   return (
     <PlayerContext.Provider
       value={{
         current,
         currentArtist,
+        currentSource,
+        nextUp,
         isPlaying,
         position,
         play,

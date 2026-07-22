@@ -3,6 +3,7 @@ import albumCover from '../assets/images/album_default.png'
 import artistBanner from '../assets/images/artist_banner.png'
 import songCover from '../assets/images/song_default.png'
 import { Verified } from '../components/icons'
+import FollowButton from '../components/FollowButton'
 import { resolveImageUrl } from '../lib/api'
 import { useApi } from '../lib/useApi'
 import { usePlayer } from '../lib/PlayerContext'
@@ -78,9 +79,7 @@ function Artist({ artist, onAlbumClick }: ArtistProps) {
         >
           <PlayArrow />
         </button>
-        <button className="rounded-full border border-neutral-400 px-4 py-1 text-xs font-semibold text-white hover:border-white">
-          Seguir
-        </button>
+        <FollowButton artist={artist} />
       </div>
 
       <section className="flex w-full max-w-[457px] flex-col gap-2.5">

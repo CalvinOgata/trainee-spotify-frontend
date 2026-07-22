@@ -1,10 +1,10 @@
 import { useRef, useState } from 'react'
 import artistAboutCover from '../assets/images/artist_about.png'
 import songCover from '../assets/images/song_default.png'
-import followingButton from '../assets/icons/FollowingButton.svg'
+import artistVerified from '../assets/icons/artistVerified.svg'
 import iconButtons from '../assets/icons/IconButtons.svg'
 import CreditsModal from './CreditsModal'
-import { Verified } from './icons'
+import FollowButton from './FollowButton'
 import { resolveImageUrl } from '../lib/api'
 import { usePlayer } from '../lib/PlayerContext'
 import { useAutoHideScrollbar } from '../lib/useAutoHideScrollbar'
@@ -159,15 +159,13 @@ function SongPanel({ onAlbumClick, onPlaylistClick, onArtistClick }: SongPanelPr
               ) : (
                 <p className="font-[Inter] text-base font-bold text-white">—</p>
               )}
-              <Verified />
+              <img src={artistVerified} alt="" className="h-[15px] w-[15px]" />
             </div>
             <div className="flex items-center justify-between gap-2">
               <p className="font-[Inter] text-xs font-medium text-white">
                 {currentArtist ? `${formatPlays(currentArtist.listeners)} ouvintes mensais` : ''}
               </p>
-              <button aria-label="Deixar de seguir" className="shrink-0">
-                <img src={followingButton} alt="" className="h-6 w-[104px]" />
-              </button>
+              {currentArtist && <FollowButton artist={currentArtist} />}
             </div>
             <p className="font-[Inter] line-clamp-3 text-xs font-medium text-neutral-400">
               {currentArtist?.about ?? ''}
@@ -192,9 +190,7 @@ function SongPanel({ onAlbumClick, onPlaylistClick, onArtistClick }: SongPanelPr
                   <p className="font-[Inter] truncate text-xs font-medium text-white">{currentArtist.name}</p>
                   <p className="font-[Inter] truncate text-[10px] font-medium text-[#B3B3B3]">Artista Principal</p>
                 </div>
-                <button aria-label="Deixar de seguir" className="shrink-0">
-                  <img src={followingButton} alt="" className="h-6 w-[104px]" />
-                </button>
+                <FollowButton artist={currentArtist} />
               </li>
             )}
             {composers.slice(0, 2).map((c, i) => (

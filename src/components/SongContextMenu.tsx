@@ -184,7 +184,7 @@ function SongContextMenu({
   }
 
   const handleSaveToggle = () => {
-    toggleSaved(music.id)
+    toggleSaved(music)
     onClose()
   }
 

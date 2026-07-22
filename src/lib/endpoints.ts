@@ -20,6 +20,17 @@ export const getMostPlayedMusics = () => api.get<Music[]>('/user/mostPlayedMusic
 export const getRecentAlbums = () => api.get<AlbumSummary[]>('/user/recentAlbums')
 export const getFollowers = () => api.get<string[]>('/user/followers')
 
+// /user/saved*
+export const getSavedMusics = () => api.get<Music[]>('/user/savedMusics')
+export const saveMusic = (id: string) => api.post<void>(`/user/savedMusics/${id}`, {})
+export const unsaveMusic = (id: string) => api.delete<void>(`/user/savedMusics/${id}`)
+export const getSavedAlbums = () => api.get<AlbumSummary[]>('/user/savedAlbums')
+export const saveAlbum = (id: string) => api.post<void>(`/user/savedAlbums/${id}`, {})
+export const unsaveAlbum = (id: string) => api.delete<void>(`/user/savedAlbums/${id}`)
+export const getFollowedArtists = () => api.get<Artist[]>('/user/followedArtists')
+export const followArtist = (id: string) => api.post<void>(`/user/followedArtists/${id}`, {})
+export const unfollowArtist = (id: string) => api.delete<void>(`/user/followedArtists/${id}`)
+
 // /playlist
 export const getPlaylist = (id: string) => api.get<Playlist>(`/playlist/${id}`)
 export const createPlaylist = (body: CreatePlaylistInput) =>

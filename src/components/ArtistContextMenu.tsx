@@ -76,7 +76,7 @@ function ArtistContextMenu({ artist, x, y, onClose }: ArtistContextMenuProps) {
   }, [onClose])
 
   const handleFollowToggle = () => {
-    toggleFollowed(artist.id)
+    toggleFollowed(artist)
     onClose()
   }
 

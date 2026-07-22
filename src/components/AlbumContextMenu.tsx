@@ -77,7 +77,7 @@ function AlbumContextMenu({ album, x, y, onClose, onArtistClick }: AlbumContextM
   }, [onClose])
 
   const handleSaveToggle = () => {
-    toggleAlbumSaved(album.id)
+    toggleAlbumSaved(album)
     onClose()
   }
 

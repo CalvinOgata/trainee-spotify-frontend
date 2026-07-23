@@ -1,4 +1,5 @@
 import { useRef, useState } from 'react'
+import type { ReactNode } from 'react'
 import albumCover from '../assets/images/album_default.png'
 import artistCover from '../assets/images/artist_default.png'
 import favoritesCover from '../assets/images/favorites_default.png'
@@ -41,6 +42,48 @@ type LibraryProps = {
 }
 
 const namePattern = /^Minha playlist nº (\d+)$/
+
+// Lowercases and strips diacritics + punctuation/symbols so searches ignore accents ("cafe" matches "Café") and punctuation ("rock n roll" matches "Rock'n'Roll").
+function normalizeForSearch(s: string): string {
+  return s
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/\p{Diacritic}/gu, '')
+    .replace(/[\p{P}\p{S}]/gu, '')
+}
+
+// Builds the normalized form of a string alongside an index map so a match found in the normalized form can be mapped back to the original char positions.
+function buildNormalizedIndex(text: string): { normalized: string; map: number[] } {
+  let normalized = ''
+  const map: number[] = []
+  for (let i = 0; i < text.length; i++) {
+    const nc = normalizeForSearch(text[i])
+    for (const c of nc) {
+      normalized += c
+      map.push(i)
+    }
+  }
+  return { normalized, map }
+}
+
+// Wraps the first accent/punctuation-insensitive match of `normalizedQuery` inside `text` in a <mark>; returns raw text if no match or empty query.
+function highlightMatch(text: string, normalizedQuery: string): ReactNode {
+  if (!normalizedQuery) return text
+  const { normalized, map } = buildNormalizedIndex(text)
+  const idx = normalized.indexOf(normalizedQuery)
+  if (idx < 0) return text
+  const origStart = map[idx]
+  const origEnd = map[idx + normalizedQuery.length - 1] + 1
+  return (
+    <>
+      {text.slice(0, origStart)}
+      <mark className="rounded-sm bg-white/20 text-inherit">
+        {text.slice(origStart, origEnd)}
+      </mark>
+      {text.slice(origEnd)}
+    </>
+  )
+}
 
 // Derives "Minha playlist nº N+1" by scanning existing playlist names for the highest N.
 function nextPlaylistName(playlists: PlaylistSummary[]): string {
@@ -166,10 +209,10 @@ function Library({ onArtistClick, onPlaylistClick, onAlbumClick, playlistsKey, o
       })
     }
   }
-  // Apply the search box as a case-insensitive substring filter over the title.
-  const q = search.trim().toLowerCase()
+  // Apply the search box as an accent/punctuation-insensitive substring filter over the title.
+  const q = normalizeForSearch(search.trim())
   const filteredRows = q
-    ? unsortedRows.filter((r) => r.title.toLowerCase().includes(q))
+    ? unsortedRows.filter((r) => buildNormalizedIndex(r.title).normalized.includes(q))
     : unsortedRows
   // Recency timestamp for a row, used to sort the unpinned section most-recent-first.
   const recencyOf = (r: Row): number =>
@@ -282,7 +325,7 @@ function Library({ onArtistClick, onPlaylistClick, onAlbumClick, playlistsKey, o
                 <p
                   className={`truncate text-sm font-normal transition-colors duration-300 ${playing ? 'text-[#67C260]' : 'text-neutral-100'}`}
                 >
-                  {row.title}
+                  {highlightMatch(row.title, q)}
                 </p>
                 <p className="flex items-center gap-1 truncate text-xs text-neutral-400">
                   {row.pinned && <Pin className="h-3 w-3 shrink-0 text-[#1FDF64]" />}

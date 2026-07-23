@@ -82,7 +82,7 @@ function AlbumContextMenu({ album, x, y, onClose, onArtistClick }: AlbumContextM
   }
 
   const handlePinToggle = () => {
-    toggleAlbumPinned(album.id)
+    toggleAlbumPinned(album)
     onClose()
   }
 

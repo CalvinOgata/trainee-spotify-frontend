@@ -81,7 +81,7 @@ function ArtistContextMenu({ artist, x, y, onClose }: ArtistContextMenuProps) {
   }
 
   const handlePinToggle = () => {
-    togglePinned(artist.id)
+    togglePinned(artist)
     onClose()
   }
 

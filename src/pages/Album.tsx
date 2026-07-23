@@ -58,7 +58,9 @@ function Album({ album }: AlbumProps) {
       {!isEmpty && (
         <div className="flex items-center">
           <button
-            onClick={() => play(tracks[0], { ...playOpts, artist: artist ?? undefined })}
+            onClick={() =>
+              play(tracks[0], { ...playOpts, artist: artist ?? undefined, promote: 'source' })
+            }
             className="grid h-10 w-10 place-items-center rounded-full bg-[#1FDF64] text-black transition hover:scale-105"
             aria-label="Reproduzir"
           >

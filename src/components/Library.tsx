@@ -6,6 +6,8 @@ import playlistCover from '../assets/images/playlist_default.png'
 import songCover from '../assets/images/song_default.png'
 import createPlaylistButton from '../assets/icons/Button.svg'
 import librarySearchIcon from '../assets/icons/searchIconLibrary.svg'
+import libraryPlayingIcon from '../assets/icons/libraryPlaying.svg'
+import pauseIcon from '../assets/icons/Pause.svg'
 import { Pin, X } from './icons'
 import Pill from './Pill'
 import { resolveImageUrl } from '../lib/api'
@@ -40,6 +42,7 @@ type LibraryProps = {
 
 const namePattern = /^Minha playlist nº (\d+)$/
 
+// Derives "Minha playlist nº N+1" by scanning existing playlist names for the highest N.
 function nextPlaylistName(playlists: PlaylistSummary[]): string {
   const max = playlists.reduce((acc, p) => {
     const m = p.name.match(namePattern)
@@ -48,6 +51,7 @@ function nextPlaylistName(playlists: PlaylistSummary[]): string {
   return `Minha playlist nº ${max + 1}`
 }
 
+// Left sidebar: builds rows from playlists/artists/albums/musics, applies filter+search+recency sort, renders playing indicators.
 function Library({ onArtistClick, onPlaylistClick, onAlbumClick, playlistsKey, onPlaylistCreated }: LibraryProps) {
   const [activeFilter, setActiveFilter] = useState<LibraryFilter>('Tudo')
   const [search, setSearch] = useState('')
@@ -58,9 +62,49 @@ function Library({ onArtistClick, onPlaylistClick, onAlbumClick, playlistsKey, o
   const { openPlaylistMenu } = usePlaylistContextMenu()
   const { openAlbumMenu } = useAlbumContextMenu()
   const { openSongMenu } = useSongContextMenu()
-  const { isPinned, isPlaylistPinned, isAlbumPinned, savedMusics, savedAlbums, followedArtists } = useLibrary()
-  const { play } = usePlayer()
+  const {
+    isPinned,
+    isPlaylistPinned,
+    isAlbumPinned,
+    savedMusics,
+    savedAlbums,
+    followedArtists,
+    getArtistById,
+  } = useLibrary()
+  const {
+    play,
+    getRecency,
+    current,
+    currentArtist,
+    currentSource,
+    currentPromote,
+    queue,
+    isPlaying,
+  } = usePlayer()
 
+  // True when the row represents what the player is currently playing per the rules (source promote for album/playlist, artist promote for artist, avulsus for music).
+  const isRowPlaying = (row: Row): boolean => {
+    switch (row.kind) {
+      case 'music':
+        return current?.id === row.music.id && queue.length <= 1
+      case 'artist':
+        return currentPromote === 'artist' && currentArtist?.id === row.artist.id
+      case 'album':
+        return (
+          currentPromote === 'source' &&
+          currentSource?.kind === 'album' &&
+          currentSource.album.id === row.album.id
+        )
+      case 'playlist':
+        return (
+          currentPromote === 'source' &&
+          currentSource?.kind === 'playlist' &&
+          currentSource.playlist.id === row.playlist.id
+        )
+    }
+  }
+
+  // Creates a new user playlist with the auto-generated name, refreshes the sidebar, and navigates to it.
   const handleCreate = async () => {
     const name = nextPlaylistName(playlists ?? [])
     try {
@@ -72,6 +116,7 @@ function Library({ onArtistClick, onPlaylistClick, onAlbumClick, playlistsKey, o
     }
   }
 
+  // Assemble raw rows for each library category included by the current filter (Tudo shows all four).
   const unsortedRows: Row[] = []
   if (activeFilter === 'Tudo' || activeFilter === 'Playlists') {
     for (const p of playlists ?? []) {
@@ -121,13 +166,27 @@ function Library({ onArtistClick, onPlaylistClick, onAlbumClick, playlistsKey, o
       })
     }
   }
+  // Apply the search box as a case-insensitive substring filter over the title.
   const q = search.trim().toLowerCase()
   const filteredRows = q
     ? unsortedRows.filter((r) => r.title.toLowerCase().includes(q))
     : unsortedRows
+  // Recency timestamp for a row, used to sort the unpinned section most-recent-first.
+  const recencyOf = (r: Row): number =>
+    r.kind === 'playlist' ? getRecency('playlist', r.playlist.id) :
+    r.kind === 'album' ? getRecency('album', r.album.id) :
+    r.kind === 'artist' ? getRecency('artist', r.artist.id) :
+    getRecency('music', r.music.id)
+  // Unpinned rows: sorted by recency desc, with never-played items falling back to their natural (data) order.
+  const unpinned = filteredRows
+    .filter((r) => !r.pinned)
+    .map((row, i) => ({ row, i, ts: recencyOf(row) }))
+    .sort((a, b) => (b.ts !== a.ts ? b.ts - a.ts : a.i - b.i))
+    .map((x) => x.row)
+  // Final render list: pinned rows first (data order), then the recency-sorted unpinned tail.
   const rows = [
     ...filteredRows.filter((r) => r.pinned),
-    ...filteredRows.filter((r) => !r.pinned),
+    ...unpinned,
   ]
 
   return (
@@ -179,7 +238,7 @@ function Library({ onArtistClick, onPlaylistClick, onAlbumClick, playlistsKey, o
       <ul ref={scrollRef} className="scroll-auto-hide flex min-h-0 flex-1 flex-col overflow-y-auto px-2">
         {rows.map((row) => {
           const isArtist = row.kind === 'artist'
-          const thumbClass = `h-10 w-10 shrink-0 ${isArtist ? 'rounded-full' : 'rounded'} object-cover`
+          const shape = isArtist ? 'rounded-full' : 'rounded'
           const remote =
             row.kind === 'playlist' ? resolveImageUrl(row.playlist.imageUrl) :
             row.kind === 'album' ? resolveImageUrl(row.album.imageUrl) :
@@ -191,21 +250,55 @@ function Library({ onArtistClick, onPlaylistClick, onAlbumClick, playlistsKey, o
             row.kind === 'music' ? songCover :
             artistCover
           const src = remote ?? fallback
-          const thumb = <img src={src} alt={row.title} title={row.title} className={thumbClass} />
+          const playing = isRowPlaying(row)
+          const thumb = (
+            <div className={`relative h-10 w-10 shrink-0 overflow-hidden ${shape}`}>
+              <img src={src} alt={row.title} title={row.title} className="h-full w-full object-cover" />
+              <div
+                aria-hidden
+                className={`pointer-events-none absolute inset-0 flex items-center justify-center bg-black/40 transition-opacity duration-300 ${playing ? 'opacity-100' : 'opacity-0'}`}
+              >
+                <div className="relative flex h-5 w-5 items-center justify-center">
+                  <svg
+                    viewBox="0 0 24 24"
+                    fill="white"
+                    className={`absolute h-5 w-5 transition-opacity duration-300 ${isPlaying ? 'opacity-0' : 'opacity-100'}`}
+                  >
+                    <path d="M8 5v14l11-7z" />
+                  </svg>
+                  <img
+                    src={pauseIcon}
+                    alt=""
+                    className={`absolute h-4 w-4 transition-opacity duration-300 ${isPlaying ? 'opacity-100' : 'opacity-0'}`}
+                  />
+                </div>
+              </div>
+            </div>
+          )
           const content = (
             <>
               {thumb}
               <div className="hidden min-w-0 flex-1 lg:block">
-                <p className="truncate text-sm font-normal text-neutral-100">{row.title}</p>
+                <p
+                  className={`truncate text-sm font-normal transition-colors duration-300 ${playing ? 'text-[#67C260]' : 'text-neutral-100'}`}
+                >
+                  {row.title}
+                </p>
                 <p className="flex items-center gap-1 truncate text-xs text-neutral-400">
                   {row.pinned && <Pin className="h-3 w-3 shrink-0 text-[#1FDF64]" />}
                   <span className="truncate">{row.sub}</span>
                 </p>
               </div>
+              <img
+                src={libraryPlayingIcon}
+                alt=""
+                aria-label="Tocando agora"
+                className={`hidden h-3 w-3 shrink-0 transition-opacity duration-300 lg:block ${playing && isPlaying ? 'opacity-100' : 'opacity-0'}`}
+              />
             </>
           )
           const buttonClass =
-            'flex w-full items-center justify-center gap-3 rounded-md px-2 py-1.5 text-left hover:bg-neutral-900 lg:justify-start'
+            'flex w-full items-center justify-center gap-3 rounded-md px-2 py-1.5 text-left transition-colors duration-200 hover:bg-[#2A2A2A] lg:justify-start'
           if (row.kind === 'artist') {
             return (
               <li key={row.key}>
@@ -233,12 +326,13 @@ function Library({ onArtistClick, onPlaylistClick, onAlbumClick, playlistsKey, o
             )
           }
           if (row.kind === 'music') {
+            const musicArtist = getArtistById(row.music.artistId)
             return (
               <li key={row.key}>
                 <button
-                  onClick={() => play(row.music)}
+                  onClick={() => play(row.music, { artist: musicArtist ?? undefined })}
                   onContextMenu={(e) =>
-                    openSongMenu(e, { music: row.music, artist: null, album: null })
+                    openSongMenu(e, { music: row.music, artist: musicArtist, album: null })
                   }
                   className={buttonClass}
                 >

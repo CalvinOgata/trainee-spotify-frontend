@@ -10,7 +10,7 @@ import { usePlayer } from '../lib/PlayerContext'
 import { useSongContextMenu } from '../lib/SongContextMenuContext'
 import { useArtistContextMenu } from '../lib/ArtistContextMenuContext'
 import { useAlbumContextMenu } from '../lib/AlbumContextMenuContext'
-import { getArtistAlbums, getArtistPopularMusics } from '../lib/endpoints'
+import { getArtist, getArtistAlbums, getArtistPopularMusics } from '../lib/endpoints'
 import { formatDuration, formatPlays } from '../lib/format'
 import type { AlbumSummary, Artist as ArtistDTO, Music } from '../lib/types'
 
@@ -32,8 +32,10 @@ type ArtistProps = {
   onAlbumClick: (album: AlbumSummary) => void
 }
 
-function Artist({ artist, onAlbumClick }: ArtistProps) {
+function Artist({ artist: artistProp, onAlbumClick }: ArtistProps) {
   const [showAllSongs, setShowAllSongs] = useState(false)
+  const { data: freshArtist } = useApi(() => getArtist(artistProp.id), [artistProp.id])
+  const artist = freshArtist ?? artistProp
   const { data: popular } = useApi(() => getArtistPopularMusics(artist.id), [artist.id])
   const { data: albums } = useApi(() => getArtistAlbums(artist.id), [artist.id])
   const { play } = usePlayer()
@@ -74,7 +76,16 @@ function Artist({ artist, onAlbumClick }: ArtistProps) {
 
       <div className="flex items-center gap-3">
         <button
-          className="grid h-10 w-10 place-items-center rounded-full bg-[#1FDF64] text-black transition hover:scale-105"
+          onClick={() => {
+            if (popularTracks.length === 0) return
+            play(popularTracks[0], {
+              artist,
+              queue: popularTracks,
+              promote: 'artist',
+            })
+          }}
+          disabled={popularTracks.length === 0}
+          className="grid h-10 w-10 place-items-center rounded-full bg-[#1FDF64] text-black transition hover:scale-105 disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:scale-100"
           aria-label="Reproduzir"
         >
           <PlayArrow />

@@ -112,7 +112,12 @@ function Playlist({ playlist, playlistsKey, onDeleted, onUpdated, onTracksChange
   const handlePlayAll = () => {
     if (tracks.length === 0) return
     const first = tracks[0]
-    play(first, { artist: artistById.get(first.artistId), queue: tracks })
+    play(first, {
+      artist: artistById.get(first.artistId),
+      queue: tracks,
+      source: { kind: 'playlist', playlist },
+      promote: 'source',
+    })
   }
 
   const handleDragStart = (i: number) => (e: DragEvent<HTMLLIElement>) => {

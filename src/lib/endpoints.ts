@@ -49,6 +49,7 @@ export const reorderPlaylist = (
 ) => api.put<Playlist>(`/playlist/${playlistId}/order`, { musicIds }, options)
 
 // /artist
+export const getArtist = (id: string) => api.get<Artist>(`/artist/${id}`)
 export const getArtistPopularMusics = (artistId: string) =>
   api.get<Music[]>(`/artist/${artistId}/popularMusics`)
 export const getArtistAlbums = (artistId: string) =>

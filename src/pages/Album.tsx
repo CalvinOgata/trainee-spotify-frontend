@@ -6,9 +6,9 @@ import { useApi } from '../lib/useApi'
 import { usePlayer } from '../lib/PlayerContext'
 import { useSongContextMenu } from '../lib/SongContextMenuContext'
 import { useAlbumContextMenu } from '../lib/AlbumContextMenuContext'
-import { getAlbumMusics } from '../lib/endpoints'
+import { getAlbumMusics, getArtist } from '../lib/endpoints'
 import { formatDuration, formatPlaylistDuration } from '../lib/format'
-import type { AlbumSummary, Artist } from '../lib/types'
+import type { AlbumSummary } from '../lib/types'
 
 const PlayArrow = () => (
   <svg viewBox="0 0 24 24" fill="currentColor" className="h-5 w-5">
@@ -20,6 +20,7 @@ type AlbumProps = { album: AlbumSummary }
 
 function Album({ album }: AlbumProps) {
   const { data: musics } = useApi(() => getAlbumMusics(album.id), [album.id])
+  const { data: artist } = useApi(() => getArtist(album.artistId), [album.artistId])
   const { play } = usePlayer()
   const { openSongMenu } = useSongContextMenu()
   const { openAlbumMenu } = useAlbumContextMenu()
@@ -27,16 +28,7 @@ function Album({ album }: AlbumProps) {
   const tracks = musics ?? []
   const totalDuration = tracks.reduce((sum, t) => sum + t.duration, 0)
   const isEmpty = tracks.length === 0
-
-  const artist: Artist = {
-    id: album.artistId,
-    name: album.artistName,
-    listeners: 0,
-    about: null,
-    imageUrl: null,
-    createdAt: album.createdAt,
-    updatedAt: null,
-  }
+  const playOpts = { queue: tracks, source: { kind: 'album' as const, album } }
 
   return (
     <div className="flex h-full flex-col gap-3">
@@ -66,7 +58,7 @@ function Album({ album }: AlbumProps) {
       {!isEmpty && (
         <div className="flex items-center">
           <button
-            onClick={() => play(tracks[0], { artist, queue: tracks, source: { kind: 'album', album } })}
+            onClick={() => play(tracks[0], { ...playOpts, artist: artist ?? undefined })}
             className="grid h-10 w-10 place-items-center rounded-full bg-[#1FDF64] text-black transition hover:scale-105"
             aria-label="Reproduzir"
           >
@@ -86,7 +78,7 @@ function Album({ album }: AlbumProps) {
             {tracks.map((t, i) => (
               <li
                 key={t.id}
-                onClick={() => play(t, { artist, queue: tracks, source: { kind: 'album', album } })}
+                onClick={() => play(t, { ...playOpts, artist: artist ?? undefined })}
                 onContextMenu={(e) =>
                   openSongMenu(e, { music: t, artist, album })
                 }

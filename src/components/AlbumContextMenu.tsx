@@ -1,7 +1,7 @@
 import { useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { useLibrary } from '../lib/LibraryContext'
 import type { AlbumSummary, Artist } from '../lib/types'
-import { CheckCircle, Person, Pin, PlusCircle } from './icons'
+import { AddLikedSongs, AlreadyAdded, GoToArtist, Pin } from './icons'
 
 type AlbumContextMenuProps = {
   album: AlbumSummary
@@ -21,7 +21,7 @@ function MenuItem({ icon, label, onClick }: MenuItemProps) {
   return (
     <button
       onClick={onClick}
-      className="flex w-full items-center gap-3 px-3 py-2 text-left text-sm text-white hover:bg-white/10"
+      className="font-[Inter] flex w-full items-center gap-3 px-3 py-2 text-left text-[10px] font-medium text-[#B3B3B3] hover:bg-white/10"
     >
       <span className="flex h-4 w-4 shrink-0 items-center justify-center text-neutral-400">
         {icon}
@@ -108,7 +108,7 @@ function AlbumContextMenu({ album, x, y, onClose, onArtistClick }: AlbumContextM
       className="fixed z-50 w-[260px] overflow-hidden rounded-md bg-[#282828] py-1 shadow-[0_16px_32px_rgba(0,0,0,0.5)]"
     >
       <MenuItem
-        icon={saved ? <CheckCircle className="h-4 w-4 text-[#1FDF64]" /> : <PlusCircle />}
+        icon={saved ? <AlreadyAdded /> : <AddLikedSongs />}
         label={saved ? 'Remover da sua biblioteca' : 'Adicionar à sua biblioteca'}
         onClick={handleSaveToggle}
       />
@@ -117,7 +117,7 @@ function AlbumContextMenu({ album, x, y, onClose, onArtistClick }: AlbumContextM
         label={pinned ? 'Remover pin do álbum' : 'Fixar álbum'}
         onClick={handlePinToggle}
       />
-      <MenuItem icon={<Person />} label="Ir para o artista" onClick={handleGoArtist} />
+      <MenuItem icon={<GoToArtist />} label="Ir para o artista" onClick={handleGoArtist} />
     </div>
   )
 }

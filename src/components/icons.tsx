@@ -270,6 +270,12 @@ export const Person = ({ className = 'h-4 w-4' }: IconProps) => (
   </svg>
 )
 
+export const GoToArtist = ({ className = 'h-4 w-4' }: IconProps) => (
+  <svg viewBox="0 0 16 17" fill="currentColor" xmlns="http://www.w3.org/2000/svg" className={className}>
+    <path d="M14.9463 7.10742L15.4443 7.1123L15.4629 13.625C15.4668 15.0264 14.3514 16.1562 12.9648 16.1562C12.548 16.1561 12.155 16.0517 11.8066 15.8711C12.0423 15.7016 12.1116 15.292 12.1318 14.9092C12.3706 15.0613 12.6523 15.1504 12.9541 15.1504C13.7946 15.1502 14.47 14.4657 14.4678 13.6162L14.4629 11.6465L13.1172 11.6484C12.7388 11.6484 12.3903 11.7712 12.1074 11.9795C12.0766 11.5564 12.0161 11.2109 11.8945 10.9326C12.2582 10.7484 12.6684 10.6427 13.1045 10.6426H14.4609L14.4502 7.10352L14.9463 7.10742ZM9.43164 9.96973C10.925 9.96976 11.5937 10.2443 11.8945 10.9326C11.0126 11.3792 10.4093 12.2984 10.4092 13.3672V13.5723C10.4092 14.5727 10.9793 15.4422 11.8066 15.8711C11.7355 15.9222 11.6493 15.9521 11.5449 15.9521H2.31836C1.75954 15.9521 1.30276 15.5034 1.30273 14.9551V13.958C1.30276 11.306 6.71858 9.96973 9.43164 9.96973ZM12.1074 11.9795C12.1389 12.411 12.1406 12.9226 12.1406 13.5244V14.5645C12.1406 14.671 12.1382 14.7889 12.1318 14.9092C11.6957 14.6314 11.4043 14.1411 11.4043 13.584V13.3789C11.4044 12.8021 11.6808 12.2936 12.1074 11.9795ZM9.43164 0C11.6772 0.00015296 13.4961 1.785 13.4961 3.98828C13.4959 6.19143 11.6771 7.97543 9.43164 7.97559C7.18608 7.97559 5.36734 6.19153 5.36719 3.98828C5.36719 1.78491 7.18599 0 9.43164 0Z" />
+  </svg>
+)
+
 export const Disc = ({ className = 'h-4 w-4' }: IconProps) => (
   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className={className}>
     <circle cx="12" cy="12" r="9" />
@@ -278,9 +284,8 @@ export const Disc = ({ className = 'h-4 w-4' }: IconProps) => (
 )
 
 export const CreditsMenu = ({ className = 'h-4 w-4' }: IconProps) => (
-  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className={className}>
-    <rect x="4" y="4" width="16" height="16" rx="1.5" />
-    <path d="M8 9h8M8 13h8M8 17h5" strokeLinecap="round" />
+  <svg viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg" className={className}>
+    <path d="M13.8912 0H1.73641C0.781382 0 0 0.781382 0 1.73641V13.8912C0 14.8463 0.781382 15.6276 1.73641 15.6276H13.8912C14.8463 15.6276 15.6276 14.8463 15.6276 13.8912V1.73641C15.6276 0.781382 14.8463 0 13.8912 0ZM8.68203 12.1548H4.34101C3.8635 12.1548 3.47281 11.7641 3.47281 11.2866C3.47281 10.8091 3.8635 10.4184 4.34101 10.4184H8.68203C9.15954 10.4184 9.55023 10.8091 9.55023 11.2866C9.55023 11.7641 9.15954 12.1548 8.68203 12.1548ZM11.2866 8.68203H4.34101C3.8635 8.68203 3.47281 8.29133 3.47281 7.81382C3.47281 7.33631 3.8635 6.94562 4.34101 6.94562H11.2866C11.7641 6.94562 12.1548 7.33631 12.1548 7.81382C12.1548 8.29133 11.7641 8.68203 11.2866 8.68203ZM11.2866 5.20922H4.34101C3.8635 5.20922 3.47281 4.81852 3.47281 4.34101C3.47281 3.8635 3.8635 3.47281 4.34101 3.47281H11.2866C11.7641 3.47281 12.1548 3.8635 12.1548 4.34101C12.1548 4.81852 11.7641 5.20922 11.2866 5.20922Z" />
   </svg>
 )
 
@@ -293,6 +298,61 @@ export const Pin = ({ className = 'h-4 w-4' }: IconProps) => (
 export const ChevronRight = ({ className = 'h-3 w-3' }: IconProps) => (
   <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="1.5" className={className}>
     <path d="m4 2 4 4-4 4" strokeLinecap="round" strokeLinejoin="round" />
+  </svg>
+)
+
+export const AddPlaylist = ({ className = 'h-4 w-4' }: IconProps) => (
+  <svg viewBox="0 0 14 14" fill="currentColor" xmlns="http://www.w3.org/2000/svg" className={className}>
+    <rect x="6.36365" width="1.27273" height="14" />
+    <rect y="7.63647" width="1.27273" height="14" transform="rotate(-90 0 7.63647)" />
+  </svg>
+)
+
+export const RemovePlaylist = ({ className = 'h-4 w-4' }: IconProps) => (
+  <svg viewBox="0 0 14 14" fill="currentColor" xmlns="http://www.w3.org/2000/svg" className={className}>
+    <path d="M13 7C13 3.68629 10.3137 1 7 1C3.68629 1 1 3.68629 1 7C1 10.3137 3.68629 13 7 13V14C3.13401 14 0 10.866 0 7C0 3.13401 3.13401 0 7 0C10.866 0 14 3.13401 14 7C14 10.866 10.866 14 7 14V13C10.3137 13 13 10.3137 13 7Z" />
+    <path d="M3.49707 6.50011L10.9971 6.46203L11.0029 7.46105L3.50292 7.50011L3.49707 6.50011Z" />
+  </svg>
+)
+
+export const AddLikedSongs = ({ className = 'h-4 w-4' }: IconProps) => (
+  <svg viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg" className={className}>
+    <rect x="6.69763" y="4.57153" width="2.23252" height="6.85719" />
+    <rect x="4.46509" y="9.14307" width="2.28573" height="6.69756" transform="rotate(-90 4.46509 9.14307)" />
+    <path d="M15.6276 8.00006C15.6276 12.4184 12.1293 16.0001 7.81382 16.0001C3.49837 16.0001 0 12.4184 0 8.00006C0 3.58175 3.49837 0 7.81382 0C12.1293 0 15.6276 3.58175 15.6276 8.00006ZM1.50085 8.00006C1.50085 11.5697 4.32726 14.4635 7.81382 14.4635C11.3004 14.4635 14.1268 11.5697 14.1268 8.00006C14.1268 4.4304 11.3004 1.53662 7.81382 1.53662C4.32726 1.53662 1.50085 4.4304 1.50085 8.00006Z" />
+  </svg>
+)
+
+export const EditPlaylist = ({ className = 'h-4 w-4' }: IconProps) => (
+  <svg viewBox="0 0 16 14" fill="none" xmlns="http://www.w3.org/2000/svg" className={className}>
+    <path
+      d="M11.165 1.07812C11.918 0.307707 13.1777 0.307707 13.9307 1.07812C14.6897 1.85492 14.6898 3.16271 13.9307 3.93945L6.11035 11.9385L1.81348 13.2324L3.33105 9.0918L11.165 1.07812Z"
+      stroke="currentColor"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+  </svg>
+)
+
+export const LockIcon = ({ className = 'h-4 w-4' }: IconProps) => (
+  <svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" className={className}>
+    <path
+      d="M3.11621 6.9043H12.3398C13.0301 6.90446 13.5898 7.46404 13.5898 8.1543V14C13.5898 14.6903 13.0301 15.2498 12.3398 15.25H3.11621C2.42586 15.25 1.86621 14.6904 1.86621 14V8.1543C1.86621 7.46394 2.42585 6.9043 3.11621 6.9043Z"
+      stroke="currentColor"
+      strokeWidth="1.5"
+    />
+    <path
+      d="M4.87158 3.60669C4.87158 2.02917 6.1505 0.750244 7.72803 0.750244C9.30551 0.750289 10.5845 2.02919 10.5845 3.60669V6.67896L4.87158 6.67896L4.87158 3.60669Z"
+      stroke="currentColor"
+      strokeWidth="1.5"
+    />
+  </svg>
+)
+
+export const AlreadyAdded = ({ className = 'h-4 w-4' }: IconProps) => (
+  <svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" className={className}>
+    <circle cx="7.81382" cy="8.0001" r="7.81382" fill="#67C260" />
+    <path d="M3.84675 8.54902L4.20739 7.94796L4.56802 7.34689L7.2127 9.29659L11.2999 5.20936L12.2616 6.17106L7.09249 11.5806L3.84675 8.54902Z" fill="black" />
   </svg>
 )
 

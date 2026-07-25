@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import albumCover from '../assets/images/album_default.png'
 import artistCover from '../assets/images/artist_default.png'
 import favoritesCover from '../assets/images/favorites_default.png'
@@ -12,6 +12,8 @@ import { useArtistContextMenu } from '../lib/ArtistContextMenuContext'
 import { usePlaylistContextMenu } from '../lib/PlaylistContextMenuContext'
 import { useAlbumContextMenu } from '../lib/AlbumContextMenuContext'
 import {
+  getArtist,
+  getArtistAlbums,
   getRecentAlbums,
   getRecentArtists,
   getRecentMusics,
@@ -48,8 +50,85 @@ function Home({ onArtistClick, onPlaylistClick, onAlbumClick }: HomeProps) {
   const showMusic = activeFilter === 'Tudo' || activeFilter === 'Música'
   const showPlaylists = activeFilter === 'Tudo' || activeFilter === 'Playlists'
 
-  const artistById = new Map((recentArtists ?? []).map((a) => [a.id, a]))
-  const albumById = new Map((recentAlbums ?? []).map((a) => [a.id, a]))
+  const [artistCache, setArtistCache] = useState<Record<string, Artist>>({})
+  const [albumCache, setAlbumCache] = useState<Record<string, AlbumSummary>>({})
+
+  const artistById = new Map<string, Artist>([
+    ...(recentArtists ?? []).map((a): [string, Artist] => [a.id, a]),
+    ...Object.entries(artistCache),
+  ])
+  const albumById = new Map<string, AlbumSummary>([
+    ...(recentAlbums ?? []).map((a): [string, AlbumSummary] => [a.id, a]),
+    ...Object.entries(albumCache),
+  ])
+
+  // Backfills album/artist caches for any recent song whose album or artist is missing from the recent-* strips.
+  useEffect(() => {
+    if (!recentMusics) return
+    const knownArtistIds = new Set([
+      ...(recentArtists ?? []).map((a) => a.id),
+      ...Object.keys(artistCache),
+    ])
+    const knownAlbumIds = new Set([
+      ...(recentAlbums ?? []).map((a) => a.id),
+      ...Object.keys(albumCache),
+    ])
+    const missingArtistIds = Array.from(
+      new Set(recentMusics.map((m) => m.artistId).filter((id) => !knownArtistIds.has(id))),
+    )
+    const missingAlbumIds = new Set(
+      recentMusics.map((m) => m.albumId).filter((id) => !knownAlbumIds.has(id)),
+    )
+    if (missingArtistIds.length === 0 && missingAlbumIds.size === 0) return
+
+    let cancelled = false
+
+    if (missingArtistIds.length > 0) {
+      Promise.all(
+        missingArtistIds.map((id) =>
+          getArtist(id).then((a) => [id, a] as const).catch(() => null),
+        ),
+      ).then((results) => {
+        if (cancelled) return
+        const additions: Record<string, Artist> = {}
+        for (const r of results) if (r) additions[r[0]] = r[1]
+        if (Object.keys(additions).length > 0) {
+          setArtistCache((prev) => ({ ...prev, ...additions }))
+        }
+      })
+    }
+
+    if (missingAlbumIds.size > 0) {
+      const artistIdsToScan = Array.from(
+        new Set(
+          recentMusics
+            .filter((m) => missingAlbumIds.has(m.albumId))
+            .map((m) => m.artistId),
+        ),
+      )
+      Promise.all(
+        artistIdsToScan.map((id) => getArtistAlbums(id).catch(() => [])),
+      ).then((results) => {
+        if (cancelled) return
+        const additions: Record<string, AlbumSummary> = {}
+        for (const albums of results) {
+          for (const a of albums) {
+            if (missingAlbumIds.has(a.id)) {
+              const { id, title, year, artistId, artistName, imageUrl, createdAt, updatedAt } = a
+              additions[a.id] = { id, title, year, artistId, artistName, imageUrl, createdAt, updatedAt }
+            }
+          }
+        }
+        if (Object.keys(additions).length > 0) {
+          setAlbumCache((prev) => ({ ...prev, ...additions }))
+        }
+      })
+    }
+
+    return () => {
+      cancelled = true
+    }
+  }, [recentMusics, recentArtists, recentAlbums, artistCache, albumCache])
 
   return (
     <div className="flex h-full flex-col gap-5">

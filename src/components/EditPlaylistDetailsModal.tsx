@@ -7,11 +7,12 @@ import type { PlaylistSummary } from '../lib/types'
 
 type EditPlaylistDetailsModalProps = {
   playlist: PlaylistSummary
+  title?: string
   onClose: () => void
   onSave: (input: { name: string; description: string }) => Promise<void>
 }
 
-function EditPlaylistDetailsModal({ playlist, onClose, onSave }: EditPlaylistDetailsModalProps) {
+function EditPlaylistDetailsModal({ playlist, title = 'Editar detalhes', onClose, onSave }: EditPlaylistDetailsModalProps) {
   const [name, setName] = useState(playlist.name)
   const [description, setDescription] = useState(playlist.description ?? '')
   const [saving, setSaving] = useState(false)
@@ -49,7 +50,7 @@ function EditPlaylistDetailsModal({ playlist, onClose, onSave }: EditPlaylistDet
         className="flex max-h-[90vh] w-full max-w-[760px] flex-col gap-5 overflow-y-auto rounded-lg bg-[#282828] p-5 sm:p-7"
       >
         <div className="flex items-start justify-between">
-          <h2 className="text-2xl font-bold text-white">Editar detalhes</h2>
+          <h2 className="text-2xl font-bold text-white">{title}</h2>
           <button onClick={onClose} aria-label="Fechar" className="text-neutral-400 hover:text-white">
             <X className="h-4 w-4" />
           </button>

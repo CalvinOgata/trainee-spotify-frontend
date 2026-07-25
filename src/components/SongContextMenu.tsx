@@ -4,13 +4,15 @@ import { useApi } from '../lib/useApi'
 import { useLibrary } from '../lib/LibraryContext'
 import type { AlbumSummary, Artist, Music, PlaylistSummary } from '../lib/types'
 import {
+  AddLikedSongs,
+  AddPlaylist,
+  AlreadyAdded,
   ChevronRight,
   CheckCircle,
   CreditsMenu,
   Disc,
-  MinusCircle,
-  Person,
-  PlusCircle,
+  GoToArtist,
+  RemovePlaylist,
 } from './icons'
 import CreditsModal from './CreditsModal'
 
@@ -45,7 +47,7 @@ function MenuItem({ icon, label, disabled, hasSubmenu, onClick, onMouseEnter }: 
       onClick={onClick}
       onMouseEnter={onMouseEnter}
       disabled={disabled}
-      className="flex w-full items-center justify-between gap-3 px-3 py-2 text-left text-sm text-white hover:bg-white/10 disabled:cursor-not-allowed disabled:opacity-40"
+      className="font-[Inter] flex w-full items-center justify-between gap-3 px-3 py-2 text-left text-[10px] font-medium text-[#B3B3B3] hover:bg-white/10 disabled:cursor-not-allowed disabled:opacity-40"
     >
       <span className="flex min-w-0 items-center gap-3">
         <span className="flex h-4 w-4 shrink-0 items-center justify-center text-neutral-400">
@@ -219,26 +221,26 @@ function SongContextMenu({
             setSubmenuOpen(false)
           }}
         >
-          <MenuItem icon={<PlusCircle />} label="Adicionar à playlist" hasSubmenu />
+          <MenuItem icon={<AddPlaylist />} label="Adicionar à playlist" hasSubmenu />
         </div>
 
         {playlistId && (
           <MenuItem
-            icon={<MinusCircle />}
+            icon={<RemovePlaylist />}
             label="Remover desta playlist"
             onClick={handleRemoveFromCurrentPlaylist}
           />
         )}
 
         <MenuItem
-          icon={liked ? <CheckCircle className="h-4 w-4 text-[#1FDF64]" /> : <PlusCircle />}
+          icon={liked ? <AlreadyAdded /> : <AddLikedSongs />}
           label={liked ? 'Remover das Músicas Curtidas' : 'Salvar em Músicas Curtidas'}
           onClick={handleLikeToggle}
           disabled={!likedPlaylist}
         />
 
         <MenuItem
-          icon={saved ? <CheckCircle className="h-4 w-4 text-[#1FDF64]" /> : <PlusCircle />}
+          icon={saved ? <AlreadyAdded /> : <AddLikedSongs />}
           label={saved ? 'Remover da sua biblioteca' : 'Salvar na sua biblioteca'}
           onClick={handleSaveToggle}
         />
@@ -246,7 +248,7 @@ function SongContextMenu({
         <div className="my-1 h-px bg-white/10" />
 
         <MenuItem
-          icon={<Person />}
+          icon={<GoToArtist />}
           label="Ir para o artista"
           onClick={handleGoArtist}
           disabled={!artist || !onArtistClick}
@@ -274,7 +276,7 @@ function SongContextMenu({
           className="fixed z-50 flex max-h-[320px] w-[240px] flex-col overflow-y-auto rounded-md bg-[#282828] py-1 shadow-[0_16px_32px_rgba(0,0,0,0.5)]"
         >
           {(playlists ?? []).length === 0 ? (
-            <p className="px-3 py-2 text-xs text-neutral-400">Nenhuma playlist</p>
+            <p className="font-[Inter] px-3 py-2 text-[10px] font-medium text-[#B3B3B3]">Nenhuma playlist</p>
           ) : (
             (playlists ?? []).map((p: PlaylistSummary) => {
               const already = music.playlistsId?.includes(p.id)
@@ -282,7 +284,7 @@ function SongContextMenu({
                 <button
                   key={p.id}
                   onClick={() => handleAddToPlaylist(p.id)}
-                  className="flex items-center justify-between gap-2 truncate px-3 py-2 text-left text-xs text-white hover:bg-white/10"
+                  className="font-[Inter] flex items-center justify-between gap-2 truncate px-3 py-2 text-left text-[10px] font-medium text-[#B3B3B3] hover:bg-white/10"
                 >
                   <span className="truncate">{p.name}</span>
                   {already && <CheckCircle className="h-3.5 w-3.5 shrink-0 text-[#1FDF64]" />}

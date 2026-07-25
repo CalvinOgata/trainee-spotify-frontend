@@ -4,7 +4,7 @@ import { useLibrary } from '../lib/LibraryContext'
 import type { PlaylistSummary } from '../lib/types'
 import ConfirmDeletePlaylistModal from './ConfirmDeletePlaylistModal'
 import EditPlaylistDetailsModal from './EditPlaylistDetailsModal'
-import { Lock, MinusCircle, Pen, Pin } from './icons'
+import { EditPlaylist, LockIcon, Pin, RemovePlaylist } from './icons'
 
 type PlaylistContextMenuProps = {
   playlist: PlaylistSummary
@@ -25,7 +25,7 @@ function MenuItem({ icon, label, onClick }: MenuItemProps) {
   return (
     <button
       onClick={onClick}
-      className="flex w-full items-center gap-3 px-3 py-2 text-left text-sm text-white hover:bg-white/10"
+      className="font-[Inter] flex w-full items-center gap-3 px-3 py-2 text-left text-[10px] font-medium text-[#B3B3B3] hover:bg-white/10"
     >
       <span className="flex h-4 w-4 shrink-0 items-center justify-center text-neutral-400">
         {icon}
@@ -134,19 +134,19 @@ function PlaylistContextMenu({
           className="fixed z-50 w-[240px] overflow-hidden rounded-md bg-[#282828] py-1 shadow-[0_16px_32px_rgba(0,0,0,0.5)]"
         >
           <MenuItem
-            icon={<Pen className="h-4 w-4" />}
+            icon={<EditPlaylist />}
             label="Editar os detalhes"
             onClick={() => setEditOpen(true)}
           />
           {!isLiked && (
             <MenuItem
-              icon={<MinusCircle />}
+              icon={<RemovePlaylist />}
               label="Apagar playlist"
               onClick={() => setConfirmOpen(true)}
             />
           )}
           <MenuItem
-            icon={<Lock className="h-4 w-4" />}
+            icon={<LockIcon />}
             label={priv ? 'Tornar pública' : 'Tornar particular'}
             onClick={handlePrivateToggle}
           />

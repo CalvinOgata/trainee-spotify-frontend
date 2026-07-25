@@ -4,9 +4,7 @@ import favoritesCover from '../assets/images/favorites_default.png'
 import playlistCover from '../assets/images/playlist_default.png'
 import profilePhoto from '../assets/images/profile_default.png'
 import songCover from '../assets/images/song_default.png'
-import { Clock, MusicNote, Pen, Trash, X } from '../components/icons'
-import ConfirmDeletePlaylistModal from '../components/ConfirmDeletePlaylistModal'
-import EditPlaylistDetailsModal from '../components/EditPlaylistDetailsModal'
+import { Clock, MusicNote, X } from '../components/icons'
 import { resolveImageUrl } from '../lib/api'
 import { useApi } from '../lib/useApi'
 import { usePlayer } from '../lib/PlayerContext'
@@ -14,13 +12,11 @@ import { useSongContextMenu } from '../lib/SongContextMenuContext'
 import { usePlaylistContextMenu } from '../lib/PlaylistContextMenuContext'
 import { useLibrary } from '../lib/LibraryContext'
 import {
-  deletePlaylist,
   getPlaylist,
   getRecentAlbums,
   getRecentArtists,
   removeMusicFromPlaylist,
   reorderPlaylist,
-  updatePlaylistAttributes,
 } from '../lib/endpoints'
 import { formatDuration, formatPlaylistDuration, formatPtDate } from '../lib/format'
 import type { Music, PlaylistSummary } from '../lib/types'
@@ -34,12 +30,10 @@ const PlayArrow = () => (
 type PlaylistProps = {
   playlist: PlaylistSummary
   playlistsKey: number
-  onDeleted: () => void
-  onUpdated: (updated: PlaylistSummary) => void
   onTracksChanged: () => void
 }
 
-function Playlist({ playlist, playlistsKey, onDeleted, onUpdated, onTracksChanged }: PlaylistProps) {
+function Playlist({ playlist, playlistsKey, onTracksChanged }: PlaylistProps) {
   const { data: full } = useApi(() => getPlaylist(playlist.id), [playlist.id, playlistsKey])
   const { data: artists } = useApi(getRecentArtists)
   const { data: albums } = useApi(getRecentAlbums)
@@ -47,8 +41,6 @@ function Playlist({ playlist, playlistsKey, onDeleted, onUpdated, onTracksChange
   const { openSongMenu } = useSongContextMenu()
   const { openPlaylistMenu } = usePlaylistContextMenu()
   const { isPlaylistPrivate } = useLibrary()
-  const [confirmOpen, setConfirmOpen] = useState(false)
-  const [editOpen, setEditOpen] = useState(false)
 
   const [localOrder, setLocalOrder] = useState<Music[] | null>(null)
   const [dragSrc, setDragSrc] = useState<number | null>(null)
@@ -98,16 +90,6 @@ function Playlist({ playlist, playlistsKey, onDeleted, onUpdated, onTracksChange
 
   const isLikedPlaylist = playlist.name === 'Músicas Curtidas'
   const cover = resolveImageUrl(playlist.imageUrl) ?? (isLikedPlaylist ? favoritesCover : playlistCover)
-
-  const handleDelete = async () => {
-    setConfirmOpen(false)
-    try {
-      await deletePlaylist(playlist.id)
-      onDeleted()
-    } catch {
-      // ignore
-    }
-  }
 
   const handlePlayAll = () => {
     if (tracks.length === 0) return
@@ -165,18 +147,7 @@ function Playlist({ playlist, playlistsKey, onDeleted, onUpdated, onTracksChange
     setDragOver(null)
   }
 
-  const handleSaveEdit = async (input: { name: string; description: string }) => {
-    try {
-      const updated = await updatePlaylistAttributes(playlist.id, input)
-      onUpdated(updated)
-      setEditOpen(false)
-    } catch {
-      // ignore
-    }
-  }
-
   return (
-    <>
     <div className="flex h-full flex-col gap-3">
       <div
         onContextMenu={(e) => openPlaylistMenu(e, playlist)}
@@ -207,39 +178,15 @@ function Playlist({ playlist, playlistsKey, onDeleted, onUpdated, onTracksChange
         </div>
       </div>
 
-      <div className="flex items-center justify-between">
-        {isEmpty ? (
-          <div />
-        ) : (
-          <button
-            onClick={handlePlayAll}
-            className="grid h-10 w-10 place-items-center rounded-full bg-[#1FDF64] text-black transition hover:scale-105"
-            aria-label="Reproduzir"
-          >
-            <PlayArrow />
-          </button>
-        )}
-        <div className="flex items-center gap-3">
-          <button
-            onClick={() => setEditOpen(true)}
-            className="text-neutral-400 hover:text-white"
-            aria-label="Editar detalhes"
-            title="Editar detalhes"
-          >
-            <Pen />
-          </button>
-          {!isLikedPlaylist && (
-            <button
-              onClick={() => setConfirmOpen(true)}
-              className="text-neutral-400 hover:text-white"
-              aria-label="Excluir playlist"
-              title="Excluir playlist"
-            >
-              <Trash />
-            </button>
-          )}
-        </div>
-      </div>
+      {!isEmpty && (
+        <button
+          onClick={handlePlayAll}
+          className="grid h-10 w-10 place-items-center rounded-full bg-[#1FDF64] text-black transition hover:scale-105"
+          aria-label="Reproduzir"
+        >
+          <PlayArrow />
+        </button>
+      )}
 
       {isEmpty ? (
         <div className="flex flex-col gap-1">
@@ -318,21 +265,6 @@ function Playlist({ playlist, playlistsKey, onDeleted, onUpdated, onTracksChange
         </>
       )}
     </div>
-    {confirmOpen && (
-      <ConfirmDeletePlaylistModal
-        playlistName={playlist.name}
-        onConfirm={handleDelete}
-        onCancel={() => setConfirmOpen(false)}
-      />
-    )}
-    {editOpen && (
-      <EditPlaylistDetailsModal
-        playlist={playlist}
-        onClose={() => setEditOpen(false)}
-        onSave={handleSaveEdit}
-      />
-    )}
-    </>
   )
 }
 

@@ -55,17 +55,6 @@ function App() {
     setPage('album')
   }
 
-  const handlePlaylistDeleted = () => {
-    setSelectedPlaylist(null)
-    refreshPlaylists()
-    setPage('home')
-  }
-
-  const handlePlaylistUpdated = (updated: PlaylistSummary) => {
-    setSelectedPlaylist(updated)
-    refreshPlaylists()
-  }
-
   const handleMenuPlaylistDeleted = (deletedId: string) => {
     refreshPlaylists()
     if (selectedPlaylist?.id === deletedId) {
@@ -132,8 +121,6 @@ function App() {
             onArtistClick={goArtist}
             onPlaylistClick={goPlaylist}
             onAlbumClick={goAlbum}
-            onPlaylistDeleted={handlePlaylistDeleted}
-            onPlaylistUpdated={handlePlaylistUpdated}
             playlistsKey={playlistsKey}
             onPlaylistCreated={refreshPlaylists}
           />

@@ -20,7 +20,7 @@ function MenuItem({ icon, label, onClick }: MenuItemProps) {
   return (
     <button
       onClick={onClick}
-      className="flex w-full items-center gap-3 px-3 py-2 text-left text-sm text-white hover:bg-white/10"
+      className="font-[Inter] flex w-full items-center gap-3 px-3 py-2 text-left text-[10px] font-medium text-[#B3B3B3] hover:bg-white/10"
     >
       <span className="flex h-4 w-4 shrink-0 items-center justify-center text-neutral-400">
         {icon}
@@ -93,7 +93,7 @@ function ArtistContextMenu({ artist, x, y, onClose }: ArtistContextMenuProps) {
       className="fixed z-50 w-[240px] overflow-hidden rounded-md bg-[#282828] py-1 shadow-[0_16px_32px_rgba(0,0,0,0.5)]"
     >
       <MenuItem
-        icon={<X className="h-3.5 w-3.5" />}
+        icon={<X className={`h-3.5 w-3.5 ${followed ? 'text-[#67C260]' : ''}`} />}
         label={followed ? 'Deixar de seguir' : 'Seguir'}
         onClick={handleFollowToggle}
       />

@@ -10,6 +10,7 @@ import librarySearchIcon from '../assets/icons/searchIconLibrary.svg'
 import libraryPlayingIcon from '../assets/icons/libraryPlaying.svg'
 import pauseIcon from '../assets/icons/Pause.svg'
 import { Pin, X } from './icons'
+import EditPlaylistDetailsModal from './EditPlaylistDetailsModal'
 import Pill from './Pill'
 import { resolveImageUrl } from '../lib/api'
 import { useApi } from '../lib/useApi'
@@ -98,6 +99,7 @@ function nextPlaylistName(playlists: PlaylistSummary[]): string {
 function Library({ onArtistClick, onPlaylistClick, onAlbumClick, playlistsKey, onPlaylistCreated }: LibraryProps) {
   const [activeFilter, setActiveFilter] = useState<LibraryFilter>('Tudo')
   const [search, setSearch] = useState('')
+  const [draftPlaylist, setDraftPlaylist] = useState<PlaylistSummary | null>(null)
   const { data: playlists } = useApi(getUserPlaylists, [playlistsKey])
   const scrollRef = useRef<HTMLUListElement>(null)
   useAutoHideScrollbar(scrollRef)
@@ -147,16 +149,30 @@ function Library({ onArtistClick, onPlaylistClick, onAlbumClick, playlistsKey, o
     }
   }
 
-  // Creates a new user playlist with the auto-generated name, refreshes the sidebar, and navigates to it.
-  const handleCreate = async () => {
-    const name = nextPlaylistName(playlists ?? [])
+  // Opens the details modal with a stubbed draft playlist so the user can edit name/description before we actually create it on the backend.
+  const handleCreate = () => {
+    setDraftPlaylist({
+      id: '',
+      name: nextPlaylistName(playlists ?? []),
+      description: '',
+      musicQtd: 0,
+      duration: 0,
+      imageUrl: null,
+      createdAt: new Date().toISOString(),
+      updatedAt: null,
+    })
+  }
+
+  // Fires when the user clicks Salvar on the draft modal: creates the playlist on the backend, refreshes the sidebar, navigates to it, then closes the modal.
+  const handleSaveDraft = async (input: { name: string; description: string }) => {
     try {
-      const created = await createPlaylist({ name, description: '' })
+      const created = await createPlaylist(input)
       onPlaylistCreated()
       onPlaylistClick(created)
     } catch {
       // ignore
     }
+    setDraftPlaylist(null)
   }
 
   // Assemble raw rows for each library category included by the current filter (Tudo shows all four).
@@ -233,6 +249,7 @@ function Library({ onArtistClick, onPlaylistClick, onAlbumClick, playlistsKey, o
   ]
 
   return (
+    <>
     <aside className="flex h-full w-[56px] shrink-0 flex-col overflow-hidden rounded-lg bg-[#121212] pb-3 md:w-[80px] lg:w-[312px]">
       <div className="flex flex-col gap-3 mb-3">
         <div className="flex items-center justify-center gap-2 px-3 pt-3 lg:justify-between">
@@ -398,6 +415,15 @@ function Library({ onArtistClick, onPlaylistClick, onAlbumClick, playlistsKey, o
         })}
       </ul>
     </aside>
+    {draftPlaylist && (
+      <EditPlaylistDetailsModal
+        playlist={draftPlaylist}
+        title="Criar playlist"
+        onClose={() => setDraftPlaylist(null)}
+        onSave={handleSaveDraft}
+      />
+    )}
+    </>
   )
 }
 

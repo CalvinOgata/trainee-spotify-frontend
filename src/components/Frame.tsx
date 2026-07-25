@@ -19,8 +19,6 @@ type FrameProps = {
   onArtistClick: (artist: ArtistDTO) => void
   onPlaylistClick: (playlist: PlaylistSummary) => void
   onAlbumClick: (album: AlbumSummary) => void
-  onPlaylistDeleted: () => void
-  onPlaylistUpdated: (updated: PlaylistSummary) => void
   playlistsKey: number
   onPlaylistCreated: () => void
 }
@@ -34,8 +32,6 @@ function Frame({
   onArtistClick,
   onPlaylistClick,
   onAlbumClick,
-  onPlaylistDeleted,
-  onPlaylistUpdated,
   playlistsKey,
   onPlaylistCreated,
 }: FrameProps) {
@@ -74,8 +70,6 @@ function Frame({
           <Playlist
             playlist={selectedPlaylist}
             playlistsKey={playlistsKey}
-            onDeleted={onPlaylistDeleted}
-            onUpdated={onPlaylistUpdated}
             onTracksChanged={onPlaylistCreated}
           />
         )}

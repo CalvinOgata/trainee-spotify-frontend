@@ -189,10 +189,11 @@ export const MusicNote = ({ className = 'h-12 w-12' }: IconProps) => (
   </svg>
 )
 
-export const Clock = ({ className = 'h-3.5 w-3.5' }: IconProps) => (
-  <svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" className={className}>
-    <circle cx="8" cy="8" r="7" stroke="currentColor" />
-    <path d="M8 4V8L10.5 10" stroke="currentColor" strokeLinecap="round" />
+export const Clock = ({ className = 'h-3 w-3' }: IconProps) => (
+  <svg viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg" className={className}>
+    <circle cx="6" cy="6" r="5.5" stroke="currentColor" />
+    <path d="M5 2.49985H6V6.49985H5V2.49985Z" fill="currentColor" />
+    <path d="M5 6.50015V5.50015H8.5V6.50015H5Z" fill="currentColor" />
   </svg>
 )
 
@@ -346,6 +347,14 @@ export const LockIcon = ({ className = 'h-4 w-4' }: IconProps) => (
       stroke="currentColor"
       strokeWidth="1.5"
     />
+  </svg>
+)
+
+export const PlaylistSongOptions = ({ className = 'h-[3px] w-[13px]' }: IconProps) => (
+  <svg viewBox="0 0 13 3" fill="currentColor" xmlns="http://www.w3.org/2000/svg" className={className}>
+    <circle cx="1.5" cy="1.5" r="1.5" />
+    <circle cx="6.5" cy="1.5" r="1.5" />
+    <circle cx="11.5" cy="1.5" r="1.5" />
   </svg>
 )
 

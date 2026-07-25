@@ -4,7 +4,7 @@ import favoritesCover from '../assets/images/favorites_default.png'
 import playlistCover from '../assets/images/playlist_default.png'
 import profilePhoto from '../assets/images/profile_default.png'
 import songCover from '../assets/images/song_default.png'
-import { Clock, MusicNote, X } from '../components/icons'
+import { Clock, MusicNote, PlaylistSongOptions } from '../components/icons'
 import { resolveImageUrl } from '../lib/api'
 import { useApi } from '../lib/useApi'
 import { usePlayer } from '../lib/PlayerContext'
@@ -15,7 +15,6 @@ import {
   getPlaylist,
   getRecentAlbums,
   getRecentArtists,
-  removeMusicFromPlaylist,
   reorderPlaylist,
 } from '../lib/endpoints'
 import { formatDuration, formatPlaylistDuration, formatPtDate } from '../lib/format'
@@ -70,15 +69,6 @@ function Playlist({ playlist, playlistsKey, onTracksChanged }: PlaylistProps) {
       flushKeepalive()
     }
   }, [playlist.id])
-
-  const handleRemoveTrack = async (musicId: string) => {
-    try {
-      await removeMusicFromPlaylist(playlist.id, musicId)
-      onTracksChanged()
-    } catch {
-      // ignore
-    }
-  }
 
   const tracks = localOrder ?? full?.musics ?? []
   const artistById = new Map((artists ?? []).map((a) => [a.id, a]))
@@ -148,28 +138,28 @@ function Playlist({ playlist, playlistsKey, onTracksChanged }: PlaylistProps) {
   }
 
   return (
-    <div className="flex h-full flex-col gap-3">
+    <div className="flex h-full flex-col">
       <div
         onContextMenu={(e) => openPlaylistMenu(e, playlist)}
         className="-mx-5 -mt-6 flex items-end gap-4 bg-gradient-to-b from-[#535353] to-[#1a1a1a] px-5 pt-10 pb-4"
       >
         {isEmpty ? (
-          <div className="grid h-[160px] w-[160px] shrink-0 place-items-center rounded bg-[#282828] text-neutral-400 shadow-[0_4px_60px_rgba(0,0,0,0.5)]">
+          <div className="grid h-[174px] w-[174px] shrink-0 place-items-center rounded bg-[#282828] text-neutral-400 shadow-[0_4px_60px_rgba(0,0,0,0.5)]">
             <MusicNote className="h-14 w-14" />
           </div>
         ) : (
-          <img src={cover} alt="" className="h-[160px] w-[160px] shrink-0 rounded shadow-[0_4px_60px_rgba(0,0,0,0.5)] object-cover" />
+          <img src={cover} alt="" className="h-[174px] w-[174px] shrink-0 rounded shadow-[0_4px_60px_rgba(0,0,0,0.5)] object-cover" />
         )}
         <div className="flex min-w-0 flex-col pb-2">
-          <p className="text-xs font-semibold leading-none text-white">
+          <p className="font-[Inter] text-[10px] font-medium leading-none text-white">
             {isPlaylistPrivate(playlist.id) ? 'Playlist particular' : 'Playlist pública'}
           </p>
-          <h1 className="mt-2 truncate text-4xl font-bold leading-none text-white sm:text-5xl lg:text-7xl">{playlist.name}</h1>
-          <p className="mt-3 flex items-center gap-1.5 text-xs font-semibold text-white">
+          <h1 className="font-[Inter] mt-9 truncate text-[64px] font-black leading-none text-white">{playlist.name}</h1>
+          <p className="font-[Inter] mt-2 flex items-center gap-1.5 text-[10px] font-bold text-white">
             <img src={profilePhoto} alt="" className="h-4 w-4 rounded-full object-cover" />
             Vitoria Tenorio
             {!isEmpty && (
-              <span className="font-normal text-white/80">
+              <span className="font-medium text-[#B3B3B3]">
                 {' • '}
                 {musicQtd} músicas, {formatPlaylistDuration(duration)}
               </span>
@@ -178,15 +168,17 @@ function Playlist({ playlist, playlistsKey, onTracksChanged }: PlaylistProps) {
         </div>
       </div>
 
-      {!isEmpty && (
-        <button
-          onClick={handlePlayAll}
-          className="grid h-10 w-10 place-items-center rounded-full bg-[#1FDF64] text-black transition hover:scale-105"
-          aria-label="Reproduzir"
-        >
-          <PlayArrow />
-        </button>
-      )}
+      <div className="flex h-[108px] items-center">
+        {!isEmpty && (
+          <button
+            onClick={handlePlayAll}
+            className="grid h-9 w-9 place-items-center rounded-full bg-[#1FDF64] text-black transition hover:scale-105"
+            aria-label="Reproduzir"
+          >
+            <PlayArrow />
+          </button>
+        )}
+      </div>
 
       {isEmpty ? (
         <div className="flex flex-col gap-1">
@@ -196,7 +188,7 @@ function Playlist({ playlist, playlistsKey, onTracksChanged }: PlaylistProps) {
       ) : (
         <>
           <section className="flex flex-col gap-1">
-            <div className="grid grid-cols-[20px_minmax(0,2fr)_minmax(0,1.5fr)_minmax(0,1.5fr)_60px_24px] items-center gap-3 border-b border-neutral-800 px-2 pb-2 text-xs font-normal text-neutral-400">
+            <div className="font-[Inter] grid grid-cols-[20px_minmax(0,2fr)_minmax(0,1.5fr)_minmax(0,1.5fr)_60px_24px] items-center gap-3 border-b border-neutral-800 px-4 pb-2 text-[10px] font-medium text-[#B3B3B3]">
               <span>#</span>
               <span>Título</span>
               <span>Álbum</span>
@@ -225,7 +217,7 @@ function Playlist({ playlist, playlistsKey, onTracksChanged }: PlaylistProps) {
                         playlistId: playlist.id,
                       })
                     }
-                    className={`grid h-12 cursor-pointer grid-cols-[20px_minmax(0,2fr)_minmax(0,1.5fr)_minmax(0,1.5fr)_60px_24px] items-center gap-3 rounded px-2 text-xs hover:bg-neutral-900 ${
+                    className={`grid h-[52px] cursor-pointer grid-cols-[20px_minmax(0,2fr)_minmax(0,1.5fr)_minmax(0,1.5fr)_60px_24px] items-center gap-3 rounded px-4 py-2 hover:bg-[#2A2A2A] ${
                       dragSrc === i ? 'opacity-40' : ''
                     } ${
                       dragOver === i && dragSrc !== null && dragSrc !== i
@@ -233,29 +225,34 @@ function Playlist({ playlist, playlistsKey, onTracksChanged }: PlaylistProps) {
                         : ''
                     }`}
                   >
-                    <span className="text-neutral-400">{i + 1}</span>
+                    <span className="font-[Inter] text-[10px] font-medium text-[#B3B3B3]">{i + 1}</span>
                     <div className="flex min-w-0 items-center gap-2.5">
-                      <img src={resolveImageUrl(t.imageUrl) ?? songCover} alt="" className="h-9 w-9 shrink-0 rounded object-cover" />
+                      <img src={resolveImageUrl(t.imageUrl) ?? songCover} alt="" className="h-9 w-9 shrink-0 rounded-[2px] object-cover" />
                       <div className="min-w-0">
-                        <p className="truncate text-sm font-semibold leading-tight text-white">{t.title}</p>
-                        <p className="truncate text-[11px] font-normal leading-tight text-neutral-400">
+                        <p className="font-[Arial] truncate text-[10px] font-bold leading-tight text-white">{t.title}</p>
+                        <p className="font-[Arial] truncate text-[10px] font-bold leading-tight text-[#B3B3B3]">
                           {artist?.name ?? 'Artista'}
                         </p>
                       </div>
                     </div>
-                    <p className="truncate font-semibold text-white">{album?.title ?? '—'}</p>
-                    <p className="truncate text-neutral-400">{formatPtDate(t.createdAt)}</p>
-                    <p className="text-right text-neutral-400">{formatDuration(t.duration)}</p>
+                    <p className="font-[Inter] truncate text-[10px] font-bold text-[#B3B3B3]">{album?.title ?? '—'}</p>
+                    <p className="font-[Inter] truncate text-[10px] font-medium text-[#B3B3B3]">{formatPtDate(t.createdAt)}</p>
+                    <p className="font-[Inter] text-right text-[10px] font-medium text-[#B3B3B3]">{formatDuration(t.duration)}</p>
                     <button
                       onClick={(e) => {
                         e.stopPropagation()
-                        handleRemoveTrack(t.id)
+                        openSongMenu(e, {
+                          music: t,
+                          artist: artist ?? null,
+                          album: album ?? null,
+                          playlistId: playlist.id,
+                        })
                       }}
-                      className="text-neutral-400 hover:text-white"
-                      aria-label="Remover desta playlist"
-                      title="Remover desta playlist"
+                      className="-mx-2 -my-2 flex h-8 w-8 items-center justify-center rounded-full text-[#B3B3B3] hover:bg-white/10 hover:text-white"
+                      aria-label="Mais opções"
+                      title="Mais opções"
                     >
-                      <X className="h-3.5 w-3.5" />
+                      <PlaylistSongOptions />
                     </button>
                   </li>
                 )

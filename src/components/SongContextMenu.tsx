@@ -1,4 +1,4 @@
-import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
+import { useLayoutEffect, useMemo, useRef, useState } from 'react'
 import { getUserPlaylists, removeMusicFromPlaylist, togglePlaylistMusic } from '../lib/endpoints'
 import { useApi } from '../lib/useApi'
 import { useLibrary } from '../lib/LibraryContext'
@@ -7,7 +7,6 @@ import {
   AddLikedSongs,
   AddPlaylist,
   AlreadyAdded,
-  ChevronRight,
   CheckCircle,
   CreditsMenu,
   Disc,
@@ -15,6 +14,7 @@ import {
   RemovePlaylist,
 } from './icons'
 import CreditsModal from './CreditsModal'
+import { ContextMenuShell, MenuItem } from './ContextMenuShell'
 
 const LIKED_PLAYLIST_NAME = 'Músicas Curtidas'
 
@@ -30,38 +30,6 @@ type SongContextMenuProps = {
   onTracksChanged: () => void
   onArtistClick?: (a: Artist) => void
   onAlbumClick?: (a: AlbumSummary) => void
-}
-
-type MenuItemProps = {
-  icon: React.ReactNode
-  label: string
-  disabled?: boolean
-  hasSubmenu?: boolean
-  onClick?: () => void
-  onMouseEnter?: () => void
-}
-
-function MenuItem({ icon, label, disabled, hasSubmenu, onClick, onMouseEnter }: MenuItemProps) {
-  return (
-    <button
-      onClick={onClick}
-      onMouseEnter={onMouseEnter}
-      disabled={disabled}
-      className="font-[Inter] flex w-full items-center justify-between gap-3 px-3 py-2 text-left text-[10px] font-medium text-[#B3B3B3] hover:bg-white/10 disabled:cursor-not-allowed disabled:opacity-40"
-    >
-      <span className="flex min-w-0 items-center gap-3">
-        <span className="flex h-4 w-4 shrink-0 items-center justify-center text-neutral-400">
-          {icon}
-        </span>
-        <span className="truncate">{label}</span>
-      </span>
-      {hasSubmenu && (
-        <span className="shrink-0 text-neutral-400">
-          <ChevronRight />
-        </span>
-      )}
-    </button>
-  )
 }
 
 function SongContextMenu({
@@ -81,11 +49,9 @@ function SongContextMenu({
   const { isSaved, toggleSaved } = useLibrary()
   const [creditsOpen, setCreditsOpen] = useState(false)
   const [submenuOpen, setSubmenuOpen] = useState(false)
-  const menuRef = useRef<HTMLDivElement>(null)
   const submenuRef = useRef<HTMLDivElement>(null)
   const submenuAnchorRef = useRef<HTMLDivElement>(null)
 
-  const [pos, setPos] = useState({ x, y })
   const [submenuPos, setSubmenuPos] = useState({ x: 0, y: 0 })
 
   const likedPlaylist = useMemo(
@@ -94,19 +60,6 @@ function SongContextMenu({
   )
   const liked = !!music.playlistsId?.includes(likedPlaylist?.id ?? '')
   const saved = isSaved(music.id)
-
-  useLayoutEffect(() => {
-    const el = menuRef.current
-    if (!el) return
-    const rect = el.getBoundingClientRect()
-    const vw = window.innerWidth
-    const vh = window.innerHeight
-    let nx = x
-    let ny = y
-    if (nx + rect.width > vw - 8) nx = Math.max(8, vw - rect.width - 8)
-    if (ny + rect.height > vh - 8) ny = Math.max(8, vh - rect.height - 8)
-    setPos({ x: nx, y: ny })
-  }, [x, y])
 
   useLayoutEffect(() => {
     if (!submenuOpen) return
@@ -124,34 +77,12 @@ function SongContextMenu({
     setSubmenuPos({ x: nx, y: ny })
   }, [submenuOpen, playlists])
 
-  useEffect(() => {
-    const handleKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') {
-        if (submenuOpen) setSubmenuOpen(false)
-        else onClose()
-      }
-    }
-    const handleClick = (e: MouseEvent) => {
-      const t = e.target as Node
-      if (menuRef.current?.contains(t)) return
-      if (submenuRef.current?.contains(t)) return
-      onClose()
-    }
-    const handleContextMenu = (e: MouseEvent) => {
-      const t = e.target as Node
-      if (menuRef.current?.contains(t)) return
-      if (submenuRef.current?.contains(t)) return
-      onClose()
-    }
-    window.addEventListener('keydown', handleKey)
-    window.addEventListener('mousedown', handleClick)
-    window.addEventListener('contextmenu', handleContextMenu)
-    return () => {
-      window.removeEventListener('keydown', handleKey)
-      window.removeEventListener('mousedown', handleClick)
-      window.removeEventListener('contextmenu', handleContextMenu)
-    }
-  }, [onClose, submenuOpen])
+  const extraDismissRefs = useMemo(() => [submenuRef], [])
+
+  const handleEscape = () => {
+    if (submenuOpen) setSubmenuOpen(false)
+    else onClose()
+  }
 
   const handleAddToPlaylist = async (pid: string) => {
     try {
@@ -206,11 +137,13 @@ function SongContextMenu({
 
   return (
     <>
-      <div
-        ref={menuRef}
-        onContextMenu={(e) => e.preventDefault()}
-        style={{ top: pos.y, left: pos.x }}
-        className="fixed z-50 w-[286px] overflow-hidden rounded-md bg-[#282828] py-1 shadow-[0_16px_32px_rgba(0,0,0,0.5)]"
+      <ContextMenuShell
+        x={x}
+        y={y}
+        onClose={onClose}
+        width={286}
+        onEscape={handleEscape}
+        extraDismissContainsRefs={extraDismissRefs}
       >
         <div
           ref={submenuAnchorRef}
@@ -260,7 +193,7 @@ function SongContextMenu({
           disabled={!album || !onAlbumClick}
         />
         <MenuItem icon={<CreditsMenu />} label="Ver créditos" onClick={handleCredits} />
-      </div>
+      </ContextMenuShell>
 
       {submenuOpen && (
         <div

@@ -8,6 +8,7 @@ import { SongContextMenuProvider } from './lib/SongContextMenuContext'
 import { ArtistContextMenuProvider } from './lib/ArtistContextMenuContext'
 import { PlaylistContextMenuProvider } from './lib/PlaylistContextMenuContext'
 import { AlbumContextMenuProvider } from './lib/AlbumContextMenuContext'
+import { EntityCacheProvider } from './lib/EntityCacheContext'
 import type { AlbumSummary, Artist, PlaylistSummary } from './lib/types'
 
 export type Page = 'home' | 'search' | 'profile' | 'artist' | 'playlist' | 'album'
@@ -85,6 +86,7 @@ function App() {
   }
 
   return (
+    <EntityCacheProvider>
     <ArtistContextMenuProvider>
     <AlbumContextMenuProvider onArtistClick={goArtist}>
     <PlaylistContextMenuProvider
@@ -131,6 +133,7 @@ function App() {
     </PlaylistContextMenuProvider>
     </AlbumContextMenuProvider>
     </ArtistContextMenuProvider>
+    </EntityCacheProvider>
   )
 }
 

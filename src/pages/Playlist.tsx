@@ -11,6 +11,7 @@ import { usePlayer } from '../lib/PlayerContext'
 import { useSongContextMenu } from '../lib/SongContextMenuContext'
 import { usePlaylistContextMenu } from '../lib/PlaylistContextMenuContext'
 import { useLibrary } from '../lib/LibraryContext'
+import { useTrackEntityMaps } from '../lib/EntityCacheContext'
 import {
   getPlaylist,
   getRecentAlbums,
@@ -71,8 +72,11 @@ function Playlist({ playlist, playlistsKey, onTracksChanged }: PlaylistProps) {
   }, [playlist.id])
 
   const tracks = localOrder ?? full?.musics ?? []
-  const artistById = new Map((artists ?? []).map((a) => [a.id, a]))
-  const albumById = new Map((albums ?? []).map((a) => [a.id, a]))
+
+  const { artistById, albumById } = useTrackEntityMaps(tracks, {
+    seedArtists: artists,
+    seedAlbums: albums,
+  })
 
   const musicQtd = full?.musicQtd ?? playlist.musicQtd
   const duration = full?.duration ?? playlist.duration

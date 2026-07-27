@@ -1,5 +1,6 @@
 import { createContext, useCallback, useContext, useEffect, useState } from 'react'
 import type { ReactNode } from 'react'
+import { useEntityCache } from './EntityCacheContext'
 import type { AlbumSummary, Artist, Music, PlaylistSummary } from './types'
 
 export type PlaybackSource =
@@ -79,6 +80,7 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
   const [isPlaying, setIsPlaying] = useState(false)
   const [position, setPosition] = useState(0)
   const [recentPlays, setRecentPlays] = useState<Record<string, number>>(loadRecentPlays)
+  const { artistById } = useEntityCache()
 
   // Persists recentPlays back to localStorage whenever it changes so Library sort survives reloads.
   useEffect(() => {
@@ -176,10 +178,13 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
         { music: current, artist: currentArtist, source: currentSource, queue, promote: currentPromote },
       ].slice(-HISTORY_LIMIT),
     )
-    setCurrent(queue[idx + 1])
+    const nextMusic = queue[idx + 1]
+    const nextArtist = artistById.get(nextMusic.artistId) ?? null
+    setCurrent(nextMusic)
+    setCurrentArtist(nextArtist)
     setPosition(0)
-    stampRecency(queue[idx + 1], currentArtist, currentSource, 'music')
-  }, [current, currentArtist, currentSource, currentPromote, queue, future, stampRecency])
+    stampRecency(nextMusic, nextArtist, currentSource, 'music')
+  }, [current, currentArtist, currentSource, currentPromote, queue, future, stampRecency, artistById])
 
   // Steps backward in history: current state moves to the future stack, prior state is restored (including source/promote/queue).
   const prev = useCallback(() => {
@@ -246,7 +251,8 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
     }
     const idx = queue.findIndex((m) => m.id === current.id)
     if (idx >= 0 && idx < queue.length - 1) {
-      return { music: queue[idx + 1], artist: currentArtist }
+      const nextMusic = queue[idx + 1]
+      return { music: nextMusic, artist: artistById.get(nextMusic.artistId) ?? null }
     }
     return null
   })()

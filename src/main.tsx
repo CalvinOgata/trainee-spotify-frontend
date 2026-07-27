@@ -8,13 +8,16 @@ import './index.css'
 import App from './App.tsx'
 import { PlayerProvider } from './lib/PlayerContext'
 import { LibraryProvider } from './lib/LibraryContext'
+import { EntityCacheProvider } from './lib/EntityCacheContext'
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <PlayerProvider>
-      <LibraryProvider>
-        <App />
-      </LibraryProvider>
-    </PlayerProvider>
+    <EntityCacheProvider>
+      <PlayerProvider>
+        <LibraryProvider>
+          <App />
+        </LibraryProvider>
+      </PlayerProvider>
+    </EntityCacheProvider>
   </StrictMode>,
 )

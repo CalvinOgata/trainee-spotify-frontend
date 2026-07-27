@@ -1,10 +1,11 @@
 import { useEffect, useRef, useState } from 'react'
 import type { DragEvent } from 'react'
 import favoritesCover from '../assets/images/favorites_default.png'
+import noCoverPlaylist from '../assets/images/NoCoverPlaylist.png'
 import playlistCover from '../assets/images/playlist_default.png'
 import profilePhoto from '../assets/images/profile_default.png'
 import songCover from '../assets/images/song_default.png'
-import { Clock, MusicNote, PlaylistSongOptions } from '../components/icons'
+import { Clock, PlaylistSongOptions } from '../components/icons'
 import { resolveImageUrl } from '../lib/api'
 import { useApi } from '../lib/useApi'
 import { usePlayer } from '../lib/PlayerContext'
@@ -145,15 +146,13 @@ function Playlist({ playlist, playlistsKey, onTracksChanged }: PlaylistProps) {
     <div className="flex h-full flex-col">
       <div
         onContextMenu={(e) => openPlaylistMenu(e, playlist)}
-        className="-mx-5 -mt-6 flex items-end gap-4 bg-gradient-to-b from-[#535353] to-[#1a1a1a] px-5 pt-10 pb-4"
+        className="-mx-5 -mt-6 flex items-end gap-4 bg-gradient-to-b from-[#938D8E] to-[#3E3939] px-5 pt-10 pb-4"
       >
-        {isEmpty ? (
-          <div className="grid h-[174px] w-[174px] shrink-0 place-items-center rounded bg-[#282828] text-neutral-400 shadow-[0_4px_60px_rgba(0,0,0,0.5)]">
-            <MusicNote className="h-14 w-14" />
-          </div>
-        ) : (
-          <img src={cover} alt="" className="h-[174px] w-[174px] shrink-0 rounded shadow-[0_4px_60px_rgba(0,0,0,0.5)] object-cover" />
-        )}
+        <img
+          src={isEmpty ? noCoverPlaylist : cover}
+          alt=""
+          className="h-[174px] w-[174px] shrink-0 rounded shadow-[0_4px_60px_rgba(0,0,0,0.5)] object-cover"
+        />
         <div className="flex min-w-0 flex-col pb-2">
           <p className="font-[Inter] text-[10px] font-medium leading-none text-white">
             {isPlaylistPrivate(playlist.id) ? 'Playlist particular' : 'Playlist pública'}
@@ -172,8 +171,8 @@ function Playlist({ playlist, playlistsKey, onTracksChanged }: PlaylistProps) {
         </div>
       </div>
 
-      <div className="flex h-[108px] items-center">
-        {!isEmpty && (
+      {!isEmpty && (
+        <div className="flex h-[108px] items-center">
           <button
             onClick={handlePlayAll}
             className="grid h-9 w-9 place-items-center rounded-full bg-[#1FDF64] text-black transition hover:scale-105"
@@ -181,13 +180,13 @@ function Playlist({ playlist, playlistsKey, onTracksChanged }: PlaylistProps) {
           >
             <PlayArrow />
           </button>
-        )}
-      </div>
+        </div>
+      )}
 
       {isEmpty ? (
-        <div className="flex flex-col gap-1">
-          <p className="text-sm font-bold text-white">Nenhuma música adicionada ainda</p>
-          <p className="text-xs font-normal text-neutral-400">Adicione músicas para começar</p>
+        <div className="flex flex-col gap-3 p-5">
+          <p className="font-[Inter] text-[18px] font-bold text-white">Nenhuma música adicionada ainda</p>
+          <p className="font-[Inter] text-[16px] font-medium text-[#B3B3B3]">Adicione músicas para começar</p>
         </div>
       ) : (
         <>

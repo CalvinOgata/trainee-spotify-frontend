@@ -9,7 +9,7 @@ import createPlaylistButton from '../assets/icons/Button.svg'
 import librarySearchIcon from '../assets/icons/searchIconLibrary.svg'
 import libraryPlayingIcon from '../assets/icons/libraryPlaying.svg'
 import pauseIcon from '../assets/icons/Pause.svg'
-import { Pin, X } from './icons'
+import { Lock, Pin, X } from './icons'
 import EditPlaylistDetailsModal from './EditPlaylistDetailsModal'
 import Pill from './Pill'
 import { resolveImageUrl } from '../lib/api'
@@ -110,6 +110,7 @@ function Library({ onArtistClick, onPlaylistClick, onAlbumClick, playlistsKey, o
   const {
     isPinned,
     isPlaylistPinned,
+    isPlaylistPrivate,
     isAlbumPinned,
     savedMusics,
     savedAlbums,
@@ -346,6 +347,9 @@ function Library({ onArtistClick, onPlaylistClick, onAlbumClick, playlistsKey, o
                 </p>
                 <p className="flex items-center gap-1 truncate text-xs text-neutral-400">
                   {row.pinned && <Pin className="h-3 w-3 shrink-0 text-[#1FDF64]" />}
+                  {row.kind === 'playlist' && isPlaylistPrivate(row.playlist.id) && (
+                    <Lock className="h-3 w-3 shrink-0 text-neutral-400" />
+                  )}
                   <span className="truncate">{row.sub}</span>
                 </p>
               </div>

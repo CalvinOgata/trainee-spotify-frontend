@@ -15,6 +15,7 @@ import Pill from '../components/Pill'
 import ShowAllButton from '../components/ShowAllButton'
 import { Tile } from '../components/Tile'
 import { useTrackEntityMaps } from '../lib/EntityCacheContext'
+import { useLibrary } from '../lib/LibraryContext'
 import {
   getRecentAlbums,
   getRecentArtists,
@@ -43,6 +44,7 @@ function Home({ onArtistClick, onPlaylistClick, onAlbumClick }: HomeProps) {
   const { openArtistMenu } = useArtistContextMenu()
   const { openPlaylistMenu } = usePlaylistContextMenu()
   const { openAlbumMenu } = useAlbumContextMenu()
+  const { isPlaylistPrivate } = useLibrary()
 
   const recentItems = (recentMusics ?? []).slice(0, 8)
   const playlistTiles = (playlists ?? []).slice(0, 7)
@@ -99,17 +101,20 @@ function Home({ onArtistClick, onPlaylistClick, onAlbumClick }: HomeProps) {
       <section className="flex flex-col gap-2">
         <h3 className="font-[Inter] text-[16px] font-bold text-white">Suas Playlists</h3>
         <div className="flex gap-3 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden md:flex-wrap md:overflow-visible">
-          {playlistTiles.map((p) => (
-            <Tile
-              key={p.id}
-              src={resolveImageUrl(p.imageUrl) ?? (p.name === 'Músicas Curtidas' ? favoritesCover : playlistCover)}
-              title={p.name}
-              subtitle={p.description ? `Playlist • ${p.description}` : 'Playlist'}
-              shape="square"
-              onClick={() => onPlaylistClick(p)}
-              onContextMenu={(e) => openPlaylistMenu(e, p)}
-            />
-          ))}
+          {playlistTiles.map((p) => {
+            const label = isPlaylistPrivate(p.id) ? 'Playlist particular' : 'Playlist'
+            return (
+              <Tile
+                key={p.id}
+                src={resolveImageUrl(p.imageUrl) ?? (p.name === 'Músicas Curtidas' ? favoritesCover : playlistCover)}
+                title={p.name}
+                subtitle={p.description ? `${label} • ${p.description}` : label}
+                shape="square"
+                onClick={() => onPlaylistClick(p)}
+                onContextMenu={(e) => openPlaylistMenu(e, p)}
+              />
+            )
+          })}
         </div>
       </section>
       )}

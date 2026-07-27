@@ -263,7 +263,7 @@ function SongPanel({ onAlbumClick, onPlaylistClick, onArtistClick }: SongPanelPr
         <CreditsModal
           onClose={() => setCreditsOpen(false)}
           title={title}
-          artistName={currentArtist?.name ?? '—'}
+          artist={currentArtist}
         />
       )}
     </>

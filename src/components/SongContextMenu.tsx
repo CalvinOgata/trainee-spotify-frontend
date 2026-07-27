@@ -231,7 +231,7 @@ function SongContextMenu({
       {creditsOpen && (
         <CreditsModal
           title={music.title}
-          artistName={artist?.name ?? '—'}
+          artist={artist}
           onClose={() => {
             setCreditsOpen(false)
             onClose()

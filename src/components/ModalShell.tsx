@@ -7,6 +7,7 @@ type ModalShellProps = {
   header?: ReactNode
   headerClassName?: string
   maxWidth?: string
+  background?: string
   contentClassName?: string
   children: ReactNode
 }
@@ -16,6 +17,7 @@ export function ModalShell({
   header,
   headerClassName,
   maxWidth = '420px',
+  background = '#282828',
   contentClassName,
   children,
 }: ModalShellProps) {
@@ -27,7 +29,7 @@ export function ModalShell({
     return () => window.removeEventListener('keydown', handleKey)
   }, [onClose])
 
-  const innerClass = `flex w-full flex-col rounded-lg bg-[#282828] p-5${contentClassName ? ` ${contentClassName}` : ''}`
+  const innerClass = `flex w-full flex-col rounded-lg p-5${contentClassName ? ` ${contentClassName}` : ''}`
   const headerWrapperClass = `flex items-start justify-between${headerClassName ? ` ${headerClassName}` : ''}`
 
   return (
@@ -37,7 +39,7 @@ export function ModalShell({
     >
       <div
         onClick={(e) => e.stopPropagation()}
-        style={{ maxWidth }}
+        style={{ maxWidth, background }}
         className={innerClass}
       >
         {header !== undefined && (

@@ -4,6 +4,7 @@ import artistBanner from '../assets/images/artist_banner.png'
 import songCover from '../assets/images/song_default.png'
 import { Verified } from '../components/icons'
 import FollowButton from '../components/FollowButton'
+import { Tile } from '../components/Tile'
 import { resolveImageUrl } from '../lib/api'
 import { useApi } from '../lib/useApi'
 import { usePlayer } from '../lib/PlayerContext'
@@ -150,20 +151,16 @@ function Artist({ artist: artistProp, onAlbumClick }: ArtistProps) {
         </div>
         <div className="flex gap-3 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden md:flex-wrap md:overflow-visible">
           {discography.map((d) => (
-            <button
+            <Tile
               key={d.id}
+              src={resolveImageUrl(d.imageUrl) ?? albumCover}
+              title={d.title}
+              subtitle={d.year ? `${d.year} • Álbum` : 'Álbum'}
+              shape="square"
               onClick={() => onAlbumClick(d)}
               onContextMenu={(e) => openAlbumMenu(e, d)}
-              className="flex h-[172px] w-[132px] shrink-0 flex-col gap-2 text-left hover:brightness-110"
-            >
-              <img src={resolveImageUrl(d.imageUrl) ?? albumCover} alt="" className="h-[132px] w-[132px] rounded object-cover" />
-              <div className="min-w-0">
-                <p className="truncate text-xs font-semibold leading-tight text-white">{d.title}</p>
-                <p className="truncate text-[11px] font-normal leading-tight text-neutral-400">
-                  {d.year ? `${d.year} • Álbum` : 'Álbum'}
-                </p>
-              </div>
-            </button>
+              className="hover:brightness-110"
+            />
           ))}
         </div>
       </section>

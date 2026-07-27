@@ -11,6 +11,7 @@ import { useSongContextMenu } from '../lib/SongContextMenuContext'
 import { useArtistContextMenu } from '../lib/ArtistContextMenuContext'
 import { usePlaylistContextMenu } from '../lib/PlaylistContextMenuContext'
 import { useAlbumContextMenu } from '../lib/AlbumContextMenuContext'
+import { Tile } from '../components/Tile'
 import { useTrackEntityMaps } from '../lib/EntityCacheContext'
 import {
   getRecentAlbums,
@@ -106,20 +107,15 @@ function Home({ onArtistClick, onPlaylistClick, onAlbumClick }: HomeProps) {
         <h3 className="text-base font-bold text-white">Suas Playlists</h3>
         <div className="flex gap-3 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden md:flex-wrap md:overflow-visible">
           {playlistTiles.map((p) => (
-            <button
+            <Tile
               key={p.id}
+              src={resolveImageUrl(p.imageUrl) ?? (p.name === 'Músicas Curtidas' ? favoritesCover : playlistCover)}
+              title={p.name}
+              subtitle={p.description ? `Playlist • ${p.description}` : 'Playlist'}
+              shape="square"
               onClick={() => onPlaylistClick(p)}
               onContextMenu={(e) => openPlaylistMenu(e, p)}
-              className="flex h-[172px] w-[132px] shrink-0 flex-col gap-2 text-left"
-            >
-              <img src={resolveImageUrl(p.imageUrl) ?? (p.name === 'Músicas Curtidas' ? favoritesCover : playlistCover)} alt="" className="h-[132px] w-[132px] rounded-[2px] object-cover" />
-              <div className="min-w-0">
-                <p className="truncate text-xs font-semibold leading-tight text-white">{p.name}</p>
-                <p className="truncate text-[11px] font-normal leading-tight text-neutral-400">
-                  {p.description ? `Playlist • ${p.description}` : 'Playlist'}
-                </p>
-              </div>
-            </button>
+            />
           ))}
         </div>
       </section>
@@ -133,18 +129,15 @@ function Home({ onArtistClick, onPlaylistClick, onAlbumClick }: HomeProps) {
         </div>
         <div className="flex gap-3 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden md:flex-wrap md:overflow-visible">
           {artistTiles.map((a) => (
-            <button
+            <Tile
               key={a.id}
+              src={resolveImageUrl(a.imageUrl) ?? artistCover}
+              title={a.name}
+              subtitle="Artista"
+              shape="circle"
               onClick={() => onArtistClick(a)}
               onContextMenu={(e) => openArtistMenu(e, a)}
-              className="flex h-[172px] w-[132px] shrink-0 flex-col gap-2 text-left"
-            >
-              <img src={resolveImageUrl(a.imageUrl) ?? artistCover} alt="" className="h-[132px] w-[132px] rounded-full object-cover" />
-              <div className="min-w-0">
-                <p className="truncate text-xs font-semibold leading-tight text-white">{a.name}</p>
-                <p className="truncate text-[11px] font-normal leading-tight text-neutral-400">Artista</p>
-              </div>
-            </button>
+            />
           ))}
         </div>
       </section>
@@ -155,20 +148,19 @@ function Home({ onArtistClick, onPlaylistClick, onAlbumClick }: HomeProps) {
         <h3 className="text-base font-bold text-white">Álbuns recentes</h3>
         <div className="flex gap-3 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden md:flex-wrap md:overflow-visible">
           {albumTiles.map((a) => (
-            <button
+            <Tile
               key={a.id}
+              src={resolveImageUrl(a.imageUrl) ?? albumCover}
+              title={a.title}
+              subtitle={a.year ? `${a.year} • Álbum` : 'Álbum'}
+              shape="square"
               onClick={() => onAlbumClick(a)}
               onContextMenu={(e) => openAlbumMenu(e, a)}
-              className="flex w-[140px] shrink-0 flex-col gap-1.5 rounded-[4px] p-1 text-left hover:brightness-110"
-            >
-              <img src={resolveImageUrl(a.imageUrl) ?? albumCover} alt="" className="h-[132px] w-[132px] rounded-[2px] object-cover" />
-              <div className="min-w-0">
-                <p className="truncate text-xs font-semibold leading-tight text-white">{a.title}</p>
-                <p className="truncate text-[11px] font-normal leading-tight text-neutral-400">
-                  {a.year ? `${a.year} • Álbum` : 'Álbum'}
-                </p>
-              </div>
-            </button>
+              width="140px"
+              height="auto"
+              gap="gap-1.5"
+              className="rounded-[4px] p-1 hover:brightness-110"
+            />
           ))}
         </div>
       </section>

@@ -3,6 +3,7 @@ import favoritesCover from '../assets/images/favorites_default.png'
 import playlistCover from '../assets/images/playlist_default.png'
 import profilePhoto from '../assets/images/profile_default.png'
 import songCover from '../assets/images/song_default.png'
+import { Tile } from '../components/Tile'
 import { resolveImageUrl } from '../lib/api'
 import { useApi } from '../lib/useApi'
 import { usePlayer } from '../lib/PlayerContext'
@@ -25,7 +26,6 @@ type ProfileProps = {
 
 const carouselClass =
   'flex gap-3 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden md:flex-wrap md:overflow-visible'
-const tileClass = 'flex h-[172px] w-[132px] shrink-0 flex-col gap-2 text-left'
 
 function Profile({ onArtistClick, onPlaylistClick }: ProfileProps) {
   const { data: playlists } = useApi(getUserPlaylists)
@@ -72,18 +72,15 @@ function Profile({ onArtistClick, onPlaylistClick }: ProfileProps) {
         </div>
         <div className={carouselClass}>
           {artistTiles.map((a) => (
-            <button
+            <Tile
               key={a.id}
+              src={resolveImageUrl(a.imageUrl) ?? artistCover}
+              title={a.name}
+              subtitle="Artista"
+              shape="circle"
               onClick={() => onArtistClick(a)}
               onContextMenu={(e) => openArtistMenu(e, a)}
-              className={tileClass}
-            >
-              <img src={resolveImageUrl(a.imageUrl) ?? artistCover} alt="" className="h-[132px] w-[132px] rounded-full object-cover" />
-              <div className="min-w-0">
-                <p className="truncate text-xs font-semibold leading-tight text-white">{a.name}</p>
-                <p className="truncate text-[11px] font-normal leading-tight text-neutral-400">Artista</p>
-              </div>
-            </button>
+            />
           ))}
         </div>
       </section>
@@ -136,19 +133,14 @@ function Profile({ onArtistClick, onPlaylistClick }: ProfileProps) {
         </div>
         <div className={carouselClass}>
           {playlistTiles.map((p) => (
-            <button
+            <Tile
               key={p.id}
+              src={resolveImageUrl(p.imageUrl) ?? (p.name === 'Músicas Curtidas' ? favoritesCover : playlistCover)}
+              title={p.name}
+              shape="square"
               onClick={() => onPlaylistClick(p)}
               onContextMenu={(e) => openPlaylistMenu(e, p)}
-              className={tileClass}
-            >
-              <img
-                src={resolveImageUrl(p.imageUrl) ?? (p.name === 'Músicas Curtidas' ? favoritesCover : playlistCover)}
-                alt=""
-                className="h-[132px] w-[132px] rounded object-cover"
-              />
-              <p className="truncate text-xs font-semibold text-white">{p.name}</p>
-            </button>
+            />
           ))}
         </div>
       </section>

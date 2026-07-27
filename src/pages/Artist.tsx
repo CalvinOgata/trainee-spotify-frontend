@@ -4,6 +4,7 @@ import artistBanner from '../assets/images/artist_banner.png'
 import songCover from '../assets/images/song_default.png'
 import { Verified } from '../components/icons'
 import FollowButton from '../components/FollowButton'
+import ShowAllButton from '../components/ShowAllButton'
 import { Tile } from '../components/Tile'
 import { resolveImageUrl } from '../lib/api'
 import { useApi } from '../lib/useApi'
@@ -147,7 +148,7 @@ function Artist({ artist: artistProp, onAlbumClick }: ArtistProps) {
       <section className="flex w-full flex-col gap-2.5">
         <div className="flex items-center justify-between">
           <h2 className="text-base font-bold leading-tight text-white">Discografia</h2>
-          <button className="text-xs font-semibold text-neutral-400 hover:text-white">Mostrar tudo</button>
+          <ShowAllButton />
         </div>
         <div className="flex gap-3 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden md:flex-wrap md:overflow-visible">
           {discography.map((d) => (

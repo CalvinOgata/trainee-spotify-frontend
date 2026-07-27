@@ -3,6 +3,7 @@ import favoritesCover from '../assets/images/favorites_default.png'
 import playlistCover from '../assets/images/playlist_default.png'
 import profilePhoto from '../assets/images/profile_default.png'
 import songCover from '../assets/images/song_default.png'
+import ShowAllButton from '../components/ShowAllButton'
 import { Tile } from '../components/Tile'
 import { resolveImageUrl } from '../lib/api'
 import { useApi } from '../lib/useApi'
@@ -129,7 +130,7 @@ function Profile({ onArtistClick, onPlaylistClick }: ProfileProps) {
       <section className="flex w-full flex-col gap-2.5">
         <div className="flex items-center justify-between">
           <h2 className="text-base font-bold leading-tight text-white">Playlists públicas</h2>
-          <button className="text-xs font-semibold text-neutral-400 hover:text-white">Mostrar tudo</button>
+          <ShowAllButton />
         </div>
         <div className={carouselClass}>
           {playlistTiles.map((p) => (

@@ -34,10 +34,10 @@ export function Tile({
   return (
     <button onClick={onClick} onContextMenu={onContextMenu} style={style} className={buttonClass}>
       <img src={src} alt={alt} className={`h-[132px] w-[132px] ${shapeClass} object-cover`} />
-      <div className="min-w-0">
-        <p className="truncate text-xs font-semibold leading-tight text-white">{title}</p>
+      <div className="flex min-w-0 flex-col gap-[5px]">
+        <p className="truncate font-[Inter] text-[12px] font-medium leading-tight text-white">{title}</p>
         {subtitle && (
-          <p className="truncate text-[11px] font-normal leading-tight text-neutral-400">{subtitle}</p>
+          <p className="truncate font-[Inter] text-[10px] font-medium leading-tight text-[#B3B3B3]">{subtitle}</p>
         )}
       </div>
     </button>

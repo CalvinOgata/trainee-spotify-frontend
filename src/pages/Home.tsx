@@ -11,6 +11,8 @@ import { useSongContextMenu } from '../lib/SongContextMenuContext'
 import { useArtistContextMenu } from '../lib/ArtistContextMenuContext'
 import { usePlaylistContextMenu } from '../lib/PlaylistContextMenuContext'
 import { useAlbumContextMenu } from '../lib/AlbumContextMenuContext'
+import Pill from '../components/Pill'
+import ShowAllButton from '../components/ShowAllButton'
 import { Tile } from '../components/Tile'
 import { useTrackEntityMaps } from '../lib/EntityCacheContext'
 import {
@@ -56,26 +58,17 @@ function Home({ onArtistClick, onPlaylistClick, onAlbumClick }: HomeProps) {
   })
 
   return (
-    <div className="flex h-full flex-col gap-5">
+    <div className="flex h-full flex-col gap-8">
       <section className="flex flex-col gap-3">
         <div className="flex gap-2.5">
-          {filters.map((label) => {
-            const active = label === activeFilter
-            return (
-              <button
-                key={label}
-                onClick={() => setActiveFilter(label)}
-                className={`flex h-8 w-14 items-center justify-center overflow-hidden whitespace-nowrap rounded-2xl p-2.5 text-[10px] font-semibold leading-none ${
-                  active ? 'bg-white text-black' : 'bg-[#343333] text-white'
-                }`}
-              >
-                {label}
-              </button>
-            )
-          })}
+          {filters.map((label) => (
+            <Pill key={label} active={label === activeFilter} onClick={() => setActiveFilter(label)}>
+              {label}
+            </Pill>
+          ))}
         </div>
         {showMusic && (
-        <div className="grid grid-cols-[repeat(auto-fill,minmax(140px,1fr))] gap-2 md:grid-cols-[repeat(auto-fill,minmax(260px,1fr))]">
+        <div className="grid grid-cols-[repeat(auto-fill,295px)] gap-2">
           {recentItems.map((m) => (
             <button
               key={m.id}
@@ -92,10 +85,10 @@ function Home({ onArtistClick, onPlaylistClick, onAlbumClick }: HomeProps) {
                   album: albumById.get(m.albumId) ?? null,
                 })
               }
-              className="flex h-[60px] w-full items-center gap-2.5 overflow-hidden rounded-[4px] bg-[#2D2D2D] pr-3 text-left hover:brightness-110"
+              className="flex h-[60px] w-[295px] items-center gap-2.5 overflow-hidden rounded-[4px] bg-[#2D2D2D] pr-3 text-left hover:brightness-110"
             >
               <img src={resolveImageUrl(m.imageUrl) ?? songCover} alt="" className="h-[60px] w-[60px] shrink-0 object-cover" />
-              <span className="truncate text-sm font-semibold text-white">{m.title}</span>
+              <span className="truncate font-[Arial] text-[12px] font-bold text-white">{m.title}</span>
             </button>
           ))}
         </div>
@@ -104,7 +97,7 @@ function Home({ onArtistClick, onPlaylistClick, onAlbumClick }: HomeProps) {
 
       {showPlaylists && (
       <section className="flex flex-col gap-2">
-        <h3 className="text-base font-bold text-white">Suas Playlists</h3>
+        <h3 className="font-[Inter] text-[16px] font-bold text-white">Suas Playlists</h3>
         <div className="flex gap-3 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden md:flex-wrap md:overflow-visible">
           {playlistTiles.map((p) => (
             <Tile
@@ -124,8 +117,8 @@ function Home({ onArtistClick, onPlaylistClick, onAlbumClick }: HomeProps) {
       {showMusic && (
       <section className="flex flex-col gap-2">
         <div className="flex items-center justify-between">
-          <h3 className="text-base font-bold text-white">Artistas recentes</h3>
-          <button className="text-xs font-semibold text-neutral-400 hover:text-white">Mostrar tudo</button>
+          <h3 className="font-[Inter] text-[16px] font-bold text-white">Artistas recentes</h3>
+          <ShowAllButton />
         </div>
         <div className="flex gap-3 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden md:flex-wrap md:overflow-visible">
           {artistTiles.map((a) => (
@@ -145,7 +138,7 @@ function Home({ onArtistClick, onPlaylistClick, onAlbumClick }: HomeProps) {
 
       {showMusic && (
       <section className="flex flex-col gap-2">
-        <h3 className="text-base font-bold text-white">Álbuns recentes</h3>
+        <h3 className="font-[Inter] text-[16px] font-bold text-white">Álbuns recentes</h3>
         <div className="flex gap-3 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden md:flex-wrap md:overflow-visible">
           {albumTiles.map((a) => (
             <Tile
@@ -156,10 +149,6 @@ function Home({ onArtistClick, onPlaylistClick, onAlbumClick }: HomeProps) {
               shape="square"
               onClick={() => onAlbumClick(a)}
               onContextMenu={(e) => openAlbumMenu(e, a)}
-              width="140px"
-              height="auto"
-              gap="gap-1.5"
-              className="rounded-[4px] p-1 hover:brightness-110"
             />
           ))}
         </div>

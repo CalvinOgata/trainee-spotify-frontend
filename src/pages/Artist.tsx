@@ -2,7 +2,9 @@ import { useState } from 'react'
 import albumCover from '../assets/images/album_default.png'
 import artistBanner from '../assets/images/artist_banner.png'
 import songCover from '../assets/images/song_default.png'
-import { Verified } from '../components/icons'
+import verifiedIcon from '../assets/icons/artistVerified.svg'
+import alreadyAddedIcon from '../assets/icons/AlreadyAdded.svg'
+import explicitIcon from '../assets/icons/Explicit.svg'
 import FollowButton from '../components/FollowButton'
 import ShowAllButton from '../components/ShowAllButton'
 import { Tile } from '../components/Tile'
@@ -19,13 +21,6 @@ import type { AlbumSummary, Artist as ArtistDTO, Music } from '../lib/types'
 const PlayArrow = () => (
   <svg viewBox="0 0 24 24" fill="currentColor" className="h-5 w-5">
     <path d="M8 5v14l11-7z" />
-  </svg>
-)
-
-const GreenCheck = () => (
-  <svg viewBox="0 0 16 16" className="h-3.5 w-3.5">
-    <circle cx="8" cy="8" r="8" fill="#1FDF64" />
-    <path d="M4.5 8.2 7 10.5l4.5-5" stroke="black" strokeWidth="1.5" fill="none" strokeLinecap="round" strokeLinejoin="round" />
   </svg>
 )
 
@@ -58,25 +53,25 @@ function Artist({ artist: artistProp, onAlbumClick }: ArtistProps) {
   const canExpand = allSongs.length > popularTracks.length
 
   return (
-    <div className="flex h-full flex-col gap-3">
+    <div className="flex flex-col">
       <div
         onContextMenu={(e) => openArtistMenu(e, artist)}
-        className="-mx-5 -mt-6 flex h-[280px] flex-col justify-end bg-cover bg-center px-5 pt-10 pb-4"
+        className="-mx-5 -mt-6 flex h-[386px] flex-col justify-end gap-[10px] bg-cover bg-center p-4"
         style={{
           backgroundImage: `linear-gradient(to bottom, rgba(65, 65, 65, 0) 0%, rgba(0, 0, 0, 0.4) 100%), url(${resolveImageUrl(artist.imageUrl) ?? artistBanner})`,
         }}
       >
-        <h1 className="text-4xl font-bold leading-none text-white sm:text-5xl lg:text-7xl">{artist.name}</h1>
-        <p className="mt-3 flex items-center gap-1.5 text-xs font-normal text-white">
-          <Verified />
-          Verified by Spotify
+        <h1 className="font-[Inter] text-[64px] font-bold leading-none text-white">{artist.name}</h1>
+        <p className="flex items-center gap-1.5 font-[Inter] text-[10px] font-bold text-white">
+          <img src={verifiedIcon} alt="" className="h-[18px] w-[18px]" />
+          Verificado pelo Spotify
         </p>
-        <p className="mt-1 text-xs font-normal text-white">
+        <p className="font-[Inter] text-[10px] font-medium text-white">
           {formatPlays(artist.listeners)} ouvintes mensais
         </p>
       </div>
 
-      <div className="flex items-center gap-3">
+      <div className="mt-[10px] flex items-center gap-[10px]">
         <button
           onClick={() => {
             if (popularTracks.length === 0) return
@@ -87,7 +82,7 @@ function Artist({ artist: artistProp, onAlbumClick }: ArtistProps) {
             })
           }}
           disabled={popularTracks.length === 0}
-          className="grid h-10 w-10 place-items-center rounded-full bg-[#1FDF64] text-black transition hover:scale-105 disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:scale-100"
+          className="grid h-9 w-9 place-items-center rounded-full bg-[#1FDF64] text-black transition hover:scale-105 disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:scale-100"
           aria-label="Reproduzir"
         >
           <PlayArrow />
@@ -95,8 +90,8 @@ function Artist({ artist: artistProp, onAlbumClick }: ArtistProps) {
         <FollowButton artist={artist} />
       </div>
 
-      <section className="flex w-full max-w-[457px] flex-col gap-2.5">
-        <h2 className="text-base font-bold leading-tight text-white">
+      <section className="mt-6 flex w-[524px] flex-col gap-2.5">
+        <h2 className="font-[Inter] text-[16px] font-bold text-white">
           {showAllSongs ? 'Todas as músicas' : 'Populares'}
         </h2>
         <ul className="flex flex-col gap-2.5">
@@ -117,21 +112,19 @@ function Artist({ artist: artistProp, onAlbumClick }: ArtistProps) {
                   album: albumById.get(t.albumId) ?? null,
                 })
               }
-              className="grid h-9 w-full cursor-pointer grid-cols-[12px_36px_minmax(0,1fr)_auto_auto_auto] items-center gap-2.5 hover:bg-neutral-900"
+              className="grid h-11 w-full cursor-pointer grid-cols-[12px_36px_minmax(0,1fr)_auto_auto_auto] items-center gap-[10px] rounded-[4px] px-2 py-1 hover:bg-neutral-900"
             >
-              <span className="text-xs font-normal text-neutral-400">{i + 1}</span>
+              <span className="font-[Inter] text-[10px] font-medium text-[#B3B3B3]">{i + 1}</span>
               <img src={resolveImageUrl(t.imageUrl) ?? songCover} alt="" className="h-9 w-9 rounded object-cover" />
-              <div className="flex min-w-0 flex-col gap-0.5">
-                <p className="truncate text-xs font-semibold leading-none text-white">{t.title}</p>
+              <div className="flex min-w-0 flex-col gap-[5px]">
+                <p className="truncate font-[Arial,_Helvetica,_sans-serif] text-[10px] font-bold leading-none text-white">{t.title}</p>
                 {t.explicit && (
-                  <span className="inline-grid h-3 w-3 place-items-center rounded-sm bg-neutral-500 text-[8px] font-bold leading-none text-black">
-                    E
-                  </span>
+                  <img src={explicitIcon} alt="Explícito" className="h-3 w-3" />
                 )}
               </div>
-              <span className="text-xs font-normal text-neutral-400">{formatPlays(t.timesListen)}</span>
-              <GreenCheck />
-              <span className="text-xs font-normal text-neutral-400">{formatDuration(t.duration)}</span>
+              <span className="font-[Inter] text-[10px] font-medium text-[#B3B3B3]">{formatPlays(t.timesListen)}</span>
+              <img src={alreadyAddedIcon} alt="" className="h-[14px] w-[14px]" />
+              <span className="font-[Inter] text-[10px] font-medium text-[#B3B3B3]">{formatDuration(t.duration)}</span>
             </li>
           ))}
         </ul>
@@ -145,9 +138,9 @@ function Artist({ artist: artistProp, onAlbumClick }: ArtistProps) {
         )}
       </section>
 
-      <section className="flex w-full flex-col gap-2.5">
+      <section className="mt-6 flex w-full flex-col gap-2.5">
         <div className="flex items-center justify-between">
-          <h2 className="text-base font-bold leading-tight text-white">Discografia</h2>
+          <h2 className="font-[Inter] text-[16px] font-bold text-white">Discografia</h2>
           <ShowAllButton />
         </div>
         <div className="flex gap-3 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden md:flex-wrap md:overflow-visible">
@@ -160,16 +153,15 @@ function Artist({ artist: artistProp, onAlbumClick }: ArtistProps) {
               shape="square"
               onClick={() => onAlbumClick(d)}
               onContextMenu={(e) => openAlbumMenu(e, d)}
-              className="hover:brightness-110"
             />
           ))}
         </div>
       </section>
 
       {artist.about && (
-        <section className="flex w-full max-w-[457px] flex-col gap-2.5">
-          <h2 className="text-base font-bold leading-tight text-white">Sobre</h2>
-          <p className="whitespace-pre-line text-sm font-normal leading-relaxed text-neutral-300">
+        <section className="mt-6 flex w-full max-w-[457px] flex-col gap-2.5">
+          <h2 className="font-[Inter] text-[16px] font-bold text-white">Sobre</h2>
+          <p className="whitespace-pre-line font-[Inter] text-xs font-medium text-neutral-400">
             {artist.about}
           </p>
         </section>

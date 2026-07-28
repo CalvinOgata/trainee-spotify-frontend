@@ -1,6 +1,7 @@
-import { createContext, useCallback, useContext, useEffect, useState } from 'react'
+import { createContext, useCallback, useContext, useEffect, useRef, useState } from 'react'
 import type { ReactNode } from 'react'
 import { useEntityCache } from './EntityCacheContext'
+import { postPlay, type PlayKind } from './endpoints'
 import type { AlbumSummary, Artist, Music, PlaylistSummary } from './types'
 
 export type PlaybackSource =
@@ -50,6 +51,24 @@ const PlayerContext = createContext<PlayerContextValue | null>(null)
 
 const HISTORY_LIMIT = 50
 const RECENT_PLAYS_STORAGE_KEY = 'spotify-frontend:recent-plays'
+const PLAY_THRESHOLD_SECONDS = 30
+const RECENT_PLAYS_PER_KIND = 8
+
+// Keeps only the RECENT_PLAYS_PER_KIND most recent entries for each entity kind (music/album/artist/playlist).
+function trimRecentPlays(map: Record<string, number>): Record<string, number> {
+  const groups: Record<string, [string, number][]> = {}
+  for (const [key, ts] of Object.entries(map)) {
+    const kind = key.split(':')[0]
+    if (!groups[kind]) groups[kind] = []
+    groups[kind].push([key, ts])
+  }
+  const out: Record<string, number> = {}
+  for (const kind in groups) {
+    groups[kind].sort((a, b) => b[1] - a[1])
+    for (const [key, ts] of groups[kind].slice(0, RECENT_PLAYS_PER_KIND)) out[key] = ts
+  }
+  return out
+}
 
 // Hydrates the persisted recency map from localStorage; drops any malformed or non-numeric entries.
 function loadRecentPlays(): Record<string, number> {
@@ -62,7 +81,7 @@ function loadRecentPlays(): Record<string, number> {
     for (const [k, v] of Object.entries(parsed as Record<string, unknown>)) {
       if (typeof v === 'number' && Number.isFinite(v)) out[k] = v
     }
-    return out
+    return trimRecentPlays(out)
   } catch {
     return {}
   }
@@ -80,6 +99,7 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
   const [isPlaying, setIsPlaying] = useState(false)
   const [position, setPosition] = useState(0)
   const [recentPlays, setRecentPlays] = useState<Record<string, number>>(loadRecentPlays)
+  const stampedRef = useRef<string | null>(null)
   const { artistById } = useEntityCache()
 
   // Persists recentPlays back to localStorage whenever it changes so Library sort survives reloads.
@@ -92,6 +112,7 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
   }, [recentPlays])
 
   // Timestamps the played music (always) plus the promoted source/artist per the intent flag; drives Library sort + light-up.
+  // Caps the stored map to RECENT_PLAYS_PER_KIND per kind and mirrors each mark to the backend fire-and-forget.
   const stampRecency = useCallback(
     (
       music: Music | null,
@@ -99,17 +120,26 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
       source: PlaybackSource | null,
       promote: 'source' | 'artist' | 'music',
     ) => {
-      const marks: Record<string, number> = {}
-      const now = Date.now()
-      if (music) marks[`music:${music.id}`] = now
+      const marks: Array<{ key: string; kind: PlayKind; id: string }> = []
+      if (music) marks.push({ key: `music:${music.id}`, kind: 'music', id: music.id })
       if (promote === 'source') {
-        if (source?.kind === 'playlist') marks[`playlist:${source.playlist.id}`] = now
-        else if (source?.kind === 'album') marks[`album:${source.album.id}`] = now
+        if (source?.kind === 'playlist')
+          marks.push({ key: `playlist:${source.playlist.id}`, kind: 'playlist', id: source.playlist.id })
+        else if (source?.kind === 'album')
+          marks.push({ key: `album:${source.album.id}`, kind: 'album', id: source.album.id })
       } else if (promote === 'artist' && artist) {
-        marks[`artist:${artist.id}`] = now
+        marks.push({ key: `artist:${artist.id}`, kind: 'artist', id: artist.id })
       }
-      if (Object.keys(marks).length === 0) return
-      setRecentPlays((prev) => ({ ...prev, ...marks }))
+      if (marks.length === 0) return
+      const now = Date.now()
+      setRecentPlays((prev) => {
+        const next = { ...prev }
+        for (const { key } of marks) next[key] = now
+        return trimRecentPlays(next)
+      })
+      for (const { kind, id } of marks) {
+        postPlay(kind, id).catch(() => {})
+      }
     },
     [],
   )
@@ -140,9 +170,8 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
       setQueue(opts?.queue ?? [music])
       setPosition(0)
       setIsPlaying(true)
-      stampRecency(music, opts?.artist ?? null, opts?.source ?? null, nextPromote)
     },
-    [current, currentArtist, currentSource, currentPromote, queue, stampRecency],
+    [current, currentArtist, currentSource, currentPromote, queue],
   )
 
   // Advances playback: prefers a future entry (redo) if present, otherwise steps forward in the current queue; stops at queue end.
@@ -164,7 +193,6 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
       setQueue(nextEntry.queue)
       setPosition(0)
       setIsPlaying(true)
-      stampRecency(nextEntry.music, nextEntry.artist, nextEntry.source, 'music')
       return
     }
     const idx = queue.findIndex((m) => m.id === current.id)
@@ -183,8 +211,7 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
     setCurrent(nextMusic)
     setCurrentArtist(nextArtist)
     setPosition(0)
-    stampRecency(nextMusic, nextArtist, currentSource, 'music')
-  }, [current, currentArtist, currentSource, currentPromote, queue, future, stampRecency, artistById])
+  }, [current, currentArtist, currentSource, currentPromote, queue, future, artistById])
 
   // Steps backward in history: current state moves to the future stack, prior state is restored (including source/promote/queue).
   const prev = useCallback(() => {
@@ -202,8 +229,7 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
     setQueue(last.queue)
     setPosition(0)
     setIsPlaying(true)
-    stampRecency(last.music, last.artist, last.source, 'music')
-  }, [current, currentArtist, currentSource, currentPromote, queue, history, stampRecency])
+  }, [current, currentArtist, currentSource, currentPromote, queue, history])
 
   // Pauses or resumes; if the track ended, seek back to zero so pressing play restarts it.
   const togglePlay = useCallback(() => {
@@ -242,6 +268,23 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
       next()
     }
   }, [position, current, next])
+
+  // Resets the "already stamped" marker when the current song changes so the next play can qualify.
+  useEffect(() => {
+    stampedRef.current = null
+  }, [current?.id])
+
+  // Fires stampRecency once per playback when position crosses min(30s, duration/2) — Spotify's rule for counting a "listen".
+  // Guarded by stampedRef so the setState cascade fires at most once per song.
+  useEffect(() => {
+    if (!current || stampedRef.current === current.id) return
+    const threshold = Math.min(PLAY_THRESHOLD_SECONDS, current.duration / 2)
+    if (position >= threshold) {
+      stampedRef.current = current.id
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      stampRecency(current, currentArtist, currentSource, currentPromote)
+    }
+  }, [position, current, currentArtist, currentSource, currentPromote, stampRecency])
 
   // Peek at what plays next: uses the top of the future stack if any, otherwise the next queue item; null when nothing follows.
   const nextUp: NextUp | null = (() => {

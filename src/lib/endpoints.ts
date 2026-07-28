@@ -20,6 +20,10 @@ export const getMostPlayedMusics = () => api.get<Music[]>('/user/mostPlayedMusic
 export const getRecentAlbums = () => api.get<AlbumSummary[]>('/user/recentAlbums')
 export const getFollowers = () => api.get<string[]>('/user/followers')
 
+export type PlayKind = 'music' | 'album' | 'artist' | 'playlist'
+export const postPlay = (kind: PlayKind, id: string) =>
+  api.post<void>('/user/plays', { kind, id })
+
 // /user/saved*
 export const getSavedMusics = () => api.get<Music[]>('/user/savedMusics')
 export const saveMusic = (id: string) => api.post<void>(`/user/savedMusics/${id}`, {})

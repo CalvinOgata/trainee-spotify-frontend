@@ -20,10 +20,12 @@ import { useArtistContextMenu } from '../lib/ArtistContextMenuContext'
 import { usePlaylistContextMenu } from '../lib/PlaylistContextMenuContext'
 import { useLibrary } from '../lib/LibraryContext'
 import {
+  getArtistPopularMusics,
   getFollowedArtists,
   getFollowers,
   getMostPlayedArtists,
   getMostPlayedMusics,
+  getPlaylist,
   getUserPlaylists,
 } from '../lib/endpoints'
 import { formatDuration, formatPlays } from '../lib/format'
@@ -69,6 +71,28 @@ function Profile({ onArtistClick, onPlaylistClick }: ProfileProps) {
 
   const artistById = new Map((topArtists ?? []).map((a) => [a.id, a]))
 
+  const handlePlayPlaylist = async (p: PlaylistSummary) => {
+    const full = await getPlaylist(p.id)
+    if (full.musics.length === 0) return
+    const first = full.musics[0]
+    play(first, {
+      artist: artistById.get(first.artistId),
+      queue: full.musics,
+      source: { kind: 'playlist', playlist: p },
+      promote: 'source',
+    })
+  }
+
+  const handlePlayArtist = async (a: Artist) => {
+    const popular = await getArtistPopularMusics(a.id)
+    if (popular.length === 0) return
+    play(popular[0], {
+      artist: a,
+      queue: popular,
+      promote: 'artist',
+    })
+  }
+
   return (
     <div className="flex h-full flex-col">
       <div className="-mx-5 -mt-6 flex h-[231px] items-end gap-3 bg-gradient-to-b from-[#938D8E] to-[#3E3939] px-5 pt-10 pb-4">
@@ -102,6 +126,7 @@ function Profile({ onArtistClick, onPlaylistClick }: ProfileProps) {
               subtitle="Artista"
               shape="circle"
               onClick={() => onArtistClick(a)}
+              onPlay={() => handlePlayArtist(a)}
               onContextMenu={(e) => openArtistMenu(e, a)}
             />
           ))}
@@ -157,6 +182,7 @@ function Profile({ onArtistClick, onPlaylistClick }: ProfileProps) {
               title={p.name}
               shape="square"
               onClick={() => onPlaylistClick(p)}
+              onPlay={() => handlePlayPlaylist(p)}
               onContextMenu={(e) => openPlaylistMenu(e, p)}
             />
           ))}

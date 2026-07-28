@@ -16,7 +16,7 @@ import { useArtistContextMenu } from '../lib/ArtistContextMenuContext'
 import { useAlbumContextMenu } from '../lib/AlbumContextMenuContext'
 import { getArtist, getArtistAlbums, getArtistPopularMusics } from '../lib/endpoints'
 import { formatDuration, formatPlays } from '../lib/format'
-import type { AlbumSummary, Artist as ArtistDTO, Music } from '../lib/types'
+import type { Album, AlbumSummary, Artist as ArtistDTO, Music } from '../lib/types'
 
 const PlayArrow = () => (
   <svg viewBox="0 0 24 24" fill="currentColor" className="h-5 w-5">
@@ -51,6 +51,17 @@ function Artist({ artist: artistProp, onAlbumClick }: ArtistProps) {
   const allSongs = Array.from(allSongsById.values())
   const displayedTracks = showAllSongs ? allSongs : popularTracks
   const canExpand = allSongs.length > popularTracks.length
+
+  const handlePlayAlbum = (a: Album) => {
+    if (a.musics.length === 0) return
+    const first = a.musics[0]
+    play(first, {
+      artist,
+      queue: a.musics,
+      source: { kind: 'album', album: a },
+      promote: 'source',
+    })
+  }
 
   return (
     <div className="flex flex-col">
@@ -152,6 +163,7 @@ function Artist({ artist: artistProp, onAlbumClick }: ArtistProps) {
               subtitle={d.year ? `${d.year} • Álbum` : 'Álbum'}
               shape="square"
               onClick={() => onAlbumClick(d)}
+              onPlay={() => handlePlayAlbum(d)}
               onContextMenu={(e) => openAlbumMenu(e, d)}
             />
           ))}

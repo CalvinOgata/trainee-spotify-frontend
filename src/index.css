@@ -4,6 +4,11 @@
   --font-sans: "Poppins", ui-sans-serif, system-ui, sans-serif;
 }
 
+@keyframes playing-bar {
+  0%, 100% { transform: scaleY(0.3); }
+  50% { transform: scaleY(1); }
+}
+
 ::view-transition-group(song-cover) {
   animation-duration: 450ms;
   animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1);

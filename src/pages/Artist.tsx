@@ -48,7 +48,11 @@ function Artist({ artist: artistProp, onAlbumClick }: ArtistProps) {
   for (const a of discography) {
     for (const m of a.musics) allSongsById.set(m.id, m)
   }
-  const allSongs = Array.from(allSongsById.values())
+  const popularIds = new Set(popularTracks.map((t) => t.id))
+  const rest = Array.from(allSongsById.values())
+    .filter((m) => !popularIds.has(m.id))
+    .sort((a, b) => b.timesListen - a.timesListen)
+  const allSongs = [...popularTracks, ...rest]
   const displayedTracks = showAllSongs ? allSongs : popularTracks
   const canExpand = allSongs.length > popularTracks.length
 

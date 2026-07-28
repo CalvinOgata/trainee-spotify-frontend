@@ -43,6 +43,8 @@ export const updatePlaylistAttributes = (id: string, body: PutPlaylistInput) =>
   api.put<PlaylistSummary>(`/playlist/${id}/attributes`, body)
 export const togglePlaylistMusic = (playlistId: string, musicId: string) =>
   api.patch<Playlist>(`/playlist/${playlistId}/${musicId}`)
+export const forceAddMusicToPlaylist = (playlistId: string, musicId: string) =>
+  api.post<Playlist>(`/playlist/${playlistId}/musics/${musicId}`, {})
 export const deletePlaylist = (id: string) => api.delete<void>(`/playlist/${id}`)
 export const removeMusicFromPlaylist = (playlistId: string, musicId: string) =>
   api.delete<void>(`/playlist/${playlistId}/${musicId}`)

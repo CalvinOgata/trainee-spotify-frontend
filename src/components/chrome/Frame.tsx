@@ -1,14 +1,14 @@
 import Library from './Library'
 import MainSection from './MainSection'
 import SongPanel from './SongPanel'
-import Home from '../pages/Home'
-import SearchResults from '../pages/SearchResults'
-import Profile from '../pages/Profile'
-import Artist from '../pages/Artist'
-import Playlist from '../pages/Playlist'
-import Album from '../pages/Album'
-import type { Page } from '../App'
-import type { AlbumSummary, Artist as ArtistDTO, PlaylistSummary } from '../lib/types'
+import Home from '../../pages/Home'
+import SearchResults from '../../pages/SearchResults'
+import Profile from '../../pages/Profile'
+import Artist from '../../pages/Artist'
+import Playlist from '../../pages/Playlist'
+import Album from '../../pages/Album'
+import type { Page } from '../../App'
+import type { AlbumSummary, Artist as ArtistDTO, PlaylistSummary } from '../../lib/types'
 
 type FrameProps = {
   query: string

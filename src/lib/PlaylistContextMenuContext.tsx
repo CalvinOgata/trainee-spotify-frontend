@@ -1,6 +1,6 @@
 import { createContext, useCallback, useContext, useState } from 'react'
 import type { MouseEvent, ReactNode } from 'react'
-import PlaylistContextMenu from '../components/PlaylistContextMenu'
+import PlaylistContextMenu from '../components/menus/PlaylistContextMenu'
 import type { PlaylistSummary } from './types'
 
 type PlaylistContextMenuContextValue = {

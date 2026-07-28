@@ -1,6 +1,6 @@
 import { useEffect, useLayoutEffect, useRef, useState } from 'react'
 import type { ReactNode, RefObject } from 'react'
-import { ChevronRight } from './icons'
+import { ChevronRight } from '../icons'
 
 type ContextMenuShellProps = {
   x: number

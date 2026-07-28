@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import type { MouseEvent } from 'react'
-import songCover from '../assets/images/song_default.png'
+import songCover from '../../assets/images/song_default.png'
 import {
   MaximizedPlayer,
   MinimizedPlayer,
@@ -11,10 +11,10 @@ import {
   VolumeHigh,
   VolumeLow,
   VolumeMute,
-} from './icons'
-import { resolveImageUrl } from '../lib/api'
-import { usePlayer } from '../lib/PlayerContext'
-import { formatDuration } from '../lib/format'
+} from '../icons'
+import { resolveImageUrl } from '../../lib/api'
+import { usePlayer } from '../../lib/PlayerContext'
+import { formatDuration } from '../../lib/format'
 
 type PlayerProps = {
   onFullscreenClick: () => void

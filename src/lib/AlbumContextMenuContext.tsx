@@ -1,6 +1,6 @@
 import { createContext, useCallback, useContext, useState } from 'react'
 import type { MouseEvent, ReactNode } from 'react'
-import AlbumContextMenu from '../components/AlbumContextMenu'
+import AlbumContextMenu from '../components/menus/AlbumContextMenu'
 import type { AlbumSummary, Artist } from './types'
 
 type AlbumContextMenuContextValue = {

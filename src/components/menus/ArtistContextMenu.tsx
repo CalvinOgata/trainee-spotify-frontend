@@ -1,7 +1,7 @@
-import { useLibrary } from '../lib/LibraryContext'
-import type { Artist } from '../lib/types'
+import { useLibrary } from '../../lib/LibraryContext'
+import type { Artist } from '../../lib/types'
 import { ContextMenuShell, MenuItem } from './ContextMenuShell'
-import { Pin, X } from './icons'
+import { Pin, X } from '../icons'
 
 type ArtistContextMenuProps = {
   artist: Artist

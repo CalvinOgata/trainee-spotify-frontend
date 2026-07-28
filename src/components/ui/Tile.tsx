@@ -1,5 +1,5 @@
 import type { MouseEvent } from 'react'
-import playButtonLarge from '../assets/icons/PlayButtonLarge.svg'
+import playButtonLarge from '../../assets/icons/PlayButtonLarge.svg'
 
 type TileProps = {
   src: string

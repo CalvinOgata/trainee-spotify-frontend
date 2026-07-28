@@ -1,8 +1,13 @@
 import { useLayoutEffect, useMemo, useRef, useState } from 'react'
-import { getUserPlaylists, removeMusicFromPlaylist, togglePlaylistMusic } from '../lib/endpoints'
-import { useApi } from '../lib/useApi'
-import { useLibrary } from '../lib/LibraryContext'
-import type { AlbumSummary, Artist, Music, PlaylistSummary } from '../lib/types'
+import {
+  forceAddMusicToPlaylist,
+  getUserPlaylists,
+  removeMusicFromPlaylist,
+  togglePlaylistMusic,
+} from '../../lib/endpoints'
+import { useApi } from '../../lib/useApi'
+import { useLibrary } from '../../lib/LibraryContext'
+import type { AlbumSummary, Artist, Music, PlaylistSummary } from '../../lib/types'
 import {
   AddLikedSongs,
   AddPlaylist,
@@ -12,8 +17,9 @@ import {
   Disc,
   GoToArtist,
   RemovePlaylist,
-} from './icons'
-import CreditsModal from './CreditsModal'
+} from '../icons'
+import ConfirmDuplicateSongModal from '../modals/ConfirmDuplicateSongModal'
+import CreditsModal from '../modals/CreditsModal'
 import { ContextMenuShell, MenuItem } from './ContextMenuShell'
 
 const LIKED_PLAYLIST_NAME = 'Músicas Curtidas'
@@ -49,6 +55,7 @@ function SongContextMenu({
   const { isSaved, toggleSaved } = useLibrary()
   const [creditsOpen, setCreditsOpen] = useState(false)
   const [submenuOpen, setSubmenuOpen] = useState(false)
+  const [duplicateFor, setDuplicateFor] = useState<PlaylistSummary | null>(null)
   const submenuRef = useRef<HTMLDivElement>(null)
   const submenuAnchorRef = useRef<HTMLDivElement>(null)
 
@@ -84,13 +91,30 @@ function SongContextMenu({
     else onClose()
   }
 
-  const handleAddToPlaylist = async (pid: string) => {
+  const handleAddToPlaylist = async (p: PlaylistSummary) => {
+    if (music.playlistsId?.includes(p.id)) {
+      setSubmenuOpen(false)
+      setDuplicateFor(p)
+      return
+    }
     try {
-      await togglePlaylistMusic(pid, music.id)
+      await togglePlaylistMusic(p.id, music.id)
       onTracksChanged()
     } catch {
       // ignore
     }
+    onClose()
+  }
+
+  const handleConfirmDuplicate = async () => {
+    if (!duplicateFor) return
+    try {
+      await forceAddMusicToPlaylist(duplicateFor.id, music.id)
+      onTracksChanged()
+    } catch {
+      // ignore
+    }
+    setDuplicateFor(null)
     onClose()
   }
 
@@ -216,7 +240,7 @@ function SongContextMenu({
               return (
                 <button
                   key={p.id}
-                  onClick={() => handleAddToPlaylist(p.id)}
+                  onClick={() => handleAddToPlaylist(p)}
                   className="font-[Inter] flex items-center justify-between gap-2 truncate px-3 py-2 text-left text-[10px] font-medium text-[#B3B3B3] hover:bg-white/10"
                 >
                   <span className="truncate">{p.name}</span>
@@ -234,6 +258,18 @@ function SongContextMenu({
           artist={artist}
           onClose={() => {
             setCreditsOpen(false)
+            onClose()
+          }}
+        />
+      )}
+
+      {duplicateFor && (
+        <ConfirmDuplicateSongModal
+          songTitle={music.title}
+          playlistName={duplicateFor.name}
+          onConfirm={handleConfirmDuplicate}
+          onCancel={() => {
+            setDuplicateFor(null)
             onClose()
           }}
         />

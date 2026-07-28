@@ -1,9 +1,9 @@
 import { useEffect, useRef, useState } from 'react'
-import profilePhoto from '../assets/images/profile_default.png'
-import { Spotify, Home, Search, X, Bell, Download } from './icons'
+import profilePhoto from '../../assets/images/profile_default.png'
+import { Spotify, Home, Search, X, Bell, Download } from '../icons'
 import SearchDropdown from './SearchDropdown'
-import { useRecentSearches, type RecentSearchItem } from '../lib/useRecentSearches'
-import type { AlbumSummary, Artist, Music, PlaylistSummary } from '../lib/types'
+import { useRecentSearches, type RecentSearchItem } from '../../lib/useRecentSearches'
+import type { AlbumSummary, Artist, Music, PlaylistSummary } from '../../lib/types'
 
 type NavbarProps = {
   query: string

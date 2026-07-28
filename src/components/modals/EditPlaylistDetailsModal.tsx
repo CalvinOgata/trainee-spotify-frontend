@@ -1,11 +1,11 @@
 import { useState } from 'react'
-import favoritesCover from '../assets/images/favorites_default.png'
-import playlistCover from '../assets/images/playlist_default.png'
-import { Lock, MusicNote } from './icons'
+import favoritesCover from '../../assets/images/favorites_default.png'
+import playlistCover from '../../assets/images/playlist_default.png'
+import { Lock, MusicNote } from '../icons'
 import { ModalShell } from './ModalShell'
-import { resolveImageUrl } from '../lib/api'
-import { useLibrary } from '../lib/LibraryContext'
-import type { PlaylistSummary } from '../lib/types'
+import { resolveImageUrl } from '../../lib/api'
+import { useLibrary } from '../../lib/LibraryContext'
+import type { PlaylistSummary } from '../../lib/types'
 
 type EditPlaylistDetailsModalProps = {
   playlist: PlaylistSummary

@@ -1,6 +1,6 @@
-import FollowButton from './FollowButton'
+import FollowButton from '../ui/FollowButton'
 import { ModalShell } from './ModalShell'
-import type { Artist } from '../lib/types'
+import type { Artist } from '../../lib/types'
 
 const composers = [
   { name: 'WOOJIN of LNGSHOT', role: 'Arranjos • Autores • Letrista' },

@@ -1,11 +1,11 @@
 import { useState } from 'react'
-import { deletePlaylist, updatePlaylistAttributes } from '../lib/endpoints'
-import { useLibrary } from '../lib/LibraryContext'
-import type { PlaylistSummary } from '../lib/types'
-import ConfirmDeletePlaylistModal from './ConfirmDeletePlaylistModal'
+import { deletePlaylist, updatePlaylistAttributes } from '../../lib/endpoints'
+import { useLibrary } from '../../lib/LibraryContext'
+import type { PlaylistSummary } from '../../lib/types'
+import ConfirmDeletePlaylistModal from '../modals/ConfirmDeletePlaylistModal'
 import { ContextMenuShell, MenuItem } from './ContextMenuShell'
-import EditPlaylistDetailsModal from './EditPlaylistDetailsModal'
-import { EditPlaylist, LockIcon, Pin, RemovePlaylist } from './icons'
+import EditPlaylistDetailsModal from '../modals/EditPlaylistDetailsModal'
+import { EditPlaylist, LockIcon, Pin, RemovePlaylist } from '../icons'
 
 type PlaylistContextMenuProps = {
   playlist: PlaylistSummary

@@ -1,9 +1,9 @@
-import followIcon from '../assets/icons/Follow.svg'
-import followHoveringIcon from '../assets/icons/FollowHovering.svg'
-import followingIcon from '../assets/icons/Following.svg'
-import unfollowIcon from '../assets/icons/Unfollow.svg'
-import { useLibrary } from '../lib/LibraryContext'
-import type { Artist } from '../lib/types'
+import followIcon from '../../assets/icons/Follow.svg'
+import followHoveringIcon from '../../assets/icons/FollowHovering.svg'
+import followingIcon from '../../assets/icons/Following.svg'
+import unfollowIcon from '../../assets/icons/Unfollow.svg'
+import { useLibrary } from '../../lib/LibraryContext'
+import type { Artist } from '../../lib/types'
 
 type FollowButtonProps = {
   artist: Artist

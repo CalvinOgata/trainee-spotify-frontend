@@ -1,6 +1,6 @@
 import { useEffect } from 'react'
 import type { ReactNode } from 'react'
-import { X } from './icons'
+import { X } from '../icons'
 
 type ModalShellProps = {
   onClose: () => void

@@ -4,11 +4,12 @@ import Navbar from './components/Navbar'
 import Frame from './components/Frame'
 import Player from './components/Player'
 import PlayingSong from './pages/PlayingSong'
+import { usePlayer } from './lib/PlayerContext'
 import { SongContextMenuProvider } from './lib/SongContextMenuContext'
 import { ArtistContextMenuProvider } from './lib/ArtistContextMenuContext'
 import { PlaylistContextMenuProvider } from './lib/PlaylistContextMenuContext'
 import { AlbumContextMenuProvider } from './lib/AlbumContextMenuContext'
-import type { AlbumSummary, Artist, PlaylistSummary } from './lib/types'
+import type { AlbumSummary, Artist, Music, PlaylistSummary } from './lib/types'
 
 export type Page = 'home' | 'search' | 'profile' | 'artist' | 'playlist' | 'album'
 
@@ -21,10 +22,18 @@ function App() {
   const [isFullscreen, setIsFullscreen] = useState(false)
   const [playlistsKey, setPlaylistsKey] = useState(0)
   const refreshPlaylists = () => setPlaylistsKey((k) => k + 1)
+  const { play } = usePlayer()
 
   const handleQueryChange = (q: string) => {
     setQuery(q)
-    if (q) setPage('search')
+  }
+
+  const handleSearchSubmit = () => {
+    if (query.trim()) setPage('search')
+  }
+
+  const playMusic = (m: Music, artist: Artist | null) => {
+    play(m, { artist: artist ?? undefined, source: { kind: 'music', album: null } })
   }
 
   const goHome = () => {
@@ -103,8 +112,13 @@ function App() {
           <Navbar
             query={query}
             onQueryChange={handleQueryChange}
+            onSearchSubmit={handleSearchSubmit}
             onHomeClick={goHome}
             onProfileClick={goProfile}
+            onArtistClick={goArtist}
+            onPlaylistClick={goPlaylist}
+            onAlbumClick={goAlbum}
+            onMusicClick={playMusic}
           />
         </div>
         {isFullscreen ? (

@@ -1,21 +1,65 @@
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import profilePhoto from '../assets/images/profile_default.png'
 import { Spotify, Home, Search, X, Bell, Download } from './icons'
+import SearchDropdown from './SearchDropdown'
+import { useRecentSearches, type RecentSearchItem } from '../lib/useRecentSearches'
+import type { AlbumSummary, Artist, Music, PlaylistSummary } from '../lib/types'
 
 type NavbarProps = {
   query: string
   onQueryChange: (q: string) => void
+  onSearchSubmit: () => void
   onHomeClick: () => void
   onProfileClick: () => void
+  onArtistClick: (artist: Artist) => void
+  onPlaylistClick: (playlist: PlaylistSummary) => void
+  onAlbumClick: (album: AlbumSummary) => void
+  onMusicClick: (music: Music, artist: Artist | null) => void
 }
 
-function Navbar({ query, onQueryChange, onHomeClick, onProfileClick }: NavbarProps) {
+function Navbar({
+  query,
+  onQueryChange,
+  onSearchSubmit,
+  onHomeClick,
+  onProfileClick,
+  onArtistClick,
+  onPlaylistClick,
+  onAlbumClick,
+  onMusicClick,
+}: NavbarProps) {
   const [mobileSearchOpen, setMobileSearchOpen] = useState(false)
+  const [dropdownOpen, setDropdownOpen] = useState(false)
+  const searchBoxRef = useRef<HTMLDivElement>(null)
+  const { recents, addRecent, removeRecent } = useRecentSearches()
 
   const handleMobileSearchOpen = () => setMobileSearchOpen(true)
   const handleMobileSearchClose = () => {
     setMobileSearchOpen(false)
     onHomeClick()
+  }
+
+  useEffect(() => {
+    if (!dropdownOpen) return
+    const handler = (e: MouseEvent) => {
+      if (searchBoxRef.current && !searchBoxRef.current.contains(e.target as Node)) {
+        setDropdownOpen(false)
+      }
+    }
+    document.addEventListener('mousedown', handler)
+    return () => document.removeEventListener('mousedown', handler)
+  }, [dropdownOpen])
+
+  const commitSearch = () => {
+    if (!query.trim()) return
+    setDropdownOpen(false)
+    onSearchSubmit()
+  }
+
+  const pickAndClose = (recordAs: RecentSearchItem, navigate: () => void) => {
+    addRecent(recordAs)
+    setDropdownOpen(false)
+    navigate()
   }
 
   return (
@@ -51,24 +95,34 @@ function Navbar({ query, onQueryChange, onHomeClick, onProfileClick }: NavbarPro
 
       {/* Search bar — desktop always, mobile only when expanded */}
       <div
-        className={`h-9 max-w-[395px] flex-1 items-center gap-1 ${
+        ref={searchBoxRef}
+        className={`relative h-9 items-center gap-1 ${
           mobileSearchOpen ? 'flex' : 'hidden md:flex'
         }`}
       >
         <button
-          onClick={onHomeClick}
+          onClick={() => { setDropdownOpen(false); onHomeClick() }}
           className="hidden shrink-0 hover:brightness-125 md:block"
           aria-label="Início"
         >
           <Home />
         </button>
-        <div className="flex h-9 min-w-0 flex-1 items-center justify-between rounded-2xl border border-white bg-[#1F1F1F] px-3.5 text-white">
+        <div className="flex h-9 w-[355px] items-center justify-between rounded-2xl border border-transparent bg-[#1F1F1F] px-3.5 text-white focus-within:border-white">
           <div className="flex min-w-0 flex-1 items-center gap-2 overflow-hidden">
             <Search className="h-4 w-[15px] shrink-0 text-[#B3B3B3]" />
             <input
               type="text"
               value={query}
               onChange={(e) => onQueryChange(e.target.value)}
+              onFocus={() => setDropdownOpen(true)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') {
+                  e.preventDefault()
+                  commitSearch()
+                } else if (e.key === 'Escape') {
+                  setDropdownOpen(false)
+                }
+              }}
               placeholder="O que você quer ouvir?"
               aria-label="Pesquisar"
               autoFocus={mobileSearchOpen}
@@ -86,6 +140,17 @@ function Navbar({ query, onQueryChange, onHomeClick, onProfileClick }: NavbarPro
             </button>
           )}
         </div>
+        {dropdownOpen && (
+          <SearchDropdown
+            query={query}
+            recents={recents}
+            onRemoveRecent={removeRecent}
+            onArtistClick={(a) => pickAndClose({ kind: 'artist', artist: a }, () => onArtistClick(a))}
+            onPlaylistClick={(p) => pickAndClose({ kind: 'playlist', playlist: p }, () => onPlaylistClick(p))}
+            onAlbumClick={(a) => pickAndClose({ kind: 'album', album: a }, () => onAlbumClick(a))}
+            onMusicClick={(m, a) => pickAndClose({ kind: 'music', music: m, artist: a }, () => onMusicClick(m, a))}
+          />
+        )}
       </div>
 
       {/* Right cluster */}

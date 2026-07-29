@@ -56,8 +56,8 @@ export const reorderPlaylist = (
 
 // /artist
 export const getArtist = (id: string) => api.get<Artist>(`/artist/${id}`)
-export const getArtistPopularMusics = (artistId: string) =>
-  api.get<Music[]>(`/artist/${artistId}/popularMusics`)
+export const getArtistPopularMusics = (artistId: string, options?: { all?: boolean }) =>
+  api.get<Music[]>(`/artist/${artistId}/popularMusics${options?.all ? '?all=true' : ''}`)
 export const getArtistAlbums = (artistId: string) =>
   api.get<Album[]>(`/artist/${artistId}/albums`)
 

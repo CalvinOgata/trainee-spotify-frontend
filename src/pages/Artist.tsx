@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import albumCover from '../assets/images/album_default.png'
 import artistBanner from '../assets/images/artist_banner.png'
 import songCover from '../assets/images/song_default.png'
@@ -16,7 +16,7 @@ import { useArtistContextMenu } from '../lib/contexts/ArtistContextMenuContext'
 import { useAlbumContextMenu } from '../lib/contexts/AlbumContextMenuContext'
 import { getArtist, getArtistAlbums, getArtistPopularMusics } from '../lib/api/endpoints'
 import { formatDuration, formatPlays } from '../lib/format'
-import type { Album, AlbumSummary, Artist as ArtistDTO, Music } from '../lib/api/types'
+import type { Album, AlbumSummary, Artist as ArtistDTO } from '../lib/api/types'
 
 const PlayArrow = () => (
   <svg viewBox="0 0 24 24" fill="currentColor" className="h-5 w-5">
@@ -31,28 +31,23 @@ type ArtistProps = {
 
 function Artist({ artist: artistProp, onAlbumClick }: ArtistProps) {
   const [showAllSongs, setShowAllSongs] = useState(false)
+  useEffect(() => {
+    setShowAllSongs(false)
+  }, [artistProp.id])
   const { data: freshArtist } = useApi(() => getArtist(artistProp.id), [artistProp.id])
   const artist = freshArtist ?? artistProp
-  const { data: popular } = useApi(() => getArtistPopularMusics(artist.id), [artist.id])
+  const { data: popular } = useApi(() => getArtistPopularMusics(artist.id, { all: true }), [artist.id])
   const { data: albums } = useApi(() => getArtistAlbums(artist.id), [artist.id])
   const { play } = usePlayer()
   const { openSongMenu } = useSongContextMenu()
   const { openArtistMenu } = useArtistContextMenu()
   const { openAlbumMenu } = useAlbumContextMenu()
 
-  const popularTracks = popular ?? []
+  const allSongs = popular ?? []
   const discography = albums ?? []
   const albumById = new Map((albums ?? []).map((a) => [a.id, a]))
 
-  const allSongsById = new Map<string, Music>()
-  for (const a of discography) {
-    for (const m of a.musics) allSongsById.set(m.id, m)
-  }
-  const popularIds = new Set(popularTracks.map((t) => t.id))
-  const rest = Array.from(allSongsById.values())
-    .filter((m) => !popularIds.has(m.id))
-    .sort((a, b) => b.timesListen - a.timesListen)
-  const allSongs = [...popularTracks, ...rest]
+  const popularTracks = allSongs.slice(0, 5)
   const displayedTracks = showAllSongs ? allSongs : popularTracks
   const canExpand = allSongs.length > popularTracks.length
 

@@ -1,5 +1,5 @@
-import { useLibrary } from '../../lib/LibraryContext'
-import type { AlbumSummary, Artist } from '../../lib/types'
+import { useLibrary } from '../../lib/contexts/LibraryContext'
+import type { AlbumSummary, Artist } from '../../lib/api/types'
 import { ContextMenuShell, MenuItem } from './ContextMenuShell'
 import { AddLikedSongs, AlreadyAdded, GoToArtist, Pin } from '../icons'
 

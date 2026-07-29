@@ -1,6 +1,6 @@
 import songCover from '../assets/images/song_default.png'
-import { resolveImageUrl } from '../lib/api'
-import { usePlayer } from '../lib/PlayerContext'
+import { resolveImageUrl } from '../lib/api/client'
+import { usePlayer } from '../lib/contexts/PlayerContext'
 
 function PlayingSong() {
   const { current } = usePlayer()

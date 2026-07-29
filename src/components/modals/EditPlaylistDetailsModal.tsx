@@ -3,9 +3,9 @@ import favoritesCover from '../../assets/images/favorites_default.png'
 import playlistCover from '../../assets/images/playlist_default.png'
 import { Lock } from '../icons'
 import { ModalShell } from './ModalShell'
-import { resolveImageUrl } from '../../lib/api'
-import { useLibrary } from '../../lib/LibraryContext'
-import type { PlaylistSummary } from '../../lib/types'
+import { resolveImageUrl } from '../../lib/api/client'
+import { useLibrary } from '../../lib/contexts/LibraryContext'
+import type { PlaylistSummary } from '../../lib/api/types'
 
 type EditPlaylistDetailsModalProps = {
   playlist: PlaylistSummary

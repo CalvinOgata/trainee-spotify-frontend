@@ -1,14 +1,14 @@
 import albumCover from '../assets/images/album_default.png'
 import songCover from '../assets/images/song_default.png'
 import { Clock } from '../components/icons'
-import { resolveImageUrl } from '../lib/api'
-import { useApi } from '../lib/useApi'
-import { usePlayer } from '../lib/PlayerContext'
-import { useSongContextMenu } from '../lib/SongContextMenuContext'
-import { useAlbumContextMenu } from '../lib/AlbumContextMenuContext'
-import { getAlbumMusics, getArtist } from '../lib/endpoints'
+import { resolveImageUrl } from '../lib/api/client'
+import { useApi } from '../lib/hooks/useApi'
+import { usePlayer } from '../lib/contexts/PlayerContext'
+import { useSongContextMenu } from '../lib/contexts/SongContextMenuContext'
+import { useAlbumContextMenu } from '../lib/contexts/AlbumContextMenuContext'
+import { getAlbumMusics, getArtist } from '../lib/api/endpoints'
 import { formatDuration, formatPlaylistDuration } from '../lib/format'
-import type { AlbumSummary } from '../lib/types'
+import type { AlbumSummary } from '../lib/api/types'
 
 const PlayArrow = () => (
   <svg viewBox="0 0 24 24" fill="currentColor" className="h-5 w-5">

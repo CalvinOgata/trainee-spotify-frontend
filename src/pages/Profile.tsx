@@ -12,13 +12,13 @@ import serjaoPhoto from '../assets/images/Serjao.jpg'
 import wandererPhoto from '../assets/images/Wanderer.jpg'
 import explicitIcon from '../assets/icons/Explicit.svg'
 import { Tile } from '../components/ui/Tile'
-import { resolveImageUrl } from '../lib/api'
-import { useApi } from '../lib/useApi'
-import { usePlayer } from '../lib/PlayerContext'
-import { useSongContextMenu } from '../lib/SongContextMenuContext'
-import { useArtistContextMenu } from '../lib/ArtistContextMenuContext'
-import { usePlaylistContextMenu } from '../lib/PlaylistContextMenuContext'
-import { useLibrary } from '../lib/LibraryContext'
+import { resolveImageUrl } from '../lib/api/client'
+import { useApi } from '../lib/hooks/useApi'
+import { usePlayer } from '../lib/contexts/PlayerContext'
+import { useSongContextMenu } from '../lib/contexts/SongContextMenuContext'
+import { useArtistContextMenu } from '../lib/contexts/ArtistContextMenuContext'
+import { usePlaylistContextMenu } from '../lib/contexts/PlaylistContextMenuContext'
+import { useLibrary } from '../lib/contexts/LibraryContext'
 import {
   getArtistPopularMusics,
   getFollowedArtists,
@@ -27,9 +27,9 @@ import {
   getMostPlayedMusics,
   getPlaylist,
   getUserPlaylists,
-} from '../lib/endpoints'
+} from '../lib/api/endpoints'
 import { formatDuration, formatPlays } from '../lib/format'
-import type { Artist, PlaylistSummary } from '../lib/types'
+import type { Artist, PlaylistSummary } from '../lib/api/types'
 
 type ProfileProps = {
   onArtistClick: (artist: Artist) => void

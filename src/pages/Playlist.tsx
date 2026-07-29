@@ -6,21 +6,21 @@ import playlistCover from '../assets/images/playlist_default.png'
 import profilePhoto from '../assets/images/profile_default.png'
 import songCover from '../assets/images/song_default.png'
 import { Clock, PlaylistSongOptions } from '../components/icons'
-import { resolveImageUrl } from '../lib/api'
-import { useApi } from '../lib/useApi'
-import { usePlayer } from '../lib/PlayerContext'
-import { useSongContextMenu } from '../lib/SongContextMenuContext'
-import { usePlaylistContextMenu } from '../lib/PlaylistContextMenuContext'
-import { useLibrary } from '../lib/LibraryContext'
-import { useTrackEntityMaps } from '../lib/EntityCacheContext'
+import { resolveImageUrl } from '../lib/api/client'
+import { useApi } from '../lib/hooks/useApi'
+import { usePlayer } from '../lib/contexts/PlayerContext'
+import { useSongContextMenu } from '../lib/contexts/SongContextMenuContext'
+import { usePlaylistContextMenu } from '../lib/contexts/PlaylistContextMenuContext'
+import { useLibrary } from '../lib/contexts/LibraryContext'
+import { useTrackEntityMaps } from '../lib/contexts/EntityCacheContext'
 import {
   getPlaylist,
   getRecentAlbums,
   getRecentArtists,
   reorderPlaylist,
-} from '../lib/endpoints'
+} from '../lib/api/endpoints'
 import { formatDuration, formatPlaylistDuration, formatPtDate } from '../lib/format'
-import type { Music, PlaylistSummary } from '../lib/types'
+import type { Music, PlaylistSummary } from '../lib/api/types'
 
 const PlayArrow = () => (
   <svg viewBox="0 0 24 24" fill="currentColor" className="h-5 w-5">

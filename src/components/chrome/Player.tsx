@@ -12,8 +12,8 @@ import {
   VolumeLow,
   VolumeMute,
 } from '../icons'
-import { resolveImageUrl } from '../../lib/api'
-import { usePlayer } from '../../lib/PlayerContext'
+import { resolveImageUrl } from '../../lib/api/client'
+import { usePlayer } from '../../lib/contexts/PlayerContext'
 import { formatDuration } from '../../lib/format'
 
 type PlayerProps = {

@@ -4,10 +4,10 @@ import {
   getUserPlaylists,
   removeMusicFromPlaylistAt,
   togglePlaylistMusic,
-} from '../../lib/endpoints'
-import { useApi } from '../../lib/useApi'
-import { useLibrary } from '../../lib/LibraryContext'
-import type { AlbumSummary, Artist, Music, PlaylistSummary } from '../../lib/types'
+} from '../../lib/api/endpoints'
+import { useApi } from '../../lib/hooks/useApi'
+import { useLibrary } from '../../lib/contexts/LibraryContext'
+import type { AlbumSummary, Artist, Music, PlaylistSummary } from '../../lib/api/types'
 import {
   AddLikedSongs,
   AddPlaylist,

@@ -1,5 +1,5 @@
 import { useRef, type ReactNode } from 'react'
-import { useAutoHideScrollbar } from '../../lib/useAutoHideScrollbar'
+import { useAutoHideScrollbar } from '../../lib/hooks/useAutoHideScrollbar'
 
 type MainSectionProps = { children: ReactNode }
 

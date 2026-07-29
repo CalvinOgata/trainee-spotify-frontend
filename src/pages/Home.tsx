@@ -5,19 +5,19 @@ import favoritesCover from '../assets/images/favorites_default.png'
 import playlistCover from '../assets/images/playlist_default.png'
 import songCover from '../assets/images/song_default.png'
 import playButtonLarge from '../assets/icons/PlayButtonLarge.svg'
-import { resolveImageUrl } from '../lib/api'
-import { useApi } from '../lib/useApi'
-import { usePlayer } from '../lib/PlayerContext'
-import { useSongContextMenu } from '../lib/SongContextMenuContext'
-import { useArtistContextMenu } from '../lib/ArtistContextMenuContext'
-import { usePlaylistContextMenu } from '../lib/PlaylistContextMenuContext'
-import { useAlbumContextMenu } from '../lib/AlbumContextMenuContext'
+import { resolveImageUrl } from '../lib/api/client'
+import { useApi } from '../lib/hooks/useApi'
+import { usePlayer } from '../lib/contexts/PlayerContext'
+import { useSongContextMenu } from '../lib/contexts/SongContextMenuContext'
+import { useArtistContextMenu } from '../lib/contexts/ArtistContextMenuContext'
+import { usePlaylistContextMenu } from '../lib/contexts/PlaylistContextMenuContext'
+import { useAlbumContextMenu } from '../lib/contexts/AlbumContextMenuContext'
 import Pill from '../components/ui/Pill'
 import PlayingBars from '../components/ui/PlayingBars'
 import ShowAllButton from '../components/ui/ShowAllButton'
 import { Tile } from '../components/ui/Tile'
-import { useTrackEntityMaps } from '../lib/EntityCacheContext'
-import { useLibrary } from '../lib/LibraryContext'
+import { useTrackEntityMaps } from '../lib/contexts/EntityCacheContext'
+import { useLibrary } from '../lib/contexts/LibraryContext'
 import {
   getAlbumMusics,
   getArtistPopularMusics,
@@ -26,8 +26,8 @@ import {
   getRecentArtists,
   getRecentMusics,
   getUserPlaylists,
-} from '../lib/endpoints'
-import type { AlbumSummary, Artist, PlaylistSummary } from '../lib/types'
+} from '../lib/api/endpoints'
+import type { AlbumSummary, Artist, PlaylistSummary } from '../lib/api/types'
 
 const filters = ['Tudo', 'Música', 'Playlists'] as const
 type Filter = (typeof filters)[number]

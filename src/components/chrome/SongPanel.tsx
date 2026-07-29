@@ -5,11 +5,11 @@ import artistVerified from '../../assets/icons/artistVerified.svg'
 import iconButtons from '../../assets/icons/IconButtons.svg'
 import CreditsModal from '../modals/CreditsModal'
 import FollowButton from '../ui/FollowButton'
-import { resolveImageUrl } from '../../lib/api'
-import { usePlayer } from '../../lib/PlayerContext'
-import { useAutoHideScrollbar } from '../../lib/useAutoHideScrollbar'
+import { resolveImageUrl } from '../../lib/api/client'
+import { usePlayer } from '../../lib/contexts/PlayerContext'
+import { useAutoHideScrollbar } from '../../lib/hooks/useAutoHideScrollbar'
 import { formatPlays } from '../../lib/format'
-import type { AlbumSummary, Artist, PlaylistSummary } from '../../lib/types'
+import type { AlbumSummary, Artist, PlaylistSummary } from '../../lib/api/types'
 
 const composers = [
   { name: 'WOOJIN of LNGSHOT', role: 'Arranjos • Autores • Letrista' },

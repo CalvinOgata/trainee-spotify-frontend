@@ -6,10 +6,10 @@ import playlistCover from '../../assets/images/playlist_default.png'
 import songCover from '../../assets/images/song_default.png'
 import verifiedIcon from '../../assets/icons/artistVerified.svg'
 import { X } from '../icons'
-import { resolveImageUrl } from '../../lib/api'
-import { search } from '../../lib/endpoints'
-import type { AlbumSummary, Artist, Music, PlaylistSummary, SearchResponse } from '../../lib/types'
-import type { RecentSearchItem } from '../../lib/useRecentSearches'
+import { resolveImageUrl } from '../../lib/api/client'
+import { search } from '../../lib/api/endpoints'
+import type { AlbumSummary, Artist, Music, PlaylistSummary, SearchResponse } from '../../lib/api/types'
+import type { RecentSearchItem } from '../../lib/hooks/useRecentSearches'
 
 type Row =
   | { key: string; kind: 'music'; title: string; sub: string; imageUrl: string | null; music: Music; artist: Artist | null }

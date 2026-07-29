@@ -6,11 +6,13 @@ import {
   getFollowedArtists,
   getSavedAlbums,
   getSavedMusics,
+  getUserPlaylists,
   saveAlbum,
   saveMusic,
   unfollowArtist,
   unsaveAlbum,
   unsaveMusic,
+  updatePlaylistPrivate,
 } from '../api/endpoints'
 import type { AlbumSummary, Artist, Music } from '../api/types'
 
@@ -42,7 +44,6 @@ const LibraryContext = createContext<LibraryContextValue | null>(null)
 
 const PINNED_ARTISTS_KEY = 'spotify-frontend:pinned-artists'
 const PINNED_PLAYLISTS_KEY = 'spotify-frontend:pinned-playlists'
-const PRIVATE_PLAYLISTS_KEY = 'spotify-frontend:private-playlists'
 const PINNED_ALBUMS_KEY = 'spotify-frontend:pinned-albums'
 
 // Hydrates a Set<string> from localStorage; returns empty Set on any error.
@@ -80,7 +81,7 @@ function useToggleableSet(storageKey?: string) {
       return next
     })
   }, [])
-  return [has, toggle] as const
+  return [has, toggle, setSet] as const
 }
 
 // Owns all library state (saved/followed/pinned/private) and exposes toggles that sync backend + local state.
@@ -91,16 +92,29 @@ export function LibraryProvider({ children }: { children: ReactNode }) {
 
   const [isPinned, togglePinnedRaw] = useToggleableSet(PINNED_ARTISTS_KEY)
   const [isPlaylistPinned, togglePlaylistPinned] = useToggleableSet(PINNED_PLAYLISTS_KEY)
-  const [isPlaylistPrivate, togglePlaylistPrivate] = useToggleableSet(PRIVATE_PLAYLISTS_KEY)
   const [isAlbumPinned, toggleAlbumPinnedRaw] = useToggleableSet(PINNED_ALBUMS_KEY)
+
+  const [isPlaylistPrivate, togglePlaylistPrivateRaw, setPrivatePlaylists] = useToggleableSet()
+  const togglePlaylistPrivate = useCallback(
+    (id: string) => {
+      updatePlaylistPrivate(id, !isPlaylistPrivate(id)).catch(() => {})
+      togglePlaylistPrivateRaw(id)
+    },
+    [isPlaylistPrivate, togglePlaylistPrivateRaw],
+  )
 
   const [artistCache, setArtistCache] = useState<Record<string, Artist>>({})
 
-  // On mount, populate the three server-owned library collections; failures leave them empty.
+  // On mount, populate the server-owned library collections; failures leave them empty.
   useEffect(() => {
     getSavedMusics().then(setSavedMusics).catch(() => setSavedMusics([]))
     getSavedAlbums().then(setSavedAlbums).catch(() => setSavedAlbums([]))
     getFollowedArtists().then(setFollowedArtists).catch(() => setFollowedArtists([]))
+    getUserPlaylists()
+      .then((playlists) =>
+        setPrivatePlaylists(new Set(playlists.filter((p) => p.isPrivate).map((p) => p.id))),
+      )
+      .catch(() => setPrivatePlaylists(new Set()))
   }, [])
 
   // Backfills artistCache with full Artist DTOs for any saved music whose artist isn't already known.

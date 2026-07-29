@@ -159,6 +159,7 @@ function Library({ onArtistClick, onPlaylistClick, onAlbumClick, playlistsKey, o
       musicQtd: 0,
       duration: 0,
       imageUrl: null,
+      isPrivate: false,
       createdAt: new Date().toISOString(),
       updatedAt: null,
     })

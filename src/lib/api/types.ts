@@ -5,6 +5,7 @@ export type PlaylistSummary = {
   musicQtd: number
   duration: number
   imageUrl: string | null
+  isPrivate: boolean
   createdAt: string
   updatedAt: string | null
 }
@@ -32,6 +33,7 @@ export type Playlist = {
   duration: number
   musics: Music[]
   imageUrl: string | null
+  isPrivate: boolean
   createdAt: string
   updatedAt: string | null
 }

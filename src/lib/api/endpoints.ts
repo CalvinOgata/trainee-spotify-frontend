@@ -41,6 +41,8 @@ export const createPlaylist = (body: CreatePlaylistInput) =>
   api.post<PlaylistSummary>('/playlist', body)
 export const updatePlaylistAttributes = (id: string, body: PutPlaylistInput) =>
   api.put<PlaylistSummary>(`/playlist/${id}/attributes`, body)
+export const updatePlaylistPrivate = (id: string, isPrivate: boolean) =>
+  api.patch<PlaylistSummary>(`/playlist/${id}/private`, { isPrivate })
 export const togglePlaylistMusic = (playlistId: string, musicId: string) =>
   api.patch<Playlist>(`/playlist/${playlistId}/${musicId}`)
 export const forceAddMusicToPlaylist = (playlistId: string, musicId: string) =>

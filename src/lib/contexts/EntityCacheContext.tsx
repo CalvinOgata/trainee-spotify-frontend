@@ -86,8 +86,8 @@ export function EntityCacheProvider({ children }: { children: ReactNode }) {
             const additions: Record<string, AlbumSummary> = {}
             for (const a of albums) {
               if (missingAlbumIdSet.has(a.id) && !albumRef.current[a.id]) {
-                const { id, title, year, artistId, artistName, imageUrl, createdAt, updatedAt } = a
-                additions[a.id] = { id, title, year, artistId, artistName, imageUrl, createdAt, updatedAt }
+                const { id, title, year, artistId, artistName, imageUrl, lastPlayedAt, createdAt, updatedAt } = a
+                additions[a.id] = { id, title, year, artistId, artistName, imageUrl, lastPlayedAt, createdAt, updatedAt }
               }
             }
             if (Object.keys(additions).length > 0) {

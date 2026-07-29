@@ -9,8 +9,6 @@ export type PlaybackSource =
   | { kind: 'playlist'; playlist: PlaylistSummary }
   | { kind: 'music'; album: AlbumSummary | null }
 
-export type RecencyKind = 'playlist' | 'album' | 'artist' | 'music'
-
 export type PromoteKind = 'source' | 'artist' | 'music'
 
 type HistoryEntry = {
@@ -44,48 +42,12 @@ type PlayerContextValue = {
   next: () => void
   prev: () => void
   seek: (seconds: number) => void
-  getRecency: (kind: RecencyKind, id: string) => number
 }
 
 const PlayerContext = createContext<PlayerContextValue | null>(null)
 
 const HISTORY_LIMIT = 50
-const RECENT_PLAYS_STORAGE_KEY = 'spotify-frontend:recent-plays'
 const PLAY_THRESHOLD_SECONDS = 30
-const RECENT_PLAYS_PER_KIND = 8
-
-// Keeps only the RECENT_PLAYS_PER_KIND most recent entries for each entity kind (music/album/artist/playlist).
-function trimRecentPlays(map: Record<string, number>): Record<string, number> {
-  const groups: Record<string, [string, number][]> = {}
-  for (const [key, ts] of Object.entries(map)) {
-    const kind = key.split(':')[0]
-    if (!groups[kind]) groups[kind] = []
-    groups[kind].push([key, ts])
-  }
-  const out: Record<string, number> = {}
-  for (const kind in groups) {
-    groups[kind].sort((a, b) => b[1] - a[1])
-    for (const [key, ts] of groups[kind].slice(0, RECENT_PLAYS_PER_KIND)) out[key] = ts
-  }
-  return out
-}
-
-// Hydrates the persisted recency map from localStorage; drops any malformed or non-numeric entries.
-function loadRecentPlays(): Record<string, number> {
-  try {
-    const raw = localStorage.getItem(RECENT_PLAYS_STORAGE_KEY)
-    if (!raw) return {}
-    const parsed: unknown = JSON.parse(raw)
-    if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) return {}
-    const out: Record<string, number> = {}
-    for (const [k, v] of Object.entries(parsed as Record<string, unknown>)) {
-      if (typeof v === 'number' && Number.isFinite(v)) out[k] = v
-    }
-    return trimRecentPlays(out)
-  } catch {
-    return {}
-  }
-}
 
 // Owns playback state (current track, queue, history/future, position) and exposes actions to mutate it.
 export function PlayerProvider({ children }: { children: ReactNode }) {
@@ -98,21 +60,10 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
   const [future, setFuture] = useState<HistoryEntry[]>([])
   const [isPlaying, setIsPlaying] = useState(false)
   const [position, setPosition] = useState(0)
-  const [recentPlays, setRecentPlays] = useState<Record<string, number>>(loadRecentPlays)
   const stampedRef = useRef<string | null>(null)
   const { artistById } = useEntityCache()
 
-  // Persists recentPlays back to localStorage whenever it changes so Library sort survives reloads.
-  useEffect(() => {
-    try {
-      localStorage.setItem(RECENT_PLAYS_STORAGE_KEY, JSON.stringify(recentPlays))
-    } catch {
-      // storage full or disabled — ignore
-    }
-  }, [recentPlays])
-
-  // Timestamps the played music (always) plus the promoted source/artist per the intent flag; drives Library sort + light-up.
-  // Caps the stored map to RECENT_PLAYS_PER_KIND per kind and mirrors each mark to the backend fire-and-forget.
+  // Fires postPlay for the played music (always) plus the promoted source/artist per the intent flag; backend derives lastPlayedAt from these.
   const stampRecency = useCallback(
     (
       music: Music | null,
@@ -120,34 +71,21 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
       source: PlaybackSource | null,
       promote: 'source' | 'artist' | 'music',
     ) => {
-      const marks: Array<{ key: string; kind: PlayKind; id: string }> = []
-      if (music) marks.push({ key: `music:${music.id}`, kind: 'music', id: music.id })
+      const marks: Array<{ kind: PlayKind; id: string }> = []
+      if (music) marks.push({ kind: 'music', id: music.id })
       if (promote === 'source') {
         if (source?.kind === 'playlist')
-          marks.push({ key: `playlist:${source.playlist.id}`, kind: 'playlist', id: source.playlist.id })
+          marks.push({ kind: 'playlist', id: source.playlist.id })
         else if (source?.kind === 'album')
-          marks.push({ key: `album:${source.album.id}`, kind: 'album', id: source.album.id })
+          marks.push({ kind: 'album', id: source.album.id })
       } else if (promote === 'artist' && artist) {
-        marks.push({ key: `artist:${artist.id}`, kind: 'artist', id: artist.id })
+        marks.push({ kind: 'artist', id: artist.id })
       }
-      if (marks.length === 0) return
-      const now = Date.now()
-      setRecentPlays((prev) => {
-        const next = { ...prev }
-        for (const { key } of marks) next[key] = now
-        return trimRecentPlays(next)
-      })
       for (const { kind, id } of marks) {
         postPlay(kind, id).catch(() => {})
       }
     },
     [],
-  )
-
-  // Returns the last-played timestamp for a given library entity, or 0 if never played.
-  const getRecency = useCallback(
-    (kind: RecencyKind, id: string) => recentPlays[`${kind}:${id}`] ?? 0,
-    [recentPlays],
   )
 
   // Starts playback: pushes prior state to history (capped), swaps in the new track/queue/source/promote, resets position, stamps recency.
@@ -316,7 +254,6 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
         next,
         prev,
         seek,
-        getRecency,
       }}
     >
       {children}

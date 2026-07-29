@@ -6,6 +6,7 @@ export type PlaylistSummary = {
   duration: number
   imageUrl: string | null
   isPrivate: boolean
+  lastPlayedAt: string | null
   createdAt: string
   updatedAt: string | null
 }
@@ -21,6 +22,7 @@ export type Music = {
   timesListen: number
   explicit: boolean | null
   imageUrl: string | null
+  lastPlayedAt: string | null
   createdAt: string
   updatedAt: string | null
 }
@@ -34,6 +36,7 @@ export type Playlist = {
   musics: Music[]
   imageUrl: string | null
   isPrivate: boolean
+  lastPlayedAt: string | null
   createdAt: string
   updatedAt: string | null
 }
@@ -44,6 +47,7 @@ export type Artist = {
   listeners: number
   about: string | null
   imageUrl: string | null
+  lastPlayedAt: string | null
   createdAt: string
   updatedAt: string | null
 }
@@ -55,6 +59,7 @@ export type AlbumSummary = {
   artistId: string
   artistName: string
   imageUrl: string | null
+  lastPlayedAt: string | null
   createdAt: string
   updatedAt: string | null
 }

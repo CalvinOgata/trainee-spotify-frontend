@@ -119,7 +119,6 @@ function Library({ onArtistClick, onPlaylistClick, onAlbumClick, playlistsKey, o
   } = useLibrary()
   const {
     play,
-    getRecency,
     current,
     currentArtist,
     currentSource,
@@ -160,6 +159,7 @@ function Library({ onArtistClick, onPlaylistClick, onAlbumClick, playlistsKey, o
       duration: 0,
       imageUrl: null,
       isPrivate: false,
+      lastPlayedAt: null,
       createdAt: new Date().toISOString(),
       updatedAt: null,
     })
@@ -232,12 +232,15 @@ function Library({ onArtistClick, onPlaylistClick, onAlbumClick, playlistsKey, o
   const filteredRows = q
     ? unsortedRows.filter((r) => buildNormalizedIndex(r.title).normalized.includes(q))
     : unsortedRows
-  // Recency timestamp for a row, used to sort the unpinned section most-recent-first.
-  const recencyOf = (r: Row): number =>
-    r.kind === 'playlist' ? getRecency('playlist', r.playlist.id) :
-    r.kind === 'album' ? getRecency('album', r.album.id) :
-    r.kind === 'artist' ? getRecency('artist', r.artist.id) :
-    getRecency('music', r.music.id)
+  // Recency timestamp for a row, used to sort the unpinned section most-recent-first. Backend serves lastPlayedAt on each entity DTO; parse to ms or 0 if never played.
+  const recencyOf = (r: Row): number => {
+    const ts =
+      r.kind === 'playlist' ? r.playlist.lastPlayedAt :
+      r.kind === 'album' ? r.album.lastPlayedAt :
+      r.kind === 'artist' ? r.artist.lastPlayedAt :
+      r.music.lastPlayedAt
+    return ts ? Date.parse(ts) : 0
+  }
   // Unpinned rows: sorted by recency desc, with never-played items falling back to their natural (data) order.
   const unpinned = filteredRows
     .filter((r) => !r.pinned)

@@ -8,6 +8,7 @@ type OpenOpts = {
   artist: Artist | null
   album: AlbumSummary | null
   playlistId?: string
+  playlistPosition?: number
 }
 
 type SongContextMenuContextValue = {
@@ -52,6 +53,7 @@ export function SongContextMenuProvider({
           artist={state.artist}
           album={state.album}
           playlistId={state.playlistId}
+          playlistPosition={state.playlistPosition}
           x={state.x}
           y={state.y}
           playlistsKey={playlistsKey}

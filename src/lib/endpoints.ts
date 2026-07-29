@@ -46,8 +46,8 @@ export const togglePlaylistMusic = (playlistId: string, musicId: string) =>
 export const forceAddMusicToPlaylist = (playlistId: string, musicId: string) =>
   api.post<Playlist>(`/playlist/${playlistId}/musics/${musicId}`, {})
 export const deletePlaylist = (id: string) => api.delete<void>(`/playlist/${id}`)
-export const removeMusicFromPlaylist = (playlistId: string, musicId: string) =>
-  api.delete<void>(`/playlist/${playlistId}/${musicId}`)
+export const removeMusicFromPlaylistAt = (playlistId: string, position: number) =>
+  api.delete<void>(`/playlist/${playlistId}/positions/${position}`)
 export const reorderPlaylist = (
   playlistId: string,
   musicIds: string[],

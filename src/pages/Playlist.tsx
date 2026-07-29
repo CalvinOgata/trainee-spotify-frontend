@@ -218,6 +218,7 @@ function Playlist({ playlist, playlistsKey, onTracksChanged }: PlaylistProps) {
                         artist: artist ?? null,
                         album: album ?? null,
                         playlistId: playlist.id,
+                        playlistPosition: i,
                       })
                     }
                     className={`grid h-[52px] cursor-pointer grid-cols-[20px_minmax(0,2fr)_minmax(0,1.5fr)_minmax(0,1.5fr)_60px_24px] items-center gap-3 rounded px-4 py-2 hover:bg-[#2A2A2A] ${
@@ -249,6 +250,7 @@ function Playlist({ playlist, playlistsKey, onTracksChanged }: PlaylistProps) {
                           artist: artist ?? null,
                           album: album ?? null,
                           playlistId: playlist.id,
+                          playlistPosition: i,
                         })
                       }}
                       className="-mx-2 -my-2 flex h-8 w-8 items-center justify-center rounded-full text-[#B3B3B3] hover:bg-white/10 hover:text-white"

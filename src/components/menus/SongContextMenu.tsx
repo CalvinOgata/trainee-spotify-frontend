@@ -1,8 +1,8 @@
-import { useLayoutEffect, useMemo, useRef, useState } from 'react'
+import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import {
   forceAddMusicToPlaylist,
   getUserPlaylists,
-  removeMusicFromPlaylist,
+  removeMusicFromPlaylistAt,
   togglePlaylistMusic,
 } from '../../lib/endpoints'
 import { useApi } from '../../lib/useApi'
@@ -29,6 +29,7 @@ type SongContextMenuProps = {
   artist: Artist | null
   album: AlbumSummary | null
   playlistId?: string
+  playlistPosition?: number
   x: number
   y: number
   playlistsKey: number
@@ -43,6 +44,7 @@ function SongContextMenu({
   artist,
   album,
   playlistId,
+  playlistPosition,
   x,
   y,
   playlistsKey,
@@ -86,6 +88,22 @@ function SongContextMenu({
 
   const extraDismissRefs = useMemo(() => [submenuRef], [])
 
+  const closeTimerRef = useRef<number | null>(null)
+  const cancelSubmenuClose = () => {
+    if (closeTimerRef.current !== null) {
+      window.clearTimeout(closeTimerRef.current)
+      closeTimerRef.current = null
+    }
+  }
+  const scheduleSubmenuClose = () => {
+    cancelSubmenuClose()
+    closeTimerRef.current = window.setTimeout(() => {
+      setSubmenuOpen(false)
+      closeTimerRef.current = null
+    }, 1000)
+  }
+  useEffect(() => () => cancelSubmenuClose(), [])
+
   const handleEscape = () => {
     if (submenuOpen) setSubmenuOpen(false)
     else onClose()
@@ -108,20 +126,22 @@ function SongContextMenu({
 
   const handleConfirmDuplicate = async () => {
     if (!duplicateFor) return
+    console.log('[duplicate] confirm clicked', { playlistId: duplicateFor.id, musicId: music.id })
     try {
-      await forceAddMusicToPlaylist(duplicateFor.id, music.id)
+      const result = await forceAddMusicToPlaylist(duplicateFor.id, music.id)
+      console.log('[duplicate] backend responded:', result)
       onTracksChanged()
-    } catch {
-      // ignore
+    } catch (e) {
+      console.error('[duplicate] forceAddMusicToPlaylist failed:', e)
     }
     setDuplicateFor(null)
     onClose()
   }
 
   const handleRemoveFromCurrentPlaylist = async () => {
-    if (!playlistId) return
+    if (!playlistId || playlistPosition === undefined) return
     try {
-      await removeMusicFromPlaylist(playlistId, music.id)
+      await removeMusicFromPlaylistAt(playlistId, playlistPosition)
       onTracksChanged()
     } catch {
       // ignore
@@ -171,17 +191,16 @@ function SongContextMenu({
       >
         <div
           ref={submenuAnchorRef}
-          onMouseEnter={() => setSubmenuOpen(true)}
-          onMouseLeave={(e) => {
-            const to = e.relatedTarget as Node | null
-            if (to && submenuRef.current?.contains(to)) return
-            setSubmenuOpen(false)
+          onMouseEnter={() => {
+            cancelSubmenuClose()
+            setSubmenuOpen(true)
           }}
+          onMouseLeave={scheduleSubmenuClose}
         >
           <MenuItem icon={<AddPlaylist />} label="Adicionar à playlist" hasSubmenu />
         </div>
 
-        {playlistId && (
+        {playlistId && playlistPosition !== undefined && (
           <MenuItem
             icon={<RemovePlaylist />}
             label="Remover desta playlist"
@@ -219,19 +238,16 @@ function SongContextMenu({
         <MenuItem icon={<CreditsMenu />} label="Ver créditos" onClick={handleCredits} />
       </ContextMenuShell>
 
-      {submenuOpen && (
-        <div
-          ref={submenuRef}
-          onMouseEnter={() => setSubmenuOpen(true)}
-          onMouseLeave={(e) => {
-            const to = e.relatedTarget as Node | null
-            if (to && submenuAnchorRef.current?.contains(to)) return
-            setSubmenuOpen(false)
-          }}
-          onContextMenu={(e) => e.preventDefault()}
-          style={{ top: submenuPos.y, left: submenuPos.x }}
-          className="fixed z-50 flex max-h-[320px] w-[240px] flex-col overflow-y-auto rounded-md bg-[#282828] py-1 shadow-[0_16px_32px_rgba(0,0,0,0.5)]"
-        >
+      <div
+        ref={submenuRef}
+        onMouseEnter={cancelSubmenuClose}
+        onMouseLeave={scheduleSubmenuClose}
+        onContextMenu={(e) => e.preventDefault()}
+        style={{ top: submenuPos.y, left: submenuPos.x }}
+        className={`fixed z-50 flex max-h-[320px] w-[240px] flex-col overflow-y-auto rounded-md bg-[#282828] py-1 shadow-[0_16px_32px_rgba(0,0,0,0.5)] transition-opacity duration-200 ${
+          submenuOpen ? 'opacity-100' : 'pointer-events-none opacity-0'
+        }`}
+      >
           {(playlists ?? []).length === 0 ? (
             <p className="font-[Inter] px-3 py-2 text-[10px] font-medium text-[#B3B3B3]">Nenhuma playlist</p>
           ) : (
@@ -249,8 +265,7 @@ function SongContextMenu({
               )
             })
           )}
-        </div>
-      )}
+      </div>
 
       {creditsOpen && (
         <CreditsModal
@@ -265,7 +280,6 @@ function SongContextMenu({
 
       {duplicateFor && (
         <ConfirmDuplicateSongModal
-          songTitle={music.title}
           playlistName={duplicateFor.name}
           onConfirm={handleConfirmDuplicate}
           onCancel={() => {

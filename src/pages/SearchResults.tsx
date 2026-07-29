@@ -7,6 +7,7 @@ import songCover from '../assets/images/song_default.png'
 import { Dots, Plus } from '../components/icons'
 import { resolveImageUrl } from '../lib/api/client'
 import { useApi } from '../lib/hooks/useApi'
+import { useLibrary } from '../lib/contexts/LibraryContext'
 import { usePlayer } from '../lib/contexts/PlayerContext'
 import { useSongContextMenu } from '../lib/contexts/SongContextMenuContext'
 import { useArtistContextMenu } from '../lib/contexts/ArtistContextMenuContext'
@@ -14,6 +15,30 @@ import { usePlaylistContextMenu } from '../lib/contexts/PlaylistContextMenuConte
 import { useAlbumContextMenu } from '../lib/contexts/AlbumContextMenuContext'
 import { search } from '../lib/api/endpoints'
 import type { AlbumSummary, Artist, Music, PlaylistSummary, SearchResponse } from '../lib/api/types'
+
+function FollowInlineButton({ artist }: { artist: Artist }) {
+  const { isFollowed, toggleFollowed } = useLibrary()
+  const followed = isFollowed(artist.id)
+  return (
+    <button
+      onClick={(e) => {
+        e.stopPropagation()
+        toggleFollowed(artist)
+      }}
+      aria-label={followed ? 'Deixar de seguir' : 'Seguir'}
+      className="group flex h-6 items-center justify-center whitespace-nowrap rounded-full border border-neutral-500 px-3 font-[Inter] font-bold text-white hover:border-white"
+    >
+      {followed ? (
+        <>
+          <span className="text-[8px] group-hover:hidden">Seguindo</span>
+          <span className="hidden text-[10px] group-hover:inline">Deixar de Seguir</span>
+        </>
+      ) : (
+        <span className="text-[10px]">Seguir</span>
+      )}
+    </button>
+  )
+}
 
 type Result =
   | { key: string; title: string; sub: string; pill: 'Música'; action: 'add'; music: Music }
@@ -53,14 +78,17 @@ function SearchResults({ query, onArtistClick, onPlaylistClick, onAlbumClick }: 
   const albumById = new Map([...albums, ...musicAlbums].map((a) => [a.id, a]))
 
   const all: Result[] = [
-    ...musics.map<Result>((m) => ({
-      key: `m-${m.id}`,
-      title: m.title,
-      sub: 'Música',
-      pill: 'Música',
-      action: 'add',
-      music: m,
-    })),
+    ...musics.map<Result>((m) => {
+      const artistName = artistById.get(m.artistId)?.name
+      return {
+        key: `m-${m.id}`,
+        title: m.title,
+        sub: artistName ? `Música • ${artistName}` : 'Música',
+        pill: 'Música',
+        action: 'add',
+        music: m,
+      }
+    }),
     ...playlists.map<Result>((p) => ({
       key: `p-${p.id}`,
       title: p.name,
@@ -104,91 +132,86 @@ function SearchResults({ query, onArtistClick, onPlaylistClick, onAlbumClick }: 
   }
 
   return (
-    <ul className="flex flex-col gap-2">
-      {all.map((r) => (
-        <li
-          key={r.key}
-          onContextMenu={(e) => {
-            if (r.pill === 'Música') {
-              openSongMenu(e, {
-                music: r.music,
-                artist: artistById.get(r.music.artistId) ?? null,
-                album: albumById.get(r.music.albumId) ?? null,
-              })
-            } else if (r.pill === 'Artista') {
-              openArtistMenu(e, r.artist)
-            } else if (r.pill === 'Playlist') {
-              openPlaylistMenu(e, r.playlist)
-            } else if (r.pill === 'Álbum') {
-              openAlbumMenu(e, r.album)
-            }
-          }}
-          className="grid grid-cols-[64px_1fr_auto_auto_auto] items-center gap-4 rounded-md px-2 py-1 hover:bg-neutral-900"
-        >
-          {(() => {
-            const remote =
-              r.pill === 'Playlist' ? resolveImageUrl(r.playlist.imageUrl) :
-              r.pill === 'Álbum' ? resolveImageUrl(r.album.imageUrl) :
-              r.pill === 'Artista' ? resolveImageUrl(r.artist.imageUrl) :
-              resolveImageUrl(r.music.imageUrl)
-            const fallback =
-              r.pill === 'Playlist' ? (r.title === 'Músicas Curtidas' ? favoritesCover : playlistCover) :
-              r.pill === 'Álbum' ? albumCover :
-              r.pill === 'Artista' ? artistCover :
-              songCover
-            const shape = r.pill === 'Artista' ? 'rounded-full' : 'rounded'
-            return <img src={remote ?? fallback} alt="" className={`h-16 w-16 ${shape} object-cover`} />
-          })()}
-          <div className="min-w-0">
-            {r.pill === 'Artista' ? (
-              <button
-                onClick={() => onArtistClick(r.artist)}
-                className="block w-full truncate text-left text-base font-semibold text-white hover:underline"
-              >
-                {r.title}
+    <ul className="flex flex-col items-center gap-2">
+      {all.map((r) => {
+        const remote =
+          r.pill === 'Playlist' ? resolveImageUrl(r.playlist.imageUrl) :
+          r.pill === 'Álbum' ? resolveImageUrl(r.album.imageUrl) :
+          r.pill === 'Artista' ? resolveImageUrl(r.artist.imageUrl) :
+          resolveImageUrl(r.music.imageUrl)
+        const fallback =
+          r.pill === 'Playlist' ? (r.title === 'Músicas Curtidas' ? favoritesCover : playlistCover) :
+          r.pill === 'Álbum' ? albumCover :
+          r.pill === 'Artista' ? artistCover :
+          songCover
+        const shape = r.pill === 'Artista' ? 'rounded-full' : 'rounded'
+        const handleTitleClick = () => {
+          if (r.pill === 'Artista') onArtistClick(r.artist)
+          else if (r.pill === 'Playlist') onPlaylistClick(r.playlist)
+          else if (r.pill === 'Álbum') onAlbumClick(r.album)
+          else
+            play(r.music, {
+              artist: artistById.get(r.music.artistId),
+              source: { kind: 'music', album: albumById.get(r.music.albumId) ?? null },
+            })
+        }
+        return (
+          <li
+            key={r.key}
+            onContextMenu={(e) => {
+              if (r.pill === 'Música') {
+                openSongMenu(e, {
+                  music: r.music,
+                  artist: artistById.get(r.music.artistId) ?? null,
+                  album: albumById.get(r.music.albumId) ?? null,
+                })
+              } else if (r.pill === 'Artista') {
+                openArtistMenu(e, r.artist)
+              } else if (r.pill === 'Playlist') {
+                openPlaylistMenu(e, r.playlist)
+              } else if (r.pill === 'Álbum') {
+                openAlbumMenu(e, r.album)
+              }
+            }}
+            className="flex h-[60px] w-[948px] items-center rounded"
+          >
+            <div className="flex h-[60px] w-[358px] max-w-[358px] items-center gap-3">
+              <img
+                src={remote ?? fallback}
+                alt=""
+                className={`h-[60px] w-[60px] shrink-0 object-cover ${shape}`}
+              />
+              <div className="flex min-w-0 flex-col justify-center">
+                <button
+                  onClick={handleTitleClick}
+                  className="truncate text-left font-[Inter] text-[16px] font-bold text-white hover:underline"
+                >
+                  {r.title}
+                </button>
+                <p className="truncate font-[Inter] text-[10px] font-bold text-[#B3B3B3]">
+                  {r.sub}
+                </p>
+              </div>
+            </div>
+            <div className="w-[300px]" aria-hidden />
+            <span className="flex h-[20px] w-[52px] items-center justify-center gap-[10px] rounded-[2px] bg-[#2D2D2D] px-2 py-1 font-[Inter] text-[10px] font-bold text-[#B3B3B3]">
+              {r.pill}
+            </span>
+            <div className="ml-auto flex items-center gap-4">
+              <button className="text-neutral-400 hover:text-white" aria-label="Mais opções">
+                <Dots className="text-[25px]" />
               </button>
-            ) : r.pill === 'Música' ? (
-              <button
-                onClick={() =>
-                  play(r.music, {
-                    artist: artistById.get(r.music.artistId),
-                    source: { kind: 'music', album: albumById.get(r.music.albumId) ?? null },
-                  })
-                }
-                className="block w-full truncate text-left text-base font-semibold text-white hover:underline"
-              >
-                {r.title}
-              </button>
-            ) : r.pill === 'Playlist' ? (
-              <button
-                onClick={() => onPlaylistClick(r.playlist)}
-                className="block w-full truncate text-left text-base font-semibold text-white hover:underline"
-              >
-                {r.title}
-              </button>
-            ) : (
-              <button
-                onClick={() => onAlbumClick(r.album)}
-                className="block w-full truncate text-left text-base font-semibold text-white hover:underline"
-              >
-                {r.title}
-              </button>
-            )}
-            <p className="truncate text-sm font-normal text-neutral-400">{r.sub}</p>
-          </div>
-          <span className="rounded-full bg-neutral-800 px-3 py-1 text-xs font-normal text-neutral-300">
-            {r.pill}
-          </span>
-          <button className="px-2"><Dots /></button>
-          {r.action === 'add' ? (
-            <button><Plus /></button>
-          ) : (
-            <button className="rounded-full border border-neutral-500 px-4 py-1 text-xs font-semibold text-white hover:border-white">
-              Seguir
-            </button>
-          )}
-        </li>
-      ))}
+              {r.action === 'add' ? (
+                <button aria-label="Adicionar">
+                  <Plus className="h-[14px] w-[14px]" />
+                </button>
+              ) : (
+                <FollowInlineButton artist={r.artist} />
+              )}
+            </div>
+          </li>
+        )
+      })}
     </ul>
   )
 }

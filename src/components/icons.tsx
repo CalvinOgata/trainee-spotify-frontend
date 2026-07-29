@@ -123,12 +123,12 @@ export const MaximizedPlayer = ({ className = 'h-[11px] w-3' }: IconProps) => (
   </svg>
 )
 
-export const Dots = () => (
-  <span className="text-neutral-400 text-lg leading-none">···</span>
+export const Dots = ({ className = 'text-lg' }: IconProps) => (
+  <span className={`text-neutral-400 leading-none ${className}`}>···</span>
 )
 
-export const Plus = () => (
-  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="h-5 w-5 text-neutral-400">
+export const Plus = ({ className = 'h-5 w-5' }: IconProps) => (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className={`text-neutral-400 ${className}`}>
     <circle cx="12" cy="12" r="9" />
     <path d="M12 8v8M8 12h8" />
   </svg>

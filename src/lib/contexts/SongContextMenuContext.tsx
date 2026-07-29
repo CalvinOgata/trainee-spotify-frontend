@@ -1,7 +1,7 @@
 import { createContext, useCallback, useContext, useState } from 'react'
 import type { MouseEvent, ReactNode } from 'react'
-import SongContextMenu from '../components/menus/SongContextMenu'
-import type { AlbumSummary, Artist, Music } from './types'
+import SongContextMenu from '../../components/menus/SongContextMenu'
+import type { AlbumSummary, Artist, Music } from '../api/types'
 
 type OpenOpts = {
   music: Music

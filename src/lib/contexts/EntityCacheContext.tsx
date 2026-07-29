@@ -1,7 +1,7 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react'
 import type { ReactNode } from 'react'
-import { getArtist, getArtistAlbums } from './endpoints'
-import type { AlbumSummary, Artist, Music } from './types'
+import { getArtist, getArtistAlbums } from '../api/endpoints'
+import type { AlbumSummary, Artist, Music } from '../api/types'
 
 type EntityCacheValue = {
   artistById: Map<string, Artist>

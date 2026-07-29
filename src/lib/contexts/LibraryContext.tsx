@@ -11,8 +11,8 @@ import {
   unfollowArtist,
   unsaveAlbum,
   unsaveMusic,
-} from './endpoints'
-import type { AlbumSummary, Artist, Music } from './types'
+} from '../api/endpoints'
+import type { AlbumSummary, Artist, Music } from '../api/types'
 
 type LibraryContextValue = {
   savedMusics: Music[]

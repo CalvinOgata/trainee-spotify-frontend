@@ -1,8 +1,8 @@
 import { createContext, useCallback, useContext, useEffect, useRef, useState } from 'react'
 import type { ReactNode } from 'react'
 import { useEntityCache } from './EntityCacheContext'
-import { postPlay, type PlayKind } from './endpoints'
-import type { AlbumSummary, Artist, Music, PlaylistSummary } from './types'
+import { postPlay, type PlayKind } from '../api/endpoints'
+import type { AlbumSummary, Artist, Music, PlaylistSummary } from '../api/types'
 
 export type PlaybackSource =
   | { kind: 'album'; album: AlbumSummary }

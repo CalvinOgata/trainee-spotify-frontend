@@ -1,7 +1,7 @@
 import { createContext, useCallback, useContext, useState } from 'react'
 import type { MouseEvent, ReactNode } from 'react'
-import ArtistContextMenu from '../components/menus/ArtistContextMenu'
-import type { Artist } from './types'
+import ArtistContextMenu from '../../components/menus/ArtistContextMenu'
+import type { Artist } from '../api/types'
 
 type ArtistContextMenuContextValue = {
   openArtistMenu: (e: MouseEvent, artist: Artist) => void

@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react'
-import type { AlbumSummary, Artist, Music, PlaylistSummary } from './types'
+import type { AlbumSummary, Artist, Music, PlaylistSummary } from '../api/types'
 
 export type RecentSearchItem =
   | { kind: 'music'; music: Music; artist: Artist | null }

@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import favoritesCover from '../../assets/images/favorites_default.png'
 import playlistCover from '../../assets/images/playlist_default.png'
-import { Lock, MusicNote } from '../icons'
+import { Lock } from '../icons'
 import { ModalShell } from './ModalShell'
 import { resolveImageUrl } from '../../lib/api'
 import { useLibrary } from '../../lib/LibraryContext'
@@ -23,7 +23,6 @@ function EditPlaylistDetailsModal({ playlist, title = 'Editar detalhes', onClose
 
   const isLikedPlaylist = playlist.name === 'Músicas Curtidas'
   const cover = resolveImageUrl(playlist.imageUrl) ?? (isLikedPlaylist ? favoritesCover : playlistCover)
-  const isEmpty = playlist.musicQtd === 0
 
   const handleSave = async () => {
     const trimmed = name.trim()
@@ -44,17 +43,11 @@ function EditPlaylistDetailsModal({ playlist, title = 'Editar detalhes', onClose
       contentClassName="gap-4 min-h-[297px]"
     >
       <div className="flex gap-4">
-        {isEmpty ? (
-          <div className="grid h-[134px] w-[134px] shrink-0 place-items-center rounded bg-[#3e3e3e] text-neutral-400 shadow-[0_4px_60px_rgba(0,0,0,0.5)]">
-            <MusicNote className="h-12 w-12" />
-          </div>
-        ) : (
-          <img
-            src={cover}
-            alt=""
-            className="h-[134px] w-[134px] shrink-0 rounded object-cover shadow-[0_4px_60px_rgba(0,0,0,0.5)]"
-          />
-        )}
+        <img
+          src={cover}
+          alt=""
+          className="h-[134px] w-[134px] shrink-0 rounded object-cover shadow-[0_4px_60px_rgba(0,0,0,0.5)]"
+        />
         <div className="flex h-[131px] w-[210px] shrink-0 flex-col gap-2">
           <input
             value={name}

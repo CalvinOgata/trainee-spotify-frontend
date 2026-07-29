@@ -1,4 +1,4 @@
-import { ModalShell } from './ModalShell'
+import { useEffect } from 'react'
 
 type ConfirmDeletePlaylistModalProps = {
   playlistName: string
@@ -11,31 +11,48 @@ function ConfirmDeletePlaylistModal({
   onConfirm,
   onCancel,
 }: ConfirmDeletePlaylistModalProps) {
+  useEffect(() => {
+    const handleKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') onCancel()
+    }
+    window.addEventListener('keydown', handleKey)
+    return () => window.removeEventListener('keydown', handleKey)
+  }, [onCancel])
+
   return (
-    <ModalShell
-      onClose={onCancel}
-      header={<h2 className="text-lg font-bold text-white">Excluir playlist?</h2>}
-      contentClassName="gap-4"
+    <div
+      onClick={onCancel}
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4"
     >
-      <p className="text-sm font-normal text-neutral-300">
-        Tem certeza que deseja excluir <span className="font-semibold text-white">{playlistName}</span>?
-        Esta ação não pode ser desfeita.
-      </p>
-      <div className="flex justify-end gap-3 pt-2">
-        <button
-          onClick={onCancel}
-          className="rounded-full border border-neutral-500 px-4 py-1.5 text-xs font-semibold text-white hover:border-white"
-        >
-          Cancelar
-        </button>
-        <button
-          onClick={onConfirm}
-          className="rounded-full bg-[#e34a4a] px-4 py-1.5 text-xs font-semibold text-white hover:bg-[#c93b3b]"
-        >
-          Excluir
-        </button>
+      <div
+        onClick={(e) => e.stopPropagation()}
+        style={{ width: 432, height: 173, padding: 40, gap: 16, borderRadius: 12, background: '#FFFFFF' }}
+        className="flex flex-col"
+      >
+        <h2 className="font-[Inter] text-[18px] font-bold text-[#121212]">
+          Apagar da sua biblioteca?
+        </h2>
+        <p className="font-[Inter] text-[12px] font-medium text-[#121212]">
+          A playlist <span className="font-bold">{playlistName}</span> será excluída da sua biblioteca.
+        </p>
+        <div className="mt-auto flex items-center justify-end gap-2">
+          <button
+            onClick={onCancel}
+            style={{ padding: '6px 12px', borderRadius: 16 }}
+            className="bg-white font-[Inter] text-[12px] font-bold text-black transition-colors hover:bg-[#EDEDED]"
+          >
+            Cancelar
+          </button>
+          <button
+            onClick={onConfirm}
+            style={{ width: 83, height: 36, padding: '6px 12px', gap: 4, borderRadius: 16 }}
+            className="flex items-center justify-center bg-[#D03930] font-[Inter] text-[12px] font-bold text-white transition-colors hover:bg-[#B02F27]"
+          >
+            Apagar
+          </button>
+        </div>
       </div>
-    </ModalShell>
+    </div>
   )
 }
 

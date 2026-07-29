@@ -1,43 +1,59 @@
-import { ModalShell } from './ModalShell'
+import { useEffect } from 'react'
 
 type ConfirmDuplicateSongModalProps = {
-  songTitle: string
   playlistName: string
   onConfirm: () => void
   onCancel: () => void
 }
 
 function ConfirmDuplicateSongModal({
-  songTitle,
   playlistName,
   onConfirm,
   onCancel,
 }: ConfirmDuplicateSongModalProps) {
+  useEffect(() => {
+    const handleKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') onCancel()
+    }
+    window.addEventListener('keydown', handleKey)
+    return () => window.removeEventListener('keydown', handleKey)
+  }, [onCancel])
+
   return (
-    <ModalShell
-      onClose={onCancel}
-      header={<h2 className="text-lg font-bold text-white">Adicionar novamente?</h2>}
-      contentClassName="gap-4"
+    <div
+      onClick={onCancel}
+      onMouseDown={(e) => e.stopPropagation()}
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4"
     >
-      <p className="text-sm font-normal text-neutral-300">
-        <span className="font-semibold text-white">{songTitle}</span> já está em{' '}
-        <span className="font-semibold text-white">{playlistName}</span>. Deseja adicionar mesmo assim?
-      </p>
-      <div className="flex justify-end gap-3 pt-2">
-        <button
-          onClick={onCancel}
-          className="rounded-full border border-neutral-500 px-4 py-1.5 text-xs font-semibold text-white hover:border-white"
-        >
-          Cancelar
-        </button>
-        <button
-          onClick={onConfirm}
-          className="rounded-full bg-[#1FDF64] px-4 py-1.5 text-xs font-semibold text-black hover:brightness-110"
-        >
-          Adicionar
-        </button>
+      <div
+        onClick={(e) => e.stopPropagation()}
+        style={{ width: 432, padding: 40, gap: 16, borderRadius: 12, background: '#FFFFFF' }}
+        className="flex flex-col"
+      >
+        <h2 className="font-[Inter] text-[18px] font-bold text-[#121212]">
+          Adicionar novamente?
+        </h2>
+        <p className="font-[Inter] text-[12px] font-medium text-[#121212]">
+          Essa música já está na playlist <span className="font-bold">{playlistName}</span>. Deseja adicionar mesmo assim?
+        </p>
+        <div className="mt-auto flex items-center justify-end gap-2">
+          <button
+            onClick={onCancel}
+            style={{ padding: '6px 12px', borderRadius: 16 }}
+            className="bg-white font-[Inter] text-[12px] font-bold text-black transition-colors hover:bg-[#EDEDED]"
+          >
+            Cancelar
+          </button>
+          <button
+            onClick={onConfirm}
+            style={{ width: 83, height: 36, padding: '6px 12px', gap: 4, borderRadius: 16 }}
+            className="flex items-center justify-center bg-[#1FDF64] font-[Inter] text-[12px] font-bold text-black transition-colors hover:bg-[#17B851]"
+          >
+            Adicionar
+          </button>
+        </div>
       </div>
-    </ModalShell>
+    </div>
   )
 }
 

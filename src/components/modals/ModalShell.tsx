@@ -9,6 +9,7 @@ type ModalShellProps = {
   maxWidth?: string
   background?: string
   contentClassName?: string
+  showClose?: boolean
   children: ReactNode
 }
 
@@ -19,6 +20,7 @@ export function ModalShell({
   maxWidth = '420px',
   background = '#282828',
   contentClassName,
+  showClose = true,
   children,
 }: ModalShellProps) {
   useEffect(() => {
@@ -45,13 +47,15 @@ export function ModalShell({
         {header !== undefined && (
           <div className={headerWrapperClass}>
             {header}
-            <button
-              onClick={onClose}
-              aria-label="Fechar"
-              className="text-neutral-400 hover:text-white"
-            >
-              <X className="h-4 w-4" />
-            </button>
+            {showClose && (
+              <button
+                onClick={onClose}
+                aria-label="Fechar"
+                className="text-neutral-400 hover:text-white"
+              >
+                <X className="h-4 w-4" />
+              </button>
+            )}
           </div>
         )}
         {children}

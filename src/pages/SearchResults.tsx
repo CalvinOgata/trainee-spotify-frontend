@@ -4,7 +4,8 @@ import artistCover from '../assets/images/artist_default.png'
 import favoritesCover from '../assets/images/favorites_default.png'
 import playlistCover from '../assets/images/playlist_default.png'
 import songCover from '../assets/images/song_default.png'
-import { Dots, Plus } from '../components/icons'
+import { AlreadyAdded, Dots, Plus } from '../components/icons'
+import Pill from '../components/ui/Pill'
 import { resolveImageUrl } from '../lib/api/client'
 import { useApi } from '../lib/hooks/useApi'
 import { useLibrary } from '../lib/contexts/LibraryContext'
@@ -55,8 +56,18 @@ type SearchResultsProps = {
 
 const EMPTY: SearchResponse = { musics: [], playlists: [], artists: [], albums: [], musicAlbums: [], musicArtists: [] }
 
+type SearchFilter = 'Tudo' | 'Músicas' | 'Álbuns' | 'Artistas' | 'Playlists'
+const searchFilters: SearchFilter[] = ['Tudo', 'Músicas', 'Álbuns', 'Artistas', 'Playlists']
+const filterToPill: Record<Exclude<SearchFilter, 'Tudo'>, Result['pill']> = {
+  Músicas: 'Música',
+  Álbuns: 'Álbum',
+  Artistas: 'Artista',
+  Playlists: 'Playlist',
+}
+
 function SearchResults({ query, onArtistClick, onPlaylistClick, onAlbumClick }: SearchResultsProps) {
   const [debouncedQ, setDebouncedQ] = useState(query.trim())
+  const [activeFilter, setActiveFilter] = useState<SearchFilter>('Tudo')
   useEffect(() => {
     const t = setTimeout(() => setDebouncedQ(query.trim()), 250)
     return () => clearTimeout(t)
@@ -67,6 +78,7 @@ function SearchResults({ query, onArtistClick, onPlaylistClick, onAlbumClick }: 
     [debouncedQ],
   )
   const { play } = usePlayer()
+  const { isSaved, toggleSaved, isAlbumSaved, toggleAlbumSaved } = useLibrary()
   const { openSongMenu } = useSongContextMenu()
   const { openArtistMenu } = useArtistContextMenu()
   const { openPlaylistMenu } = usePlaylistContextMenu()
@@ -115,6 +127,8 @@ function SearchResults({ query, onArtistClick, onPlaylistClick, onAlbumClick }: 
     })),
   ]
 
+  const filtered = activeFilter === 'Tudo' ? all : all.filter((r) => r.pill === filterToPill[activeFilter])
+
   if (!debouncedQ) {
     return (
       <p className="text-sm font-normal text-neutral-400">
@@ -123,17 +137,37 @@ function SearchResults({ query, onArtistClick, onPlaylistClick, onAlbumClick }: 
     )
   }
 
+  const filters = (
+    <div className="flex gap-2">
+      {searchFilters.map((f) => (
+        <Pill key={f} active={f === activeFilter} onClick={() => setActiveFilter(f)}>
+          {f}
+        </Pill>
+      ))}
+    </div>
+  )
+
   if (results && all.length === 0) {
     return (
-      <p className="text-sm font-normal text-neutral-400">
-        Nenhum resultado para <span className="font-semibold text-white">{debouncedQ}</span>.
-      </p>
+      <div className="flex flex-col gap-4">
+        {filters}
+        <p className="text-sm font-normal text-neutral-400">
+          Nenhum resultado para <span className="font-semibold text-white">{debouncedQ}</span>.
+        </p>
+      </div>
     )
   }
 
   return (
-    <ul className="flex flex-col items-center gap-2">
-      {all.map((r) => {
+    <div className="flex flex-col gap-4">
+      {filters}
+      {filtered.length === 0 ? (
+        <p className="text-sm font-normal text-neutral-400">
+          Nenhum resultado nesse filtro.
+        </p>
+      ) : (
+        <ul className="flex flex-col items-center gap-2">
+          {filtered.map((r) => {
         const remote =
           r.pill === 'Playlist' ? resolveImageUrl(r.playlist.imageUrl) :
           r.pill === 'Álbum' ? resolveImageUrl(r.album.imageUrl) :
@@ -155,9 +189,18 @@ function SearchResults({ query, onArtistClick, onPlaylistClick, onAlbumClick }: 
               source: { kind: 'music', album: albumById.get(r.music.albumId) ?? null },
             })
         }
+        const inLibrary =
+          r.pill === 'Música' ? isSaved(r.music.id) :
+          r.pill === 'Álbum' ? isAlbumSaved(r.album.id) :
+          false
+        const handleAdd = () => {
+          if (r.pill === 'Música') toggleSaved(r.music)
+          else if (r.pill === 'Álbum') toggleAlbumSaved(r.album)
+        }
         return (
           <li
             key={r.key}
+            onClick={handleTitleClick}
             onContextMenu={(e) => {
               if (r.pill === 'Música') {
                 openSongMenu(e, {
@@ -173,21 +216,21 @@ function SearchResults({ query, onArtistClick, onPlaylistClick, onAlbumClick }: 
                 openAlbumMenu(e, r.album)
               }
             }}
-            className="flex h-[60px] w-[948px] items-center rounded"
+            className="group flex h-[60px] w-[948px] cursor-pointer items-center rounded hover:bg-[#2D2D2D]"
           >
             <div className="flex h-[60px] w-[358px] max-w-[358px] items-center gap-3">
-              <img
-                src={remote ?? fallback}
-                alt=""
-                className={`h-[60px] w-[60px] shrink-0 object-cover ${shape}`}
-              />
+              <div className={`relative h-[60px] w-[60px] shrink-0 overflow-hidden ${shape}`}>
+                <img src={remote ?? fallback} alt="" className="h-full w-full object-cover" />
+                <div className="pointer-events-none absolute inset-0 hidden items-center justify-center bg-black/30 group-hover:flex">
+                  <svg viewBox="0 0 24 24" fill="white" className="h-6 w-6">
+                    <path d="M8 5v14l11-7z" />
+                  </svg>
+                </div>
+              </div>
               <div className="flex min-w-0 flex-col justify-center">
-                <button
-                  onClick={handleTitleClick}
-                  className="truncate text-left font-[Inter] text-[16px] font-bold text-white hover:underline"
-                >
+                <p className="truncate text-left font-[Inter] text-[16px] font-bold text-white">
                   {r.title}
-                </button>
+                </p>
                 <p className="truncate font-[Inter] text-[10px] font-bold text-[#B3B3B3]">
                   {r.sub}
                 </p>
@@ -198,12 +241,26 @@ function SearchResults({ query, onArtistClick, onPlaylistClick, onAlbumClick }: 
               {r.pill}
             </span>
             <div className="ml-auto flex items-center gap-4">
-              <button className="text-neutral-400 hover:text-white" aria-label="Mais opções">
+              <button
+                onClick={(e) => e.stopPropagation()}
+                className="text-neutral-400 hover:text-white"
+                aria-label="Mais opções"
+              >
                 <Dots className="text-[25px]" />
               </button>
               {r.action === 'add' ? (
-                <button aria-label="Adicionar">
-                  <Plus className="h-[14px] w-[14px]" />
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    handleAdd()
+                  }}
+                  aria-label={inLibrary ? 'Remover da biblioteca' : 'Adicionar à biblioteca'}
+                >
+                  {inLibrary ? (
+                    <AlreadyAdded className="h-[14px] w-[14px]" />
+                  ) : (
+                    <Plus className="h-[14px] w-[14px]" />
+                  )}
                 </button>
               ) : (
                 <FollowInlineButton artist={r.artist} />
@@ -213,6 +270,8 @@ function SearchResults({ query, onArtistClick, onPlaylistClick, onAlbumClick }: 
         )
       })}
     </ul>
+      )}
+    </div>
   )
 }
 

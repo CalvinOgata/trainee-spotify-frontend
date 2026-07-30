@@ -170,13 +170,18 @@ export function LibraryProvider({ children }: { children: ReactNode }) {
   const toggleSaved = useCallback(
     (music: Music) => {
       const already = savedMusics.some((m) => m.id === music.id)
-      if (already) unsaveMusic(music.id).catch(() => {})
-      else saveMusic(music.id).catch(() => {})
-      setSavedMusics((prev) =>
-        prev.some((m) => m.id === music.id)
-          ? prev.filter((m) => m.id !== music.id)
-          : [music, ...prev],
-      )
+      if (already) {
+        unsaveMusic(music.id).catch(() => {})
+        setSavedMusics((prev) => prev.filter((m) => m.id !== music.id))
+      } else {
+        // Insere o DTO devolvido pelo backend (traz o lastPlayedAt derivado) para o
+        // item entrar já na posição de recência certa, sem "pular" do fim da lista.
+        saveMusic(music.id)
+          .then((dto) =>
+            setSavedMusics((prev) => (prev.some((m) => m.id === dto.id) ? prev : [dto, ...prev])),
+          )
+          .catch(() => {})
+      }
     },
     [savedMusics],
   )
@@ -185,13 +190,16 @@ export function LibraryProvider({ children }: { children: ReactNode }) {
   const toggleAlbumSaved = useCallback(
     (album: AlbumSummary) => {
       const already = savedAlbums.some((a) => a.id === album.id)
-      if (already) unsaveAlbum(album.id).catch(() => {})
-      else saveAlbum(album.id).catch(() => {})
-      setSavedAlbums((prev) =>
-        prev.some((a) => a.id === album.id)
-          ? prev.filter((a) => a.id !== album.id)
-          : [album, ...prev],
-      )
+      if (already) {
+        unsaveAlbum(album.id).catch(() => {})
+        setSavedAlbums((prev) => prev.filter((a) => a.id !== album.id))
+      } else {
+        saveAlbum(album.id)
+          .then((dto) =>
+            setSavedAlbums((prev) => (prev.some((a) => a.id === dto.id) ? prev : [dto, ...prev])),
+          )
+          .catch(() => {})
+      }
     },
     [savedAlbums],
   )
@@ -201,10 +209,11 @@ export function LibraryProvider({ children }: { children: ReactNode }) {
     (album: AlbumSummary) => {
       const willPin = !isAlbumPinned(album.id)
       if (willPin && !isAlbumSaved(album.id)) {
-        saveAlbum(album.id).catch(() => {})
-        setSavedAlbums((prev) =>
-          prev.some((a) => a.id === album.id) ? prev : [album, ...prev],
-        )
+        saveAlbum(album.id)
+          .then((dto) =>
+            setSavedAlbums((prev) => (prev.some((a) => a.id === dto.id) ? prev : [dto, ...prev])),
+          )
+          .catch(() => {})
       }
       toggleAlbumPinnedRaw(album.id)
     },
@@ -216,10 +225,11 @@ export function LibraryProvider({ children }: { children: ReactNode }) {
     (artist: Artist) => {
       const willPin = !isPinned(artist.id)
       if (willPin && !isFollowed(artist.id)) {
-        followArtist(artist.id).catch(() => {})
-        setFollowedArtists((prev) =>
-          prev.some((a) => a.id === artist.id) ? prev : [artist, ...prev],
-        )
+        followArtist(artist.id)
+          .then((dto) =>
+            setFollowedArtists((prev) => (prev.some((a) => a.id === dto.id) ? prev : [dto, ...prev])),
+          )
+          .catch(() => {})
       }
       togglePinnedRaw(artist.id)
     },
@@ -230,13 +240,16 @@ export function LibraryProvider({ children }: { children: ReactNode }) {
   const toggleFollowed = useCallback(
     (artist: Artist) => {
       const already = followedArtists.some((a) => a.id === artist.id)
-      if (already) unfollowArtist(artist.id).catch(() => {})
-      else followArtist(artist.id).catch(() => {})
-      setFollowedArtists((prev) =>
-        prev.some((a) => a.id === artist.id)
-          ? prev.filter((a) => a.id !== artist.id)
-          : [artist, ...prev],
-      )
+      if (already) {
+        unfollowArtist(artist.id).catch(() => {})
+        setFollowedArtists((prev) => prev.filter((a) => a.id !== artist.id))
+      } else {
+        followArtist(artist.id)
+          .then((dto) =>
+            setFollowedArtists((prev) => (prev.some((a) => a.id === dto.id) ? prev : [dto, ...prev])),
+          )
+          .catch(() => {})
+      }
     },
     [followedArtists],
   )

@@ -26,13 +26,15 @@ export const postPlay = (kind: PlayKind, id: string) =>
 
 // /user/saved*
 export const getSavedMusics = () => api.get<Music[]>('/user/savedMusics')
-export const saveMusic = (id: string) => api.post<void>(`/user/savedMusics/${id}`, {})
+// POST devolve o item salvo (com lastPlayedAt já derivado) para inserir na posição
+// de recência correta sem um GET extra; DELETE continua 204 (sem corpo).
+export const saveMusic = (id: string) => api.post<Music>(`/user/savedMusics/${id}`, {})
 export const unsaveMusic = (id: string) => api.delete<void>(`/user/savedMusics/${id}`)
 export const getSavedAlbums = () => api.get<AlbumSummary[]>('/user/savedAlbums')
-export const saveAlbum = (id: string) => api.post<void>(`/user/savedAlbums/${id}`, {})
+export const saveAlbum = (id: string) => api.post<AlbumSummary>(`/user/savedAlbums/${id}`, {})
 export const unsaveAlbum = (id: string) => api.delete<void>(`/user/savedAlbums/${id}`)
 export const getFollowedArtists = () => api.get<Artist[]>('/user/followedArtists')
-export const followArtist = (id: string) => api.post<void>(`/user/followedArtists/${id}`, {})
+export const followArtist = (id: string) => api.post<Artist>(`/user/followedArtists/${id}`, {})
 export const unfollowArtist = (id: string) => api.delete<void>(`/user/followedArtists/${id}`)
 
 // /playlist

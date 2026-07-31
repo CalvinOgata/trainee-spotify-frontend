@@ -216,9 +216,9 @@ function SearchResults({ query, onArtistClick, onPlaylistClick, onAlbumClick }: 
                 openAlbumMenu(e, r.album)
               }
             }}
-            className="group flex h-[60px] w-[948px] cursor-pointer items-center rounded hover:bg-[#2D2D2D]"
+            className="group flex h-[60px] w-full min-w-0 max-w-[948px] cursor-pointer items-center gap-2 rounded px-1 hover:bg-[#2D2D2D] md:gap-0 md:px-0"
           >
-            <div className="flex h-[60px] w-[358px] max-w-[358px] items-center gap-3">
+            <div className="flex h-[60px] min-w-0 flex-1 items-center gap-3 md:w-[358px] md:max-w-[358px] md:flex-none">
               <div className={`relative h-[60px] w-[60px] shrink-0 overflow-hidden ${shape}`}>
                 <img src={remote ?? fallback} alt="" className="h-full w-full object-cover" />
                 <div className="pointer-events-none absolute inset-0 hidden items-center justify-center bg-black/30 group-hover:flex">
@@ -228,7 +228,7 @@ function SearchResults({ query, onArtistClick, onPlaylistClick, onAlbumClick }: 
                 </div>
               </div>
               <div className="flex min-w-0 flex-col justify-center">
-                <p className="truncate text-left font-[Inter] text-[16px] font-bold text-white">
+                <p className="truncate text-left font-[Inter] text-[14px] font-bold text-white md:text-[16px]">
                   {r.title}
                 </p>
                 <p className="truncate font-[Inter] text-[10px] font-bold text-[#B3B3B3]">
@@ -236,11 +236,12 @@ function SearchResults({ query, onArtistClick, onPlaylistClick, onAlbumClick }: 
                 </p>
               </div>
             </div>
-            <div className="w-[300px]" aria-hidden />
-            <span className="flex h-[20px] w-[52px] items-center justify-center gap-[10px] rounded-[2px] bg-[#2D2D2D] px-2 py-1 font-[Inter] text-[10px] font-bold text-[#B3B3B3]">
+            <div className="hidden flex-1 md:block" aria-hidden />
+            <span className="hidden h-[20px] w-[52px] shrink-0 items-center justify-center gap-[10px] rounded-[2px] bg-[#2D2D2D] px-2 py-1 font-[Inter] text-[10px] font-bold text-[#B3B3B3] md:flex">
               {r.pill}
             </span>
-            <div className="ml-auto flex items-center gap-4">
+            <div className="hidden flex-1 md:block" aria-hidden />
+            <div className="ml-auto flex items-center gap-4 md:ml-0">
               <button
                 onClick={(e) => e.stopPropagation()}
                 className="text-neutral-400 hover:text-white"

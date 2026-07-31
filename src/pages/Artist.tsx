@@ -63,15 +63,15 @@ function Artist({ artist: artistProp, onAlbumClick }: ArtistProps) {
   }
 
   return (
-    <div className="flex flex-col">
+    <div className="flex min-w-0 flex-col">
       <div
         onContextMenu={(e) => openArtistMenu(e, artist)}
-        className="-mx-5 -mt-6 flex h-[386px] flex-col justify-end gap-[10px] bg-cover bg-center p-4"
+        className="-mx-3 -mt-4 flex h-[240px] flex-col justify-end gap-[10px] bg-cover bg-center p-4 md:-mx-5 md:-mt-6 md:h-[386px]"
         style={{
           backgroundImage: `linear-gradient(to bottom, rgba(65, 65, 65, 0) 0%, rgba(0, 0, 0, 0.4) 100%), url(${resolveImageUrl(artist.imageUrl) ?? artistBanner})`,
         }}
       >
-        <h1 className="font-[Inter] text-[64px] font-bold leading-none text-white">{artist.name}</h1>
+        <h1 className="font-[Inter] truncate text-[32px] font-bold leading-none text-white md:text-[64px]">{artist.name}</h1>
         <p className="flex items-center gap-1.5 font-[Inter] text-[10px] font-bold text-white">
           <img src={verifiedIcon} alt="" className="h-[18px] w-[18px]" />
           Verificado pelo Spotify
@@ -100,7 +100,7 @@ function Artist({ artist: artistProp, onAlbumClick }: ArtistProps) {
         <FollowButton artist={artist} />
       </div>
 
-      <section className="mt-6 flex w-[524px] flex-col gap-2.5">
+      <section className="mt-6 flex w-full min-w-0 max-w-[524px] flex-col gap-2.5">
         <h2 className="font-[Inter] text-[16px] font-bold text-white">
           {showAllSongs ? 'Todas as músicas' : 'Populares'}
         </h2>

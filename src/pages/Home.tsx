@@ -40,6 +40,7 @@ type HomeProps = {
 
 function Home({ onArtistClick, onPlaylistClick, onAlbumClick }: HomeProps) {
   const [activeFilter, setActiveFilter] = useState<Filter>('Tudo')
+  const [showAllArtists, setShowAllArtists] = useState(false)
   const { data: recentMusics } = useApi(getRecentMusics)
   const { data: playlists } = useApi(getUserPlaylists)
   const { data: recentArtists } = useApi(getRecentArtists)
@@ -53,8 +54,10 @@ function Home({ onArtistClick, onPlaylistClick, onAlbumClick }: HomeProps) {
 
   const recentItems = (recentMusics ?? []).slice(0, 8)
   const playlistTiles = (playlists ?? []).slice(0, 7)
-  const artistTiles = (recentArtists ?? []).slice(0, 9)
-  const albumTiles = (recentAlbums ?? []).slice(0, 7)
+  const allArtists = recentArtists ?? []
+  const artistTiles = showAllArtists ? allArtists : allArtists.slice(0, 9)
+  const canExpandArtists = allArtists.length > 0
+  const albumTiles = recentAlbums ?? []
 
   const showMusic = activeFilter === 'Tudo' || activeFilter === 'Música'
   const showPlaylists = activeFilter === 'Tudo' || activeFilter === 'Playlists'
@@ -99,8 +102,8 @@ function Home({ onArtistClick, onPlaylistClick, onAlbumClick }: HomeProps) {
   }
 
   return (
-    <div className="flex h-full flex-col gap-8">
-      <section className="flex flex-col gap-3">
+    <div className="flex h-full min-w-0 flex-col gap-6 md:gap-8">
+      <section className="flex min-w-0 flex-col gap-3">
         <div className="flex gap-2.5">
           {filters.map((label) => (
             <Pill key={label} active={label === activeFilter} onClick={() => setActiveFilter(label)}>
@@ -109,7 +112,7 @@ function Home({ onArtistClick, onPlaylistClick, onAlbumClick }: HomeProps) {
           ))}
         </div>
         {showMusic && (
-        <div className="grid grid-cols-[repeat(auto-fill,295px)] gap-2">
+        <div className="grid max-w-[352px] grid-cols-2 gap-1 md:max-w-none md:grid-cols-[repeat(auto-fill,295px)] md:gap-2">
           {recentItems.map((m) => {
             const isCurrent = current?.id === m.id && position < m.duration
             return (
@@ -128,17 +131,17 @@ function Home({ onArtistClick, onPlaylistClick, onAlbumClick }: HomeProps) {
                     album: albumById.get(m.albumId) ?? null,
                   })
                 }
-                className="group flex h-[60px] w-[295px] items-center gap-2.5 overflow-hidden rounded-[4px] bg-[#2D2D2D] pr-3 text-left transition-colors hover:bg-[#5B5A5A]/60"
+                className="group flex min-h-[32px] w-full min-w-0 items-center gap-2 overflow-hidden rounded-[4px] bg-[#2D2D2D] pr-2 text-left transition-colors hover:bg-[#5B5A5A]/60 md:h-[60px] md:w-[295px] md:gap-2.5 md:pr-3"
               >
-                <img src={resolveImageUrl(m.imageUrl) ?? songCover} alt="" className="h-[60px] w-[60px] shrink-0 object-cover" />
-                <span className="min-w-0 flex-1 truncate font-[Arial] text-[12px] font-bold text-white">{m.title}</span>
+                <img src={resolveImageUrl(m.imageUrl) ?? songCover} alt="" className="h-[32px] w-[32px] shrink-0 object-cover md:h-[60px] md:w-[60px]" />
+                <span className="line-clamp-2 min-w-0 flex-1 font-[Arial] text-[10px] font-bold leading-tight text-white md:truncate md:text-[12px]">{m.title}</span>
                 {isCurrent ? (
-                  <PlayingBars animate={isPlaying} className="ml-auto" />
+                  <PlayingBars animate={isPlaying} className="ml-auto shrink-0" />
                 ) : (
                   <img
                     src={playButtonLarge}
                     alt=""
-                    className="ml-auto h-[54px] w-[54px] shrink-0 opacity-0 transition-opacity duration-200 group-hover:opacity-100"
+                    className="ml-auto hidden h-[54px] w-[54px] shrink-0 opacity-0 transition-opacity duration-200 group-hover:opacity-100 md:block"
                   />
                 )}
               </button>
@@ -149,7 +152,7 @@ function Home({ onArtistClick, onPlaylistClick, onAlbumClick }: HomeProps) {
       </section>
 
       {showPlaylists && (
-      <section className="flex flex-col gap-2">
+      <section className="flex min-w-0 flex-col gap-2">
         <h3 className="font-[Inter] text-[16px] font-bold text-white">Suas Playlists</h3>
         <div className="flex gap-3 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden md:flex-wrap md:overflow-visible">
           {playlistTiles.map((p) => {
@@ -172,12 +175,23 @@ function Home({ onArtistClick, onPlaylistClick, onAlbumClick }: HomeProps) {
       )}
 
       {showMusic && (
-      <section className="flex flex-col gap-2">
+      <section className="flex min-w-0 flex-col gap-2">
         <div className="flex items-center justify-between">
           <h3 className="font-[Inter] text-[16px] font-bold text-white">Artistas recentes</h3>
-          <ShowAllButton />
+          {(canExpandArtists || showAllArtists) && (
+            <ShowAllButton
+              expanded={showAllArtists}
+              onClick={() => setShowAllArtists((v) => !v)}
+            />
+          )}
         </div>
-        <div className="flex gap-3 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden md:flex-wrap md:overflow-visible">
+        <div
+          className={
+            showAllArtists
+              ? 'flex flex-wrap gap-3'
+              : 'flex gap-3 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden md:flex-wrap md:overflow-visible'
+          }
+        >
           {artistTiles.map((a) => (
             <Tile
               key={a.id}
@@ -195,9 +209,9 @@ function Home({ onArtistClick, onPlaylistClick, onAlbumClick }: HomeProps) {
       )}
 
       {showMusic && (
-      <section className="flex flex-col gap-2">
+      <section className="flex min-w-0 flex-col gap-2">
         <h3 className="font-[Inter] text-[16px] font-bold text-white">Álbuns recentes</h3>
-        <div className="flex gap-3 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden md:flex-wrap md:overflow-visible">
+        <div className="flex flex-wrap gap-3">
           {albumTiles.map((a) => (
             <Tile
               key={a.id}

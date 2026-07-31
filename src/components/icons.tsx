@@ -10,11 +10,10 @@ export const Spotify = ({ className = 'h-7 w-7 text-white' }: IconProps) => (
 )
 
 export const Home = ({ className = 'h-9 w-9' }: IconProps) => (
-  <svg viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg" className={className}>
-    <rect width="36" height="36" rx="18" fill="#1F1F1F" />
+  <svg viewBox="10 10 15 16" fill="none" xmlns="http://www.w3.org/2000/svg" className={className}>
     <path
       d="M17.2432 10.7373C17.4013 10.6426 17.5987 10.6426 17.7568 10.7373L24.2568 14.6377C24.4074 14.7281 24.5 14.8908 24.5 15.0664V25C24.5 25.2761 24.2761 25.5 24 25.5H20C19.7239 25.5 19.5 25.2761 19.5 25V21.5C19.5 20.6716 18.8284 20 18 20H17C16.1716 20 15.5 20.6716 15.5 21.5V25C15.5 25.2761 15.2761 25.5 15 25.5H11C10.7239 25.5 10.5 25.2761 10.5 25V15.0664C10.5 14.8908 10.5926 14.7281 10.7432 14.6377L17.2432 10.7373Z"
-      stroke="#B3B3B3"
+      stroke="currentColor"
     />
   </svg>
 )

@@ -95,26 +95,45 @@ function Player({ onFullscreenClick, isFullscreen }: PlayerProps) {
   const VolumeIcon = volume === 0 ? VolumeMute : volume < 0.5 ? VolumeLow : VolumeHigh
 
   return (
-    <footer className="flex h-16 shrink-0 items-center gap-3 bg-black px-2.5 py-1">
-      <div className="flex min-w-0 flex-1 basis-0 items-center gap-3">
-        <div className="flex h-[35px] w-[111px] shrink-0 items-center gap-3">
-          <img
-            src={resolveImageUrl(current?.imageUrl) ?? songCover}
-            alt=""
-            className="h-[35px] w-9 shrink-0 rounded-[2px] object-cover"
-            style={isFullscreen ? undefined : { viewTransitionName: 'song-cover' }}
-          />
-          <div className="flex min-w-0 flex-col gap-[10px]">
-            <p className="font-[Inter] h-[12px] w-[63px] truncate text-[10px] font-bold leading-3 text-white">{title}</p>
-            <p className="font-[Inter] h-[12px] w-[49px] truncate text-[10px] font-bold leading-3 text-[#B3B3B3]">{subtitle}</p>
-          </div>
+    <footer className="flex h-16 shrink-0 items-center gap-2 bg-black px-2 py-1 md:gap-3 md:px-2.5">
+      <div className="flex min-w-0 flex-1 items-center gap-2 md:basis-0 md:gap-3">
+        <img
+          src={resolveImageUrl(current?.imageUrl) ?? songCover}
+          alt=""
+          className="h-[35px] w-9 shrink-0 rounded-[2px] object-cover"
+          style={isFullscreen ? undefined : { viewTransitionName: 'song-cover' }}
+        />
+        <div className="flex min-w-0 flex-col gap-[2px] md:gap-[10px]">
+          <p className="font-[Inter] truncate text-[12px] font-bold leading-3 text-white md:h-[12px] md:w-[63px] md:text-[10px]">{title}</p>
+          <p className="font-[Inter] truncate text-[10px] font-bold leading-3 text-[#B3B3B3] md:h-[12px] md:w-[49px]">{subtitle}</p>
         </div>
       </div>
-      <div className="flex w-full max-w-[509px] shrink-0 flex-col items-center gap-1">
+      <div className="flex shrink-0 items-center gap-2 md:hidden">
+        <button
+          onClick={togglePlay}
+          className="grid h-9 w-9 place-items-center rounded-full bg-white text-black hover:scale-105 transition-transform"
+          aria-label={isPlaying ? 'Pausar' : 'Reproduzir'}
+        >
+          {isPlaying ? (
+            <svg viewBox="0 0 24 24" fill="black" className="h-4 w-4">
+              <rect x="6" y="5" width="4" height="14" rx="1" />
+              <rect x="14" y="5" width="4" height="14" rx="1" />
+            </svg>
+          ) : (
+            <svg viewBox="0 0 24 24" fill="black" className="h-4 w-4">
+              <path d="M8 5v14l11-7z" />
+            </svg>
+          )}
+        </button>
+        <button onClick={next} className="text-white hover:brightness-125" aria-label="Próxima">
+          <Next />
+        </button>
+      </div>
+      <div className="hidden w-full max-w-[509px] shrink-0 flex-col items-center gap-1 md:flex">
         <div className="flex h-10 w-full items-center justify-center gap-3">
           <button
             onClick={prev}
-            className={`text-[#B3B3B3] hover:text-white ${isFullscreen ? '' : 'hidden md:inline-flex'}`}
+            className="text-[#B3B3B3] hover:text-white"
             aria-label="Anterior"
           >
             <Prev />
@@ -130,7 +149,7 @@ function Player({ onFullscreenClick, isFullscreen }: PlayerProps) {
             <Next />
           </button>
         </div>
-        <div className={`w-full items-center gap-1.5 ${isFullscreen ? 'flex' : 'hidden md:flex'}`}>
+        <div className="flex w-full items-center gap-1.5">
           <span className="w-[22px] text-right text-[11px] font-medium leading-3 text-[#B3B3B3]">
             {formatDuration(Math.floor(position))}
           </span>
@@ -153,7 +172,7 @@ function Player({ onFullscreenClick, isFullscreen }: PlayerProps) {
           </span>
         </div>
       </div>
-      <div className="flex min-w-0 flex-1 basis-0 items-center justify-end gap-3 text-[#B3B3B3]">
+      <div className="hidden min-w-0 flex-1 basis-0 items-center justify-end gap-3 text-[#B3B3B3] md:flex">
         <button
           onClick={handleMuteToggle}
           className="hidden hover:text-white md:block"

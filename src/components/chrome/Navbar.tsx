@@ -50,6 +50,16 @@ function Navbar({
     return () => document.removeEventListener('mousedown', handler)
   }, [dropdownOpen])
 
+  useEffect(() => {
+    const mql = window.matchMedia('(min-width: 768px)')
+    const handler = (e: MediaQueryListEvent | MediaQueryList) => {
+      if (e.matches) setMobileSearchOpen(false)
+    }
+    handler(mql)
+    mql.addEventListener('change', handler)
+    return () => mql.removeEventListener('change', handler)
+  }, [])
+
   const commitSearch = () => {
     if (!query.trim()) return
     setDropdownOpen(false)
@@ -75,20 +85,20 @@ function Navbar({
 
       {/* Mobile icon row — collapses to just Home + Search + (spacer) + Profile */}
       {!mobileSearchOpen && (
-        <div className="flex items-center gap-2 md:hidden">
+        <div className="flex items-center gap-1 md:hidden">
           <button
             onClick={onHomeClick}
-            className="grid h-9 w-9 place-items-center rounded-full bg-[#1F1F1F] text-white hover:brightness-125"
+            className="grid h-9 w-9 place-items-center rounded-full bg-[#1F1F1F] text-[#B3B3B3] hover:brightness-125"
             aria-label="Página inicial"
           >
-            <Home className="h-4 w-4" />
+            <Home className="h-4 w-[15px]" />
           </button>
           <button
             onClick={handleMobileSearchOpen}
-            className="grid h-9 w-9 place-items-center rounded-full bg-[#1F1F1F] text-white hover:brightness-125"
+            className="grid h-9 w-[43px] place-items-center rounded-full bg-[#1F1F1F] text-[#B3B3B3] hover:brightness-125"
             aria-label="Pesquisar"
           >
-            <Search className="h-4 w-4" />
+            <Search className="h-4 w-[15px]" />
           </button>
         </div>
       )}
@@ -96,18 +106,18 @@ function Navbar({
       {/* Search bar — desktop always, mobile only when expanded */}
       <div
         ref={searchBoxRef}
-        className={`relative h-9 items-center gap-1 ${
-          mobileSearchOpen ? 'flex' : 'hidden md:flex'
+        className={`relative h-9 min-w-0 items-center gap-1 ${
+          mobileSearchOpen ? 'flex flex-1' : 'hidden md:flex'
         }`}
       >
         <button
           onClick={() => { setDropdownOpen(false); onHomeClick() }}
-          className="hidden shrink-0 hover:brightness-125 md:block"
+          className="hidden shrink-0 place-items-center rounded-full bg-[#1F1F1F] text-[#B3B3B3] hover:brightness-125 md:grid md:h-9 md:w-9"
           aria-label="Início"
         >
-          <Home />
+          <Home className="h-4 w-[15px]" />
         </button>
-        <div className="flex h-9 w-[355px] items-center justify-between rounded-2xl border border-transparent bg-[#1F1F1F] px-3.5 text-white focus-within:border-white">
+        <div className="flex h-9 w-full min-w-0 items-center justify-between rounded-2xl border border-transparent bg-[#1F1F1F] px-3.5 text-white focus-within:border-white md:w-[355px]">
           <div className="flex min-w-0 flex-1 items-center gap-2 overflow-hidden">
             <Search className="h-4 w-[15px] shrink-0 text-[#B3B3B3]" />
             <input
@@ -166,9 +176,9 @@ function Navbar({
           <button
             onClick={onProfileClick}
             aria-label="Perfil"
-            className="h-9 w-9 shrink-0 overflow-hidden rounded-full border-4 border-black hover:brightness-110"
+            className="grid h-9 w-9 shrink-0 place-items-center overflow-hidden rounded-full hover:brightness-110 md:border-4 md:border-black"
           >
-            <img src={profilePhoto} alt="" className="h-full w-full object-cover" />
+            <img src={profilePhoto} alt="" className="h-[25px] w-[25px] rounded-full object-cover md:h-full md:w-full" />
           </button>
         </div>
       )}

@@ -256,8 +256,8 @@ function Library({ onArtistClick, onPlaylistClick, onAlbumClick, playlistsKey, o
   return (
     <>
     <aside className="flex h-full w-[56px] shrink-0 flex-col overflow-hidden rounded-lg bg-[#121212] pb-3 md:w-[80px] lg:w-[312px]">
-      <div className="flex flex-col gap-3 mb-3">
-        <div className="flex items-center justify-center gap-2 px-3 pt-3 lg:justify-between">
+      <div className="hidden flex-col gap-3 mb-3 lg:flex">
+        <div className="hidden items-center justify-center gap-2 px-3 pt-3 lg:flex lg:justify-between">
           <h2 className="font-[Inter] hidden text-[12px] font-bold text-white lg:block">Sua Biblioteca</h2>
           <button
             onClick={handleCreate}

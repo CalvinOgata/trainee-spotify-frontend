@@ -94,16 +94,16 @@ function Profile({ onArtistClick, onPlaylistClick }: ProfileProps) {
   }
 
   return (
-    <div className="flex h-full flex-col">
-      <div className="-mx-5 -mt-6 flex h-[231px] items-end gap-3 bg-gradient-to-b from-[#938D8E] to-[#3E3939] px-5 pt-10 pb-4">
+    <div className="flex h-full min-w-0 flex-col">
+      <div className="-mx-3 -mt-4 flex min-h-[180px] items-end gap-3 bg-gradient-to-b from-[#938D8E] to-[#3E3939] px-3 pt-6 pb-4 md:-mx-5 md:-mt-6 md:h-[231px] md:px-5 md:pt-10">
         <img
           src={profilePhoto}
           alt=""
-          className="h-[175px] w-[175px] shrink-0 rounded-full object-cover shadow-[0_12px_22.2px_0_rgba(0,0,0,0.25)]"
+          className="h-[100px] w-[100px] shrink-0 rounded-full object-cover shadow-[0_12px_22.2px_0_rgba(0,0,0,0.25)] md:h-[175px] md:w-[175px]"
         />
-        <div className="flex min-w-0 flex-col gap-[10px] pb-2">
+        <div className="flex min-w-0 flex-col gap-[6px] pb-2 md:gap-[10px]">
           <p className="font-[Inter] text-[10px] font-medium leading-none text-white">Perfil</p>
-          <h1 className="truncate font-[Inter] text-[64px] font-black leading-none text-white">
+          <h1 className="truncate font-[Inter] text-[28px] font-black leading-none text-white md:text-[64px]">
             Vitoria Tenorio
           </h1>
           <p className="font-[Inter] text-[10px] font-medium leading-none text-[#B3B3B3]">
@@ -112,7 +112,7 @@ function Profile({ onArtistClick, onPlaylistClick }: ProfileProps) {
         </div>
       </div>
 
-      <section className="mt-8 flex h-[211px] w-[420px] flex-col gap-2">
+      <section className="mt-8 flex min-w-0 max-w-full flex-col gap-2 md:h-[211px] md:w-[420px]">
         <div>
           <h2 className="font-[Inter] text-[16px] font-bold text-white">Artistas mais tocados este mês</h2>
           <p className="font-[Inter] text-[10px] font-medium text-[#B3B3B3]">Visíveis apenas para você</p>
@@ -133,7 +133,7 @@ function Profile({ onArtistClick, onPlaylistClick }: ProfileProps) {
         </div>
       </section>
 
-      <section className="mt-6 flex h-[260px] w-[457px] flex-col gap-2.5">
+      <section className="mt-6 flex min-w-0 max-w-full flex-col gap-2.5 md:h-[260px] md:w-[457px]">
         <div>
           <h2 className="font-[Inter] text-[16px] font-bold text-white">Músicas mais tocadas este mês</h2>
           <p className="font-[Inter] text-[10px] font-medium text-[#B3B3B3]">Visíveis apenas para você</p>

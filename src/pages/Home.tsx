@@ -154,7 +154,7 @@ function Home({ onArtistClick, onPlaylistClick, onAlbumClick }: HomeProps) {
       {showPlaylists && (
       <section className="flex min-w-0 flex-col gap-2">
         <h3 className="font-[Inter] text-[16px] font-bold text-white">Suas Playlists</h3>
-        <div className="flex gap-3 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden md:flex-wrap md:overflow-visible">
+        <div className="flex gap-3 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
           {playlistTiles.map((p) => {
             const label = isPlaylistPrivate(p.id) ? 'Playlist particular' : 'Playlist'
             return (
@@ -189,7 +189,7 @@ function Home({ onArtistClick, onPlaylistClick, onAlbumClick }: HomeProps) {
           className={
             showAllArtists
               ? 'flex flex-wrap gap-3'
-              : 'flex gap-3 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden md:flex-wrap md:overflow-visible'
+              : 'flex gap-3 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden'
           }
         >
           {artistTiles.map((a) => (
@@ -211,7 +211,7 @@ function Home({ onArtistClick, onPlaylistClick, onAlbumClick }: HomeProps) {
       {showMusic && (
       <section className="flex min-w-0 flex-col gap-2">
         <h3 className="font-[Inter] text-[16px] font-bold text-white">Álbuns recentes</h3>
-        <div className="flex flex-wrap gap-3">
+        <div className="flex gap-3 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
           {albumTiles.map((a) => (
             <Tile
               key={a.id}

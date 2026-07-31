@@ -1,4 +1,4 @@
-import { useMemo } from 'react'
+import { useMemo, useState } from 'react'
 import artistCover from '../assets/images/artist_default.png'
 import favoritesCover from '../assets/images/favorites_default.png'
 import playlistCover from '../assets/images/playlist_default.png'
@@ -11,6 +11,7 @@ import kirbyPhoto from '../assets/images/Kirby.jpg'
 import serjaoPhoto from '../assets/images/Serjao.jpg'
 import wandererPhoto from '../assets/images/Wanderer.jpg'
 import explicitIcon from '../assets/icons/Explicit.svg'
+import ShowAllButton from '../components/ui/ShowAllButton'
 import { Tile } from '../components/ui/Tile'
 import { resolveImageUrl } from '../lib/api/client'
 import { useApi } from '../lib/hooks/useApi'
@@ -66,7 +67,9 @@ function Profile({ onArtistClick, onPlaylistClick }: ProfileProps) {
     return arr.slice(0, 3)
   }, [topArtists])
   const musicRows = (topMusics ?? []).slice(0, 4)
-  const playlistTiles = publicPlaylists.slice(0, 7)
+  const [showAllPlaylists, setShowAllPlaylists] = useState(false)
+  const playlistTiles = showAllPlaylists ? publicPlaylists : publicPlaylists.slice(0, 7)
+  const canExpandPlaylists = publicPlaylists.length > 0
   const followerTiles = (followers ?? []).slice(0, 8)
 
   const artistById = new Map((topArtists ?? []).map((a) => [a.id, a]))
@@ -95,26 +98,30 @@ function Profile({ onArtistClick, onPlaylistClick }: ProfileProps) {
 
   return (
     <div className="flex h-full min-w-0 flex-col">
-      <div className="-mx-3 -mt-4 flex min-h-[180px] items-end gap-3 bg-gradient-to-b from-[#938D8E] to-[#3E3939] px-3 pt-6 pb-4 md:-mx-5 md:-mt-6 md:h-[231px] md:px-5 md:pt-10">
+      <div className="-mx-3 -mt-4 flex min-h-[116px] min-w-[360px] shrink-0 items-end gap-3 bg-gradient-to-b from-[#938D8E] to-[#3E3939] px-3 pt-4 pb-4 md:-mx-5 md:-mt-6 md:h-[231px] md:min-h-0 md:min-w-0 md:px-5 md:pt-10">
         <img
           src={profilePhoto}
           alt=""
-          className="h-[100px] w-[100px] shrink-0 rounded-full object-cover shadow-[0_12px_22.2px_0_rgba(0,0,0,0.25)] md:h-[175px] md:w-[175px]"
+          className="h-[60px] w-[60px] shrink-0 rounded-full object-cover shadow-[0_12px_22.2px_0_rgba(0,0,0,0.25)] md:h-[175px] md:w-[175px]"
         />
-        <div className="flex min-w-0 flex-col gap-[6px] pb-2 md:gap-[10px]">
+        <div className="flex min-w-0 max-w-[calc(100vw-160px)] flex-col gap-[4px] pb-1 md:max-w-none md:gap-[10px] md:pb-2">
           <p className="font-[Inter] text-[10px] font-medium leading-none text-white">Perfil</p>
-          <h1 className="truncate font-[Inter] text-[28px] font-black leading-none text-white md:text-[64px]">
+          <h1 className="truncate font-[Inter] text-[20px] font-bold leading-none text-white md:text-[64px] md:font-black">
             Vitoria Tenorio
           </h1>
-          <p className="font-[Inter] text-[10px] font-medium leading-none text-[#B3B3B3]">
-            {playlistCount} playlists públicas • {followerCount} seguidores • {followingCount} seguindo
+          <p className="font-[Inter] text-[10px] font-medium leading-tight text-[#B3B3B3] md:leading-none">
+            <span className="whitespace-nowrap">{playlistCount} playlists públicas</span>
+            {' • '}
+            <span className="whitespace-nowrap">{followerCount} seguidores</span>
+            {' • '}
+            <span className="whitespace-nowrap">{followingCount} seguindo</span>
           </p>
         </div>
       </div>
 
-      <section className="mt-8 flex min-w-0 max-w-full flex-col gap-2 md:h-[211px] md:w-[420px]">
+      <section className="mt-4 flex min-w-0 max-w-full flex-col gap-2 md:mt-8 md:h-[211px] md:w-[420px]">
         <div>
-          <h2 className="font-[Inter] text-[16px] font-bold text-white">Artistas mais tocados este mês</h2>
+          <h2 className="font-[Inter] text-[12px] font-bold text-white md:text-[16px]">Artistas mais tocados este mês</h2>
           <p className="font-[Inter] text-[10px] font-medium text-[#B3B3B3]">Visíveis apenas para você</p>
         </div>
         <div className={carouselClass}>
@@ -135,7 +142,7 @@ function Profile({ onArtistClick, onPlaylistClick }: ProfileProps) {
 
       <section className="mt-6 flex min-w-0 max-w-full flex-col gap-2.5 md:h-[260px] md:w-[457px]">
         <div>
-          <h2 className="font-[Inter] text-[16px] font-bold text-white">Músicas mais tocadas este mês</h2>
+          <h2 className="font-[Inter] text-[12px] font-bold text-white md:text-[16px]">Músicas mais tocadas este mês</h2>
           <p className="font-[Inter] text-[10px] font-medium text-[#B3B3B3]">Visíveis apenas para você</p>
         </div>
         <ul className="flex flex-col gap-2.5">
@@ -155,26 +162,34 @@ function Profile({ onArtistClick, onPlaylistClick }: ProfileProps) {
                   album: null,
                 })
               }
-              className="grid h-11 w-full cursor-pointer grid-cols-[12px_36px_minmax(0,1fr)_auto_auto] items-center gap-[10px] rounded-[4px] px-2 py-1 hover:bg-neutral-900"
+              className="grid h-11 w-full cursor-pointer grid-cols-[12px_40px_minmax(0,1fr)] items-center gap-[10px] rounded-[4px] px-2 py-1 hover:bg-neutral-900 md:grid-cols-[12px_36px_minmax(0,1fr)_auto_auto]"
             >
               <span className="font-[Inter] text-[10px] font-medium text-[#B3B3B3]">{i + 1}</span>
-              <img src={resolveImageUrl(t.imageUrl) ?? songCover} alt="" className="h-9 w-9 rounded object-cover" />
+              <img src={resolveImageUrl(t.imageUrl) ?? songCover} alt="" className="h-10 w-10 rounded object-cover md:h-9 md:w-9" />
               <div className="flex min-w-0 flex-col gap-[5px]">
-                <p className="truncate font-[Arial,_Helvetica,_sans-serif] text-[10px] font-bold leading-none text-white">{t.title}</p>
+                <p className="truncate font-[Arial,_Helvetica,_sans-serif] text-[12px] font-bold leading-none text-white md:text-[10px]">{t.title}</p>
                 {t.explicit && (
-                  <img src={explicitIcon} alt="Explícito" className="h-3 w-3" />
+                  <img src={explicitIcon} alt="Explícito" className="h-[10px] w-[10px] md:h-3 md:w-3" />
                 )}
               </div>
-              <span className="font-[Inter] text-[10px] font-medium text-[#B3B3B3]">{formatPlays(t.timesListen)}</span>
-              <span className="font-[Inter] text-[10px] font-medium text-[#B3B3B3]">{formatDuration(t.duration)}</span>
+              <span className="hidden font-[Inter] text-[10px] font-medium text-[#B3B3B3] md:inline">{formatPlays(t.timesListen)}</span>
+              <span className="hidden font-[Inter] text-[10px] font-medium text-[#B3B3B3] md:inline">{formatDuration(t.duration)}</span>
             </li>
           ))}
         </ul>
       </section>
 
       <section className="mt-6 flex flex-col gap-[10px]">
-        <h2 className="font-[Inter] text-[16px] font-bold text-white">Playlists públicas</h2>
-        <div className={carouselClass}>
+        <div className="flex items-center justify-between">
+          <h2 className="font-[Inter] text-[12px] font-bold text-white md:text-[16px]">Playlists públicas</h2>
+          {canExpandPlaylists && (
+            <ShowAllButton
+              expanded={showAllPlaylists}
+              onClick={() => setShowAllPlaylists((v) => !v)}
+            />
+          )}
+        </div>
+        <div className={showAllPlaylists ? 'flex flex-wrap gap-3' : carouselClass}>
           {playlistTiles.map((p) => (
             <Tile
               key={p.id}
@@ -191,12 +206,12 @@ function Profile({ onArtistClick, onPlaylistClick }: ProfileProps) {
 
       {followerTiles.length > 0 && (
         <section className="mt-3 flex w-full flex-col gap-2.5">
-          <h2 className="text-base font-bold leading-tight text-white">Seguidores</h2>
+          <h2 className="font-[Inter] text-[12px] font-bold leading-tight text-white md:text-base">Seguidores</h2>
           <div className={carouselClass}>
             {followerTiles.map((name, i) => (
-              <div key={`${name}-${i}`} className="flex w-[140px] shrink-0 flex-col items-center gap-2">
-                <img src={userPhotos[i % userPhotos.length]} alt="" className="h-[132px] w-[132px] rounded-full object-cover" />
-                <p className="w-full truncate text-center font-[Inter] text-[12px] font-medium leading-tight text-white">{name}</p>
+              <div key={`${name}-${i}`} className="flex w-[60px] shrink-0 flex-col items-center gap-2 md:w-[140px]">
+                <img src={userPhotos[i % userPhotos.length]} alt="" className="h-[60px] w-[60px] rounded-full object-cover md:h-[132px] md:w-[132px]" />
+                <p className="line-clamp-2 w-full break-words text-center font-[Inter] text-[12px] font-medium leading-tight text-white md:line-clamp-none md:truncate">{name}</p>
               </div>
             ))}
           </div>
@@ -204,11 +219,11 @@ function Profile({ onArtistClick, onPlaylistClick }: ProfileProps) {
       )}
 
       <section className="mt-6 flex w-full flex-col gap-2.5">
-        <h2 className="text-base font-bold leading-tight text-white">Seguindo</h2>
+        <h2 className="font-[Inter] text-[12px] font-bold leading-tight text-white md:text-base">Seguindo</h2>
         <div className={carouselClass}>
-          <div className="flex w-[140px] shrink-0 flex-col items-center gap-2">
-            <img src={userPhotos[5]} alt="" className="h-[132px] w-[132px] rounded-full object-cover" />
-            <p className="w-full truncate text-center font-[Inter] text-[12px] font-medium leading-tight text-white">Pessoa</p>
+          <div className="flex w-[60px] shrink-0 flex-col items-center gap-2 md:w-[140px]">
+            <img src={userPhotos[5]} alt="" className="h-[60px] w-[60px] rounded-full object-cover md:h-[132px] md:w-[132px]" />
+            <p className="line-clamp-2 w-full break-words text-center font-[Inter] text-[12px] font-medium leading-tight text-white md:line-clamp-none md:truncate">Pessoa</p>
           </div>
         </div>
       </section>

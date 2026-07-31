@@ -96,40 +96,49 @@ function Player({ onFullscreenClick, isFullscreen }: PlayerProps) {
 
   return (
     <footer className="flex h-16 shrink-0 items-center gap-2 bg-black px-2 py-1 md:gap-3 md:px-2.5">
-      <div className="flex min-w-0 flex-1 items-center gap-2 md:basis-0 md:gap-3">
+      <button
+        type="button"
+        onClick={current ? onFullscreenClick : undefined}
+        disabled={!current}
+        aria-label={isFullscreen ? 'Sair da tela cheia' : 'Abrir tela cheia'}
+        className="flex min-w-0 flex-1 items-center gap-2 text-left md:basis-0 md:gap-3 md:cursor-default md:pointer-events-none"
+      >
         <img
           src={resolveImageUrl(current?.imageUrl) ?? songCover}
           alt=""
-          className="h-[35px] w-9 shrink-0 rounded-[2px] object-cover"
+          className={`h-[35px] w-9 shrink-0 rounded-[2px] object-cover ${isFullscreen ? 'hidden md:block' : ''}`}
           style={isFullscreen ? undefined : { viewTransitionName: 'song-cover' }}
         />
         <div className="flex min-w-0 flex-col gap-[2px] md:gap-[10px]">
-          <p className="font-[Inter] truncate text-[12px] font-bold leading-3 text-white md:h-[12px] md:w-[63px] md:text-[10px]">{title}</p>
+          <p className="font-[Inter] truncate text-[10px] font-bold leading-3 text-white md:h-[12px] md:w-[63px] md:text-[10px]">{title}</p>
           <p className="font-[Inter] truncate text-[10px] font-bold leading-3 text-[#B3B3B3] md:h-[12px] md:w-[49px]">{subtitle}</p>
         </div>
-      </div>
-      <div className="flex shrink-0 items-center gap-2 md:hidden">
+      </button>
+      <div className={`shrink-0 items-center gap-2 md:hidden ${isFullscreen ? 'hidden' : 'flex'}`}>
+        <button onClick={prev} className="text-white hover:brightness-125" aria-label="Anterior">
+          <Prev className="h-[11px] w-[10.5px]" />
+        </button>
         <button
           onClick={togglePlay}
-          className="grid h-9 w-9 place-items-center rounded-full bg-white text-black hover:scale-105 transition-transform"
+          className="grid h-6 w-6 place-items-center rounded-full bg-white text-black hover:scale-105 transition-transform"
           aria-label={isPlaying ? 'Pausar' : 'Reproduzir'}
         >
           {isPlaying ? (
-            <svg viewBox="0 0 24 24" fill="black" className="h-4 w-4">
+            <svg viewBox="0 0 24 24" fill="black" className="h-3 w-3">
               <rect x="6" y="5" width="4" height="14" rx="1" />
               <rect x="14" y="5" width="4" height="14" rx="1" />
             </svg>
           ) : (
-            <svg viewBox="0 0 24 24" fill="black" className="h-4 w-4">
+            <svg viewBox="0 0 24 24" fill="black" className="h-3 w-3">
               <path d="M8 5v14l11-7z" />
             </svg>
           )}
         </button>
         <button onClick={next} className="text-white hover:brightness-125" aria-label="Próxima">
-          <Next />
+          <Next className="h-[11px] w-[10.5px]" />
         </button>
       </div>
-      <div className="hidden w-full max-w-[509px] shrink-0 flex-col items-center gap-1 md:flex">
+      <div className={`shrink-0 flex-col items-center gap-1 md:w-full md:max-w-[509px] md:flex ${isFullscreen ? 'flex' : 'hidden'}`}>
         <div className="flex h-10 w-full items-center justify-center gap-3">
           <button
             onClick={prev}
@@ -149,7 +158,7 @@ function Player({ onFullscreenClick, isFullscreen }: PlayerProps) {
             <Next />
           </button>
         </div>
-        <div className="flex w-full items-center gap-1.5">
+        <div className="flex w-full min-w-[175px] items-center gap-1.5">
           <span className="w-[22px] text-right text-[11px] font-medium leading-3 text-[#B3B3B3]">
             {formatDuration(Math.floor(position))}
           </span>
@@ -172,7 +181,7 @@ function Player({ onFullscreenClick, isFullscreen }: PlayerProps) {
           </span>
         </div>
       </div>
-      <div className="hidden min-w-0 flex-1 basis-0 items-center justify-end gap-3 text-[#B3B3B3] md:flex">
+      <div className={`min-w-0 flex-1 basis-0 items-center justify-end gap-3 text-[#B3B3B3] md:flex ${isFullscreen ? 'flex' : 'hidden'}`}>
         <button
           onClick={handleMuteToggle}
           className="hidden hover:text-white md:block"
@@ -200,7 +209,11 @@ function Player({ onFullscreenClick, isFullscreen }: PlayerProps) {
           className="hover:text-white"
           aria-label={isFullscreen ? 'Sair da tela cheia' : 'Tela cheia'}
         >
-          {isFullscreen ? <MaximizedPlayer /> : <MinimizedPlayer />}
+          {isFullscreen ? (
+            <MaximizedPlayer className="h-[11px] w-3" />
+          ) : (
+            <MinimizedPlayer />
+          )}
         </button>
       </div>
     </footer>

@@ -31,8 +31,10 @@ type ArtistProps = {
 
 function Artist({ artist: artistProp, onAlbumClick }: ArtistProps) {
   const [showAllSongs, setShowAllSongs] = useState(false)
+  const [showAllAlbums, setShowAllAlbums] = useState(false)
   useEffect(() => {
     setShowAllSongs(false)
+    setShowAllAlbums(false)
   }, [artistProp.id])
   const { data: freshArtist } = useApi(() => getArtist(artistProp.id), [artistProp.id])
   const artist = freshArtist ?? artistProp
@@ -66,12 +68,12 @@ function Artist({ artist: artistProp, onAlbumClick }: ArtistProps) {
     <div className="flex min-w-0 flex-col">
       <div
         onContextMenu={(e) => openArtistMenu(e, artist)}
-        className="-mx-3 -mt-4 flex h-[240px] flex-col justify-end gap-[10px] bg-cover bg-center p-4 md:-mx-5 md:-mt-6 md:h-[386px]"
+        className="-mx-3 -mt-4 flex min-h-[180px] min-w-[360px] shrink-0 flex-col justify-end gap-[10px] bg-cover bg-center p-4 md:-mx-5 md:-mt-6 md:h-[386px] md:min-h-0 md:min-w-0"
         style={{
           backgroundImage: `linear-gradient(to bottom, rgba(65, 65, 65, 0) 0%, rgba(0, 0, 0, 0.4) 100%), url(${resolveImageUrl(artist.imageUrl) ?? artistBanner})`,
         }}
       >
-        <h1 className="font-[Inter] truncate text-[32px] font-bold leading-none text-white md:text-[64px]">{artist.name}</h1>
+        <h1 className="font-[Inter] truncate text-[20px] font-bold leading-none text-white md:text-[64px] md:font-black">{artist.name}</h1>
         <p className="flex items-center gap-1.5 font-[Inter] text-[10px] font-bold text-white">
           <img src={verifiedIcon} alt="" className="h-[18px] w-[18px]" />
           Verificado pelo Spotify
@@ -101,7 +103,7 @@ function Artist({ artist: artistProp, onAlbumClick }: ArtistProps) {
       </div>
 
       <section className="mt-6 flex w-full min-w-0 max-w-[524px] flex-col gap-2.5">
-        <h2 className="font-[Inter] text-[16px] font-bold text-white">
+        <h2 className="font-[Inter] text-[12px] font-bold text-white md:text-[16px]">
           {showAllSongs ? 'Todas as músicas' : 'Populares'}
         </h2>
         <ul className="flex flex-col gap-2.5">
@@ -122,19 +124,19 @@ function Artist({ artist: artistProp, onAlbumClick }: ArtistProps) {
                   album: albumById.get(t.albumId) ?? null,
                 })
               }
-              className="grid h-11 w-full cursor-pointer grid-cols-[12px_36px_minmax(0,1fr)_auto_auto_auto] items-center gap-[10px] rounded-[4px] px-2 py-1 hover:bg-neutral-900"
+              className="grid h-11 w-full cursor-pointer grid-cols-[12px_40px_minmax(0,1fr)] items-center gap-[10px] rounded-[4px] px-2 py-1 hover:bg-neutral-900 md:grid-cols-[12px_36px_minmax(0,1fr)_auto_auto_auto]"
             >
               <span className="font-[Inter] text-[10px] font-medium text-[#B3B3B3]">{i + 1}</span>
-              <img src={resolveImageUrl(t.imageUrl) ?? songCover} alt="" className="h-9 w-9 rounded object-cover" />
+              <img src={resolveImageUrl(t.imageUrl) ?? songCover} alt="" className="h-10 w-10 rounded object-cover md:h-9 md:w-9" />
               <div className="flex min-w-0 flex-col gap-[5px]">
-                <p className="truncate font-[Arial,_Helvetica,_sans-serif] text-[10px] font-bold leading-none text-white">{t.title}</p>
+                <p className="truncate font-[Arial,_Helvetica,_sans-serif] text-[12px] font-bold leading-none text-white md:text-[10px]">{t.title}</p>
                 {t.explicit && (
-                  <img src={explicitIcon} alt="Explícito" className="h-3 w-3" />
+                  <img src={explicitIcon} alt="Explícito" className="h-[10px] w-[10px] md:h-3 md:w-3" />
                 )}
               </div>
-              <span className="font-[Inter] text-[10px] font-medium text-[#B3B3B3]">{formatPlays(t.timesListen)}</span>
-              <img src={alreadyAddedIcon} alt="" className="h-[14px] w-[14px]" />
-              <span className="font-[Inter] text-[10px] font-medium text-[#B3B3B3]">{formatDuration(t.duration)}</span>
+              <span className="hidden font-[Inter] text-[10px] font-medium text-[#B3B3B3] md:inline">{formatPlays(t.timesListen)}</span>
+              <img src={alreadyAddedIcon} alt="" className="hidden h-[14px] w-[14px] md:inline" />
+              <span className="hidden font-[Inter] text-[10px] font-medium text-[#B3B3B3] md:inline">{formatDuration(t.duration)}</span>
             </li>
           ))}
         </ul>
@@ -150,10 +152,21 @@ function Artist({ artist: artistProp, onAlbumClick }: ArtistProps) {
 
       <section className="mt-6 flex w-full flex-col gap-2.5">
         <div className="flex items-center justify-between">
-          <h2 className="font-[Inter] text-[16px] font-bold text-white">Discografia</h2>
-          <ShowAllButton />
+          <h2 className="font-[Inter] text-[12px] font-bold text-white md:text-[16px]">Discografia</h2>
+          {discography.length > 0 && (
+            <ShowAllButton
+              expanded={showAllAlbums}
+              onClick={() => setShowAllAlbums((v) => !v)}
+            />
+          )}
         </div>
-        <div className="flex gap-3 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden md:flex-wrap md:overflow-visible">
+        <div
+          className={
+            showAllAlbums
+              ? 'flex flex-wrap gap-3'
+              : 'flex gap-3 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden md:flex-wrap md:overflow-visible'
+          }
+        >
           {discography.map((d) => (
             <Tile
               key={d.id}
@@ -171,7 +184,7 @@ function Artist({ artist: artistProp, onAlbumClick }: ArtistProps) {
 
       {artist.about && (
         <section className="mt-6 flex w-full max-w-[457px] flex-col gap-2.5">
-          <h2 className="font-[Inter] text-[16px] font-bold text-white">Sobre</h2>
+          <h2 className="font-[Inter] text-[12px] font-bold text-white md:text-[16px]">Sobre</h2>
           <p className="whitespace-pre-line font-[Inter] text-xs font-medium text-neutral-400">
             {artist.about}
           </p>

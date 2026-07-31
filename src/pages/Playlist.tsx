@@ -153,19 +153,22 @@ function Playlist({ playlist, playlistsKey, onTracksChanged }: PlaylistProps) {
           alt=""
           className="h-[100px] w-[100px] shrink-0 rounded shadow-[0_4px_60px_rgba(0,0,0,0.5)] object-cover md:h-[174px] md:w-[174px]"
         />
-        <div className="flex min-w-0 max-w-[calc(100vw-160px)] flex-col pb-1 md:max-w-none md:pb-2">
+        <div className="flex min-w-0 max-w-[calc(100vw-200px)] flex-col pb-1 md:max-w-none md:pb-2">
           <p className="font-[Inter] text-[10px] font-medium leading-none text-white">
             {isPlaylistPrivate(playlist.id) ? 'Playlist particular' : 'Playlist pública'}
           </p>
-          <h1 className="font-[Inter] mt-2 truncate text-[20px] font-bold leading-none text-white md:mt-9 md:text-[64px] md:font-black">{playlist.name}</h1>
-          <p className="font-[Inter] mt-2 flex flex-wrap items-center gap-x-1.5 gap-y-1 text-[10px] font-bold text-white">
-            <span className="flex items-center gap-1.5">
+          <h1 className="font-[Inter] mt-2 line-clamp-2 break-words text-[20px] font-bold leading-tight text-white md:mt-9 md:line-clamp-none md:truncate md:text-[64px] md:font-black md:leading-none">{playlist.name}</h1>
+          <p className="font-[Inter] mt-2 text-[10px] font-bold leading-tight text-white">
+            <span className="inline-flex items-center gap-1.5 align-middle">
               <img src={profilePhoto} alt="" className="h-4 w-4 rounded-full object-cover" />
               <span className="whitespace-nowrap">Vitoria Tenorio</span>
             </span>
             {!isEmpty && (
-              <span className="whitespace-nowrap font-medium text-[#B3B3B3]">
-                • {musicQtd} músicas, {formatPlaylistDuration(duration)}
+              <span className="font-medium text-[#B3B3B3]">
+                {' '}
+                <span className="whitespace-nowrap">• {musicQtd} músicas</span>
+                ,{' '}
+                <span className="whitespace-nowrap">{formatPlaylistDuration(duration)}</span>
               </span>
             )}
           </p>

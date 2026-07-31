@@ -41,14 +41,23 @@ function Album({ album }: AlbumProps) {
           alt=""
           className="h-[100px] w-[100px] shrink-0 rounded shadow-[0_4px_60px_rgba(0,0,0,0.5)] object-cover md:h-[160px] md:w-[160px]"
         />
-        <div className="flex min-w-0 max-w-[calc(100vw-160px)] flex-col pb-1 md:max-w-none md:pb-2">
+        <div className="flex min-w-0 max-w-[calc(100vw-200px)] flex-col pb-1 md:max-w-none md:pb-2">
           <p className="font-[Inter] text-[10px] font-semibold leading-none text-white md:text-xs">Álbum</p>
-          <h1 className="font-[Inter] mt-2 truncate text-[20px] font-bold leading-none text-white md:text-4xl md:font-black lg:text-7xl">{album.title}</h1>
-          <p className="mt-2 flex flex-wrap items-center gap-x-1.5 gap-y-1 font-[Inter] text-[10px] font-semibold text-white md:mt-3 md:text-xs">
+          <h1 className="font-[Inter] mt-2 line-clamp-2 break-words text-[20px] font-bold leading-tight text-white md:line-clamp-none md:truncate md:text-4xl md:font-black md:leading-none lg:text-7xl">{album.title}</h1>
+          <p className="mt-2 font-[Inter] text-[10px] font-semibold leading-tight text-white md:mt-3 md:text-xs">
             <span className="whitespace-nowrap">{album.artistName}</span>
             {!isEmpty && (
-              <span className="whitespace-nowrap font-normal text-white/80">
-                {album.year ? `• ${album.year} • ` : '• '}{tracks.length} músicas, {formatPlaylistDuration(totalDuration)}
+              <span className="font-normal text-white/80">
+                {' '}
+                {album.year && (
+                  <>
+                    <span className="whitespace-nowrap">• {album.year}</span>
+                    {' '}
+                  </>
+                )}
+                <span className="whitespace-nowrap">• {tracks.length} músicas</span>
+                ,{' '}
+                <span className="whitespace-nowrap">{formatPlaylistDuration(totalDuration)}</span>
               </span>
             )}
           </p>

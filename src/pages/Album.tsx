@@ -31,24 +31,24 @@ function Album({ album }: AlbumProps) {
   const playOpts = { queue: tracks, source: { kind: 'album' as const, album } }
 
   return (
-    <div className="flex h-full flex-col gap-3">
+    <div className="flex h-full min-w-0 flex-col gap-3">
       <div
         onContextMenu={(e) => openAlbumMenu(e, album)}
-        className="-mx-5 -mt-6 flex items-end gap-4 bg-gradient-to-b from-[#535353] to-[#1a1a1a] px-5 pt-10 pb-4"
+        className="-mx-3 -mt-4 flex min-h-[116px] min-w-[360px] shrink-0 items-end gap-3 bg-gradient-to-b from-[#535353] to-[#1a1a1a] px-3 pt-4 pb-4 md:-mx-5 md:-mt-6 md:min-h-0 md:min-w-0 md:gap-4 md:px-5 md:pt-10"
       >
         <img
           src={resolveImageUrl(album.imageUrl) ?? albumCover}
           alt=""
-          className="h-[160px] w-[160px] shrink-0 rounded shadow-[0_4px_60px_rgba(0,0,0,0.5)] object-cover"
+          className="h-[100px] w-[100px] shrink-0 rounded shadow-[0_4px_60px_rgba(0,0,0,0.5)] object-cover md:h-[160px] md:w-[160px]"
         />
-        <div className="flex min-w-0 flex-col pb-2">
-          <p className="text-xs font-semibold leading-none text-white">Álbum</p>
-          <h1 className="mt-2 truncate text-4xl font-bold leading-none text-white sm:text-5xl lg:text-7xl">{album.title}</h1>
-          <p className="mt-3 flex items-center gap-1.5 text-xs font-semibold text-white">
-            {album.artistName}
+        <div className="flex min-w-0 max-w-[calc(100vw-160px)] flex-col pb-1 md:max-w-none md:pb-2">
+          <p className="font-[Inter] text-[10px] font-semibold leading-none text-white md:text-xs">Álbum</p>
+          <h1 className="font-[Inter] mt-2 truncate text-[20px] font-bold leading-none text-white md:text-4xl md:font-black lg:text-7xl">{album.title}</h1>
+          <p className="mt-2 flex flex-wrap items-center gap-x-1.5 gap-y-1 font-[Inter] text-[10px] font-semibold text-white md:mt-3 md:text-xs">
+            <span className="whitespace-nowrap">{album.artistName}</span>
             {!isEmpty && (
-              <span className="font-normal text-white/80">
-                {album.year ? ` • ${album.year}` : ''} • {tracks.length} músicas, {formatPlaylistDuration(totalDuration)}
+              <span className="whitespace-nowrap font-normal text-white/80">
+                {album.year ? `• ${album.year} • ` : '• '}{tracks.length} músicas, {formatPlaylistDuration(totalDuration)}
               </span>
             )}
           </p>
@@ -71,7 +71,7 @@ function Album({ album }: AlbumProps) {
 
       {!isEmpty && (
         <section className="flex flex-col gap-1">
-          <div className="grid grid-cols-[20px_minmax(0,2fr)_60px] items-center gap-3 border-b border-neutral-800 px-2 pb-2 text-xs font-normal text-neutral-400">
+          <div className="hidden grid-cols-[20px_minmax(0,2fr)_60px] items-center gap-3 border-b border-neutral-800 px-2 pb-2 text-xs font-normal text-neutral-400 md:grid">
             <span>#</span>
             <span>Título</span>
             <span className="flex justify-end"><Clock /></span>
@@ -84,19 +84,19 @@ function Album({ album }: AlbumProps) {
                 onContextMenu={(e) =>
                   openSongMenu(e, { music: t, artist, album })
                 }
-                className="grid h-12 cursor-pointer grid-cols-[20px_minmax(0,2fr)_60px] items-center gap-3 rounded px-2 text-xs hover:bg-neutral-900"
+                className="grid h-12 cursor-pointer grid-cols-[20px_minmax(0,1fr)] items-center gap-3 rounded px-2 text-xs hover:bg-neutral-900 md:grid-cols-[20px_minmax(0,2fr)_60px]"
               >
                 <span className="text-neutral-400">{i + 1}</span>
                 <div className="flex min-w-0 items-center gap-2.5">
-                  <img src={resolveImageUrl(t.imageUrl) ?? songCover} alt="" className="h-9 w-9 shrink-0 rounded object-cover" />
+                  <img src={resolveImageUrl(t.imageUrl) ?? songCover} alt="" className="h-10 w-10 shrink-0 rounded object-cover md:h-9 md:w-9" />
                   <div className="min-w-0">
-                    <p className="truncate text-sm font-semibold leading-tight text-white">{t.title}</p>
+                    <p className="truncate font-[Arial,_Helvetica,_sans-serif] text-[12px] font-bold leading-tight text-white md:text-sm md:font-semibold">{t.title}</p>
                     <p className="truncate text-[11px] font-normal leading-tight text-neutral-400">
                       {album.artistName}
                     </p>
                   </div>
                 </div>
-                <p className="text-right text-neutral-400">{formatDuration(t.duration)}</p>
+                <p className="hidden text-right text-neutral-400 md:block">{formatDuration(t.duration)}</p>
               </li>
             ))}
           </ul>

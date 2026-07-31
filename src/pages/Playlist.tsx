@@ -143,28 +143,29 @@ function Playlist({ playlist, playlistsKey, onTracksChanged }: PlaylistProps) {
   }
 
   return (
-    <div className="flex h-full flex-col">
+    <div className="flex h-full min-w-0 flex-col gap-3">
       <div
         onContextMenu={(e) => openPlaylistMenu(e, playlist)}
-        className="-mx-5 -mt-6 flex items-end gap-4 bg-gradient-to-b from-[#938D8E] to-[#3E3939] px-5 pt-10 pb-4"
+        className="-mx-3 -mt-4 flex min-h-[116px] min-w-[360px] shrink-0 items-end gap-3 bg-gradient-to-b from-[#938D8E] to-[#3E3939] px-3 pt-4 pb-4 md:-mx-5 md:-mt-6 md:min-h-0 md:min-w-0 md:gap-4 md:px-5 md:pt-10"
       >
         <img
           src={isEmpty ? noCoverPlaylist : cover}
           alt=""
-          className="h-[174px] w-[174px] shrink-0 rounded shadow-[0_4px_60px_rgba(0,0,0,0.5)] object-cover"
+          className="h-[100px] w-[100px] shrink-0 rounded shadow-[0_4px_60px_rgba(0,0,0,0.5)] object-cover md:h-[174px] md:w-[174px]"
         />
-        <div className="flex min-w-0 flex-col pb-2">
+        <div className="flex min-w-0 max-w-[calc(100vw-160px)] flex-col pb-1 md:max-w-none md:pb-2">
           <p className="font-[Inter] text-[10px] font-medium leading-none text-white">
             {isPlaylistPrivate(playlist.id) ? 'Playlist particular' : 'Playlist pública'}
           </p>
-          <h1 className="font-[Inter] mt-9 truncate text-[64px] font-black leading-none text-white">{playlist.name}</h1>
-          <p className="font-[Inter] mt-2 flex items-center gap-1.5 text-[10px] font-bold text-white">
-            <img src={profilePhoto} alt="" className="h-4 w-4 rounded-full object-cover" />
-            Vitoria Tenorio
+          <h1 className="font-[Inter] mt-2 truncate text-[20px] font-bold leading-none text-white md:mt-9 md:text-[64px] md:font-black">{playlist.name}</h1>
+          <p className="font-[Inter] mt-2 flex flex-wrap items-center gap-x-1.5 gap-y-1 text-[10px] font-bold text-white">
+            <span className="flex items-center gap-1.5">
+              <img src={profilePhoto} alt="" className="h-4 w-4 rounded-full object-cover" />
+              <span className="whitespace-nowrap">Vitoria Tenorio</span>
+            </span>
             {!isEmpty && (
-              <span className="font-medium text-[#B3B3B3]">
-                {' • '}
-                {musicQtd} músicas, {formatPlaylistDuration(duration)}
+              <span className="whitespace-nowrap font-medium text-[#B3B3B3]">
+                • {musicQtd} músicas, {formatPlaylistDuration(duration)}
               </span>
             )}
           </p>
@@ -172,7 +173,7 @@ function Playlist({ playlist, playlistsKey, onTracksChanged }: PlaylistProps) {
       </div>
 
       {!isEmpty && (
-        <div className="flex h-[108px] items-center">
+        <div className="flex items-center">
           <button
             onClick={handlePlayAll}
             className="grid h-9 w-9 place-items-center rounded-full bg-[#1FDF64] text-black transition hover:scale-105"
@@ -191,7 +192,7 @@ function Playlist({ playlist, playlistsKey, onTracksChanged }: PlaylistProps) {
       ) : (
         <>
           <section className="flex flex-col gap-1">
-            <div className="font-[Inter] grid grid-cols-[20px_minmax(0,2fr)_minmax(0,1.5fr)_minmax(0,1.5fr)_60px_24px] items-center gap-3 border-b border-neutral-800 px-4 pb-2 text-[10px] font-medium text-[#B3B3B3]">
+            <div className="font-[Inter] hidden grid-cols-[20px_minmax(0,2fr)_minmax(0,1.5fr)_minmax(0,1.5fr)_60px_24px] items-center gap-3 border-b border-neutral-800 px-4 pb-2 text-[10px] font-medium text-[#B3B3B3] md:grid">
               <span>#</span>
               <span>Título</span>
               <span>Álbum</span>
@@ -221,7 +222,7 @@ function Playlist({ playlist, playlistsKey, onTracksChanged }: PlaylistProps) {
                         playlistPosition: i,
                       })
                     }
-                    className={`grid h-[52px] cursor-pointer grid-cols-[20px_minmax(0,2fr)_minmax(0,1.5fr)_minmax(0,1.5fr)_60px_24px] items-center gap-3 rounded px-4 py-2 hover:bg-[#2A2A2A] ${
+                    className={`grid h-[52px] cursor-pointer grid-cols-[20px_minmax(0,1fr)_24px] items-center gap-3 rounded px-2 py-2 hover:bg-[#2A2A2A] md:grid-cols-[20px_minmax(0,2fr)_minmax(0,1.5fr)_minmax(0,1.5fr)_60px_24px] md:px-4 ${
                       dragSrc === i ? 'opacity-40' : ''
                     } ${
                       dragOver === i && dragSrc !== null && dragSrc !== i
@@ -231,17 +232,17 @@ function Playlist({ playlist, playlistsKey, onTracksChanged }: PlaylistProps) {
                   >
                     <span className="font-[Inter] text-[10px] font-medium text-[#B3B3B3]">{i + 1}</span>
                     <div className="flex min-w-0 items-center gap-2.5">
-                      <img src={resolveImageUrl(t.imageUrl) ?? songCover} alt="" className="h-9 w-9 shrink-0 rounded-[2px] object-cover" />
+                      <img src={resolveImageUrl(t.imageUrl) ?? songCover} alt="" className="h-10 w-10 shrink-0 rounded-[2px] object-cover md:h-9 md:w-9" />
                       <div className="min-w-0">
-                        <p className="font-[Arial] truncate text-[10px] font-bold leading-tight text-white">{t.title}</p>
+                        <p className="font-[Arial] truncate text-[12px] font-bold leading-tight text-white md:text-[10px]">{t.title}</p>
                         <p className="font-[Arial] truncate text-[10px] font-bold leading-tight text-[#B3B3B3]">
                           {artist?.name ?? 'Artista'}
                         </p>
                       </div>
                     </div>
-                    <p className="font-[Inter] truncate text-[10px] font-bold text-[#B3B3B3]">{album?.title ?? '—'}</p>
-                    <p className="font-[Inter] truncate text-[10px] font-medium text-[#B3B3B3]">{formatPtDate(t.createdAt)}</p>
-                    <p className="font-[Inter] text-right text-[10px] font-medium text-[#B3B3B3]">{formatDuration(t.duration)}</p>
+                    <p className="hidden font-[Inter] truncate text-[10px] font-bold text-[#B3B3B3] md:block">{album?.title ?? '—'}</p>
+                    <p className="hidden font-[Inter] truncate text-[10px] font-medium text-[#B3B3B3] md:block">{formatPtDate(t.createdAt)}</p>
+                    <p className="hidden font-[Inter] text-right text-[10px] font-medium text-[#B3B3B3] md:block">{formatDuration(t.duration)}</p>
                     <button
                       onClick={(e) => {
                         e.stopPropagation()

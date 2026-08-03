@@ -216,10 +216,10 @@ function SearchResults({ query, onArtistClick, onPlaylistClick, onAlbumClick }: 
                 openAlbumMenu(e, r.album)
               }
             }}
-            className="group flex h-[60px] w-full min-w-0 max-w-[948px] cursor-pointer items-center gap-2 rounded px-1 hover:bg-[#2D2D2D] md:gap-0 md:px-0"
+            className="group flex min-h-[56px] w-full min-w-0 max-w-[948px] cursor-pointer items-center gap-2 rounded px-1 hover:bg-[#2D2D2D] md:h-[60px] md:min-h-0 md:gap-0 md:px-0"
           >
-            <div className="flex h-[60px] min-w-0 flex-1 items-center gap-3 md:w-[358px] md:max-w-[358px] md:flex-none">
-              <div className={`relative h-[60px] w-[60px] shrink-0 overflow-hidden ${shape}`}>
+            <div className="flex min-h-[56px] min-w-0 flex-1 items-center gap-3 md:h-[60px] md:w-[358px] md:max-w-[358px] md:min-h-0 md:flex-none">
+              <div className={`relative h-12 w-12 shrink-0 overflow-hidden md:h-[60px] md:w-[60px] ${shape}`}>
                 <img src={remote ?? fallback} alt="" className="h-full w-full object-cover" />
                 <div className="pointer-events-none absolute inset-0 hidden items-center justify-center bg-black/30 group-hover:flex">
                   <svg viewBox="0 0 24 24" fill="white" className="h-6 w-6">
@@ -227,12 +227,32 @@ function SearchResults({ query, onArtistClick, onPlaylistClick, onAlbumClick }: 
                   </svg>
                 </div>
               </div>
-              <div className="flex min-w-0 flex-col justify-center">
-                <p className="truncate text-left font-[Inter] text-[14px] font-bold text-white md:text-[16px]">
+              <div className="flex min-w-0 max-w-[calc(100vw-170px)] flex-col justify-center py-1 md:max-w-none md:py-0">
+                <p className="line-clamp-2 break-words text-left font-[Inter] text-[13px] font-bold leading-tight text-white md:line-clamp-none md:truncate md:text-[16px] md:leading-normal">
                   {r.title}
                 </p>
-                <p className="truncate font-[Inter] text-[10px] font-bold text-[#B3B3B3]">
-                  {r.sub}
+                <p className="font-[Inter] text-[10px] font-bold leading-tight text-[#B3B3B3] md:truncate md:leading-normal">
+                  {r.pill === 'Música' && artistById.get(r.music.artistId)?.name ? (
+                    <>
+                      <span className="whitespace-nowrap">Música</span>
+                      {' '}
+                      <span className="whitespace-nowrap">• {artistById.get(r.music.artistId)!.name}</span>
+                    </>
+                  ) : r.pill === 'Playlist' && r.playlist.description ? (
+                    <>
+                      <span className="whitespace-nowrap">Playlist</span>
+                      {' '}
+                      <span className="whitespace-nowrap">• {r.playlist.description}</span>
+                    </>
+                  ) : r.pill === 'Álbum' ? (
+                    <>
+                      <span className="whitespace-nowrap">Álbum</span>
+                      {' '}
+                      <span className="whitespace-nowrap">• {r.album.artistName}</span>
+                    </>
+                  ) : (
+                    r.sub
+                  )}
                 </p>
               </div>
             </div>

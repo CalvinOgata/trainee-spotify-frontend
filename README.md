@@ -52,7 +52,7 @@ O Vite abre em **http://localhost:5173** com HMR (hot module replacement) ativad
 - 🟦 **TypeScript** com project references (`tsconfig.app.json` para o app, `tsconfig.node.json` para tooling)
 - ⚡ **Vite 8** — build tool e dev server (com proxy `/api/*` → backend)
 - 🎨 **Tailwind CSS v4** via `@tailwindcss/vite` (sem `tailwind.config.js`, sem PostCSS — customização de tema mora inline em `@theme { ... }` no CSS)
-- 🔠 **Poppins** (via `@fontsource/poppins`) como fonte padrão
+- 🔠 **Inter** como fonte principal (carregada pelo Google Fonts no `index.html`, registrada como `--font-sans` no `index.css` e aplicada explicitamente via `font-[Inter]` na maioria dos elementos)
 - 🧹 **ESLint** com flat config + `typescript-eslint` + `eslint-plugin-react-hooks` + `eslint-plugin-react-refresh`
 
 ---
